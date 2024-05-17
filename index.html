@@ -8,25 +8,29 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #2e2e2e;
+            background-color: #0c0414;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             font-family: Arial, sans-serif;
+            position: relative;
         }
         h1 {
             color: #800080;
             font-size: 5rem;
-            position: relative;
+            position: absolute;
             z-index: 1;
+            animation: pulse 1s infinite;
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #800080, 0 0 40px #800080, 0 0 50px #800080, 0 0 60px #800080, 0 0 70px #800080;
         }
         .stars {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: transparent;
+            top: 0;
+            left: 0;
             overflow: hidden;
         }
         .star {
@@ -34,19 +38,8 @@
             height: 2px;
             background: white;
             position: absolute;
-            top: 0;
-            left: 0;
-            animation: moveStars 10s linear infinite;
-        }
-        @keyframes moveStars {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) translateX(100vw);
-                opacity: 0;
-            }
+            top: 50%;
+            left: 50%;
         }
     </style>
 </head>
@@ -55,19 +48,70 @@
     <h1>[WEBSITE]</h1>
 
     <script>
-        function createStar() {
-            const star = document.createElement("div");
-            star.classList.add("star");
-            star.style.left = Math.random() * 100 + "vw";
-            star.style.animationDuration = Math.random() * 10 + 5 + "s";
-            document.querySelector(".stars").appendChild(star);
+        const starsContainer = document.querySelector('.stars');
+        const numStars = 200;
+        var speed = 0.001; // Speed factor
+        var fontSize = 5; // Font size
 
-            setTimeout(() => {
-                star.remove();
-            }, 15000);
+        // use mousewheel to change speed
+        document.addEventListener('wheel', function(e) {
+            if (e.deltaY > 0) {
+                speed *= 0.9;
+                fontSize *= 0.9;
+                document.querySelector('h1').style.fontSize = fontSize + 'rem';
+            } else {
+                speed *= 1.1;
+                fontSize *= 1.1;
+                document.querySelector('h1').style.fontSize = fontSize + 'rem';
+            }
+        });
+
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = Math.random() * 50;
+            star.style.transform = `translate(${Math.cos(angle) * distance}vw, ${Math.sin(angle) * distance}vh)`;
+
+            star.dataset.angle = angle;
+            star.dataset.distance = distance;
+            star.dataset.speed = speed;
+
+            starsContainer.appendChild(star);
         }
 
-        setInterval(createStar, 100);
+        function updateStars() {
+            const stars = document.querySelectorAll('.star');
+
+            stars.forEach(star => {
+                let angle = parseFloat(star.dataset.angle);
+                let distance = parseFloat(star.dataset.distance);
+                const speed = parseFloat(star.dataset.speed);
+
+                distance += speed * distance * distance;
+
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+
+                star.style.transform = `translate(${x}vw, ${y}vh)`;
+                star.dataset.distance = distance;
+
+                if (distance > 100) {
+                    star.remove();
+                    createStar();
+                }
+            });
+
+
+            requestAnimationFrame(updateStars);
+        }
+
+        for (let i = 0; i < numStars; i++) {
+            createStar();
+        }
+
+        updateStars();
     </script>
 </body>
 </html>
