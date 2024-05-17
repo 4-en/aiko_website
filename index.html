@@ -71,7 +71,7 @@
             star.classList.add('star');
 
             const angle = Math.random() * 2 * Math.PI;
-            const distance = Math.random() * 50;
+            const distance = Math.random() * 50 + 0.8;
             star.style.transform = `translate(${Math.cos(angle) * distance}vw, ${Math.sin(angle) * distance}vh)`;
 
             star.dataset.angle = angle;
