@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2e2e2e;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #800080;
+            font-size: 5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: hidden;
+        }
+        .star {
+            width: 2px;
+            height: 2px;
+            background: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: moveStars 10s linear infinite;
+        }
+        @keyframes moveStars {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(100vw);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <h1>[WEBSITE]</h1>
+
+    <script>
+        function createStar() {
+            const star = document.createElement("div");
+            star.classList.add("star");
+            star.style.left = Math.random() * 100 + "vw";
+            star.style.animationDuration = Math.random() * 10 + 5 + "s";
+            document.querySelector(".stars").appendChild(star);
+
+            setTimeout(() => {
+                star.remove();
+            }, 15000);
+        }
+
+        setInterval(createStar, 100);
+    </script>
+</body>
+</html>
