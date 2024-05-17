@@ -76,7 +76,8 @@
 
             star.dataset.angle = angle;
             star.dataset.distance = distance;
-            star.dataset.speed = speed;
+            star.dataset.speed = speed * (0.2 + Math.random());
+            star.dataset.baseSize = 0.5 + Math.random() * 2;
 
             starsContainer.appendChild(star);
         }
@@ -89,13 +90,20 @@
                 let distance = parseFloat(star.dataset.distance);
                 const speed = parseFloat(star.dataset.speed);
 
-                distance += speed * distance * distance;
+                distance += speed * distance * distance 
 
                 const x = Math.cos(angle) * distance;
                 const y = Math.sin(angle) * distance;
 
                 star.style.transform = `translate(${x}vw, ${y}vh)`;
                 star.dataset.distance = distance;
+
+                const relSpeed = speed / 0.0005;
+
+                // update size based on distance
+                const size = star.dataset.baseSize * (1 + 0.01 * distance) * (relSpeed);
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
 
                 if (distance > 100) {
                     star.remove();
