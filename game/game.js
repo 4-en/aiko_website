@@ -155,6 +155,9 @@ function updateDynamites() {
 
             // clear dynamites
             dynamites = [];
+
+            // clear stars
+            stars = [];
         }
     });
 }
