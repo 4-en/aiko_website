@@ -1,18 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store</title>
-    <style>
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0c0414;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: top;
+      height: 100vh;
+      font-family: apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      position: relative;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      color: #ad83b3;
+      text-decoration: none;
+      background-color: transparent;
+      z-index: 1;
+      display: flex;
+      justify-content: space-evenly;
+      padding: 10px 20px;
+    }
+
+    .inner-navbar {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .inner-navbar a {
+      color: #c89ece;
+      border-color: transparent;
+      border-width: 2px;
+      border-style: solid;
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 1.5rem;
+    }
+
+    .inner-navbar a:hover {
+      border-color: #c89ece;
+    }
+
+    .root {
+      margin: 100px;
+      padding: 24px;
+      display: flex;
+      justify-content: top;
+      align-items: left;
+      flex-direction: column;
+      max-width: 1200px;
+      width: 95%;
+      color: #eeccff;
+      background-color: #20162a;
+      border-radius: 20px;
+    }
+
+    h1 {
+      color: #eeccff;
+      padding: 0;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .store {
+      margin-top: 40px;
+      display: flex;
+      justify-content: top;
+      align-items: center;
+      flex-direction: column;
+      width: 100%;
+      background-color: transparent;
+    }
+
+  </style>
 </head>
+
 <body>
-    <div class="root">
+  <div class="navbar">
+    <div class="inner-navbar">
+      <a href="/">Home</a>
+      <a href="/chat/">Chat</a>
+      <a href="/store/">Store</a>
+      <a href="/more/">More</a>
+    </div>
+  </div>
+  <div class="root">
+    <h1>Aiko's Premium Store</h1>
+    <div class="store">
       <div id="my-store-104263097"></div>
       <div>
-        <script data-cfasync="false" type="text/javascript" src="https://app.ecwid.com/script.js?104263097&data_platform=code&data_date=2024-05-18" charset="utf-8"></script><script type="text/javascript"> xProductBrowser("categoriesPerRow=3","views=grid(20,3) list(60) table(60)","categoryView=grid","searchView=list","id=my-store-104263097");</script>
+        <script data-cfasync="false" type="text/javascript"
+          src="https://app.ecwid.com/script.js?104263097&data_platform=code&data_date=2024-05-18"
+          charset="utf-8"></script>
+        <script
+          type="text/javascript"> xProductBrowser("categoriesPerRow=3", "views=grid(20,3) list(60) table(60)", "categoryView=grid", "searchView=list", "id=my-store-104263097");</script>
       </div>
     </div>
+  </div>
 </body>
+
 </html>
