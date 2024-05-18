@@ -8,7 +8,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-let player, stars, lastStarDrop, score, lives, gameOver, keys;
+let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites;
 
 function initializeGame() {
     player = {
@@ -27,12 +27,19 @@ function initializeGame() {
     player.flipped_image.src = 'gnome-child-flipped.png';
     player.normal_image.src = 'gnome-child.png';
 
+    dynamite_img = new Image();
+    dynamite_img.src = 'Dynamite.webp';
+    dynamites = [];
+
+
     stars = [];
     lastStarDrop = Date.now();
     score = 0;
     lives = 3;
     gameOver = false;
     keys = {};
+
+    hatStack = [];
 
     player.image.onload = () => {
         draw();
@@ -63,12 +70,26 @@ starImage.src = 'phat.webp'; // Replace with the actual path to your star image
 
 const starFrequency = 1000; // Time in ms between star drops
 
-function drawFoxGirl() {
+function drawPlayer() {
     ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+
+    // draw the hat stack on top of the player
+    let x = player.x + 20;
+    let y = player.y - 10;
+    for (let i = 0; i < hatStack.length; i++) {
+        const image = new Image();
+        image.src = hatStack[i];
+        ctx.drawImage(image, x, y, 50, 50);
+        y -= 20;
+    }
 }
 
 function drawStar(star) {
     ctx.drawImage(star.image, star.x, star.y, star.width, star.height);
+}
+
+function drawDynamite(dynamite) {
+    ctx.drawImage(dynamite.image, dynamite.x, dynamite.y, dynamite.width, dynamite.height);
 }
 
 function createStar() {
@@ -78,9 +99,47 @@ function createStar() {
         width: 50,
         height: 50,
         dy: 3,
-        image: starVariants[Math.floor(Math.random() * starVariants.length)]
+        image: starVariants[Math.floor(Math.random() * starVariants.length)],
+        points: 1
     };
     stars.push(star);
+}
+
+function createDynamite() {
+    const dynamite = {
+        x: Math.random() * (canvas.width - 20),
+        y: 0,
+        width: 50,
+        height: 50,
+        dy: 3,
+        image: dynamite_img,
+        points: 1
+    };
+    dynamites.push(dynamite);
+}
+
+function updateDynamites() {
+    dynamites.forEach((dynamite, index) => {
+        dynamite.y += dynamite.dy;
+        if (dynamite.y + dynamite.height > canvas.height) {
+            dynamites.splice(index, 1);
+            
+        }
+        if (dynamite.x < player.x + player.width &&
+            dynamite.x + dynamite.width > player.x &&
+            dynamite.y < player.y + player.height &&
+            dynamite.y + dynamite.height > player.y - hatStack.length * 20) {
+            dynamites.splice(index, 1);
+
+            // damage the player
+            lives--;
+            if (lives <= 0) {
+                gameOver = true;
+            }
+            // clear the hat stack
+            hatStack = [];
+        }
+    });
 }
 
 function updateStars() {
@@ -96,9 +155,12 @@ function updateStars() {
         if (star.x < player.x + player.width &&
             star.x + star.width > player.x &&
             star.y < player.y + player.height &&
-            star.y + star.height > player.y) {
+            star.y + star.height > player.y - hatStack.length * 20) {
             stars.splice(index, 1);
             score++;
+
+            // add the hat to the stack
+            hatStack.push(star.image.src);
         }
     });
 }
@@ -136,8 +198,9 @@ function getHighScore() {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawFoxGirl();
+    drawPlayer();
     stars.forEach(drawStar);
+    dynamites.forEach(drawDynamite);
     ctx.fillStyle = 'white';
     ctx.font = '30px Arial';
     ctx.fillText(`Score: ${score}`, 20, 50);
@@ -169,10 +232,16 @@ function draw() {
 
 function update() {
     if (Date.now() - lastStarDrop > starFrequency) {
-        createStar();
+        let chance = Math.random();
+        if (chance < 0.2) {
+            createDynamite();
+        } else {
+            createStar();
+        }
         lastStarDrop = Date.now();
     }
     updateStars();
+    updateDynamites();
     movePlayer();
     if (!gameOver) {
         requestAnimationFrame(update);
