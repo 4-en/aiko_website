@@ -122,7 +122,7 @@ function updateDynamites() {
     dynamites.forEach((dynamite, index) => {
         dynamite.y += dynamite.dy;
         if (dynamite.y + dynamite.height > canvas.height) {
-            dynamites.splice(index, 1);
+            dynamite.y = canvas.height - dynamite.height;
             
         }
         if (dynamite.x < player.x + player.width &&
