@@ -8,7 +8,20 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites;
+function RandomGenerator(seed) {
+    this.seed = seed;
+    this.state = seed;
+    this.a = 1664525;
+    this.c = 1013904223;
+    this.m = Math.pow(2, 32);
+
+    this.next = function () {
+        this.state = (this.a * this.state + this.c) % this.m;
+        return this.state;
+    }
+}
+
+let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator;
 
 function initializeGame() {
     player = {
@@ -41,6 +54,9 @@ function initializeGame() {
 
     hatStack = [];
 
+    // set random seed
+    generator = new RandomGenerator(123);
+
     player.image.onload = () => {
         draw();
         update();
@@ -53,10 +69,7 @@ const starSources = [
     "Green_partyhat.webp",
     "Purple_partyhat.webp",
     "Red_partyhat.webp",
-    "Yellow_partyhat.webp",
-    "White_partyhat.webp",
-    "Rainbow_partyhat.webp"
-
+    "Yellow_partyhat.webp"
 ];
 
 starSources.forEach(source => {
@@ -93,13 +106,15 @@ function drawDynamite(dynamite) {
 }
 
 function createStar() {
+    let idx = Math.floor(generator.next() / generator.m * starVariants.length);
     const star = {
-        x: Math.random() * (canvas.width - 20),
+        x: generator.next() / generator.m * (canvas.width - 20),
         y: 0,
         width: 50,
         height: 50,
         dy: 3,
-        image: starVariants[Math.floor(Math.random() * starVariants.length)],
+        idx: idx,
+        image: starVariants[idx],
         points: 1
     };
     stars.push(star);
@@ -107,7 +122,7 @@ function createStar() {
 
 function createDynamite() {
     const dynamite = {
-        x: Math.random() * (canvas.width - 20),
+        x: generator.next() / generator.m * (canvas.width - 20),
         y: 0,
         width: 50,
         height: 50,
@@ -123,7 +138,7 @@ function updateDynamites() {
         dynamite.y += dynamite.dy;
         if (dynamite.y + dynamite.height > canvas.height) {
             dynamite.y = canvas.height - dynamite.height;
-            
+
         }
         if (dynamite.x < player.x + player.width &&
             dynamite.x + dynamite.width > player.x &&
@@ -138,8 +153,29 @@ function updateDynamites() {
             }
             // clear the hat stack
             hatStack = [];
+
+            // clear dynamites
+            dynamites = [];
         }
     });
+}
+
+function checkPhatSet() {
+    // check if hats contain a full set of stars
+    let idxs = hatStack.map(hat => hat.idx);
+    let set = new Set(idxs);
+    if (set.size === starSources.length) {
+        // clear the hat stack
+        hatStack = [];
+
+        // clear dynamites
+        dynamites = [];
+
+        if (lives < 3) {
+            lives++;
+        }
+    }
+
 }
 
 function updateStars() {
@@ -161,6 +197,9 @@ function updateStars() {
 
             // add the hat to the stack
             hatStack.push(star.image.src);
+
+            // check if the player has collected a full set of stars
+            checkPhatSet();
         }
     });
 }
@@ -169,7 +208,7 @@ function movePlayer() {
     if ((keys['ArrowLeft'] || keys['a']) && player.x > 0) {
         player.x -= player.dx;
         // flip the player image
-        if(!player.isFlipped){
+        if (!player.isFlipped) {
             player.image = player.flipped_image;
             player.isFlipped = true;
         }
@@ -178,7 +217,7 @@ function movePlayer() {
     if ((keys['ArrowRight'] || keys['d']) && player.x + player.width < canvas.width) {
         player.x += player.dx;
         // flip the player image
-        if(player.isFlipped){
+        if (player.isFlipped) {
             player.image = player.normal_image;
             player.isFlipped = false;
         }
@@ -232,7 +271,7 @@ function draw() {
 
 function update() {
     if (Date.now() - lastStarDrop > starFrequency) {
-        let chance = Math.random();
+        let chance = generator.next() / generator.m;
         if (chance < 0.2) {
             createDynamite();
         } else {
