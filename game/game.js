@@ -90,8 +90,7 @@ function drawPlayer() {
     let x = player.x + 20;
     let y = player.y - 10;
     for (let i = 0; i < hatStack.length; i++) {
-        const image = new Image();
-        image.src = hatStack[i];
+        const image = hatStack[i].image;
         ctx.drawImage(image, x, y, 50, 50);
         y -= 20;
     }
@@ -162,6 +161,7 @@ function updateDynamites() {
 
 function checkPhatSet() {
     // check if hats contain a full set of stars
+    // use star.idx
     let idxs = hatStack.map(hat => hat.idx);
     let set = new Set(idxs);
     if (set.size === starSources.length) {
@@ -196,8 +196,7 @@ function updateStars() {
             score++;
 
             // add the hat to the stack
-            hatStack.push(star.image.src);
-
+            hatStack.push(star);
             // check if the player has collected a full set of stars
             checkPhatSet();
         }
