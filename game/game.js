@@ -171,9 +171,7 @@ function checkPhatSet() {
         // clear dynamites
         dynamites = [];
 
-        if (lives < 3) {
-            lives++;
-        }
+        lifes++;
     }
 
 }
@@ -246,7 +244,7 @@ function draw() {
     for (let i = 0; i < lives; i++) {
         hearts += '❤️';
     }
-    ctx.fillText(hearts, canvas.width - 150, 50);
+    ctx.fillText(hearts, canvas.width - lives * 41 - 30, 50);
 
     if (gameOver) {
         ctx.fillStyle = 'red';
@@ -269,7 +267,7 @@ function draw() {
 }
 
 function update() {
-    if (Date.now() - lastStarDrop > starFrequency) {
+    if (Date.now() - lastStarDrop > starFrequency - Math.min(score * 2, 500)) {
         let chance = generator.next() / generator.m;
         if (chance < 0.2) {
             createDynamite();
