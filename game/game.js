@@ -126,6 +126,8 @@ function drawDynamite(dynamite) {
     ctx.drawImage(dynamite.image, dynamite.x, dynamite.y, dynamite.width, dynamite.height);
 }
 
+
+
 function createStar() {
     let weights = [1, 1, 1, 1, 1, 1];
     for (let i = 0; i < hatStack.length; i++) {
@@ -141,7 +143,7 @@ function createStar() {
             break;
         }
     }
-    
+
     const star = {
         x: generator.next() / generator.m * (canvas.width - 20),
         y: 0,
@@ -309,6 +311,27 @@ function getHighScore() {
     return localStorage.getItem('highScore') || 0;
 }
 
+function drawHatProgress() {
+    let x = 20;
+    let y = 100;
+    let dy = 60;
+    
+    // draw ui overview of collected hats
+    // draw hat regularly if collected, draw with less opacity if not
+    for (let i = 0; i < starSources.length; i++) {
+        let image = starVariants[i];
+        let opacity = 1;
+        if (!hatStack.some(hat => hat.idx === i)) {
+            opacity = 0.1;
+        }
+        ctx.globalAlpha = opacity;
+        ctx.drawImage(image, x, y, 50, 50);
+        ctx.globalAlpha = 1;
+        y += dy;
+    }
+}
+
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPlayer();
@@ -322,6 +345,8 @@ function draw() {
         hearts += '❤️';
     }
     ctx.fillText(hearts, canvas.width - lives * 41 - 30, 50);
+
+    drawHatProgress();
 
     if (gameOver) {
         ctx.fillStyle = 'red';
