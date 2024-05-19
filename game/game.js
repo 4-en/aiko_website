@@ -21,7 +21,7 @@ function RandomGenerator(seed) {
     }
 }
 
-let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator;
+let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator, hit_sound, death_sound, music, catch_sound;
 
 function initializeGame() {
     player = {
@@ -43,6 +43,12 @@ function initializeGame() {
     dynamite_img = new Image();
     dynamite_img.src = 'Dynamite.webp';
     dynamites = [];
+
+    hit_sound = new Audio('hit-sound.mp3');
+    death_sound = new Audio('runescape-death-sound.mp3');
+    music = new Audio('Sea_Shanty_2.ogg');
+    music.loop = true;
+    music.play();
 
 
     stars = [];
@@ -147,8 +153,11 @@ function updateDynamites() {
 
             // damage the player
             lives--;
+            hit_sound.play();
             if (lives <= 0) {
                 gameOver = true;
+                death_sound.play();
+                music.pause();
             }
             // clear the hat stack
             hatStack = [];
@@ -185,8 +194,11 @@ function updateStars() {
         if (star.y + star.height > canvas.height) {
             stars.splice(index, 1);
             lives--;
+            hit_sound.play();
             if (lives <= 0) {
                 gameOver = true;
+                death_sound.play();
+                music.pause();
             }
         }
         if (star.x < player.x + player.width &&
