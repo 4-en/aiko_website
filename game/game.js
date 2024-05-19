@@ -4,6 +4,20 @@ const ctx = canvas.getContext('2d');
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    // adjust resolution for mobile
+    if (window.innerWidth < 720) {
+        canvas.width = 720;
+        let aspectRatio = window.innerWidth / window.innerHeight;
+        canvas.height = 720 / aspectRatio;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+    } else {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.width = '';
+        canvas.style.height = '';
+    }
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
