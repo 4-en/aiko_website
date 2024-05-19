@@ -34,7 +34,6 @@ function RandomGenerator(seed) {
         return this.state;
     }
 }
-
 let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator, hit_sound, death_sound, music, catch_sound, tilt;
 
 function initializeGame() {
@@ -336,7 +335,7 @@ document.addEventListener('keyup', (e) => keys[e.key] = false);
 // if on mobile, use tilt controls
 window.addEventListener('deviceorientation', (e) => {
     // set tilt between -1 and 1
-    const maxAngle = 30;
+    const maxAngle = 18;
     tilt = e.gamma / maxAngle;
     if (tilt < -1) {
         tilt = -1;
