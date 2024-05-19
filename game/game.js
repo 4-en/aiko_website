@@ -91,7 +91,6 @@ const starSources = [
     "Purple_partyhat.webp",
     "Red_partyhat.webp",
     "Yellow_partyhat.webp",
-    "White_partyhat.webp",
     "Rainbow_partyhat.webp"
 ];
 
@@ -128,7 +127,21 @@ function drawDynamite(dynamite) {
 }
 
 function createStar() {
-    let idx = Math.floor(generator.next() / generator.m * starVariants.length);
+    let weights = [1, 1, 1, 1, 1, 1];
+    for (let i = 0; i < hatStack.length; i++) {
+        weights[hatStack[i].idx] = 0.3;
+    }
+    let idx = 0;
+    let total = weights.reduce((a, b) => a + b, 0);
+    let random = generator.next() / generator.m * total;
+    for (let i = 0; i < weights.length; i++) {
+        random -= weights[i];
+        if (random <= 0) {
+            idx = i;
+            break;
+        }
+    }
+    
     const star = {
         x: generator.next() / generator.m * (canvas.width - 20),
         y: 0,
@@ -140,7 +153,7 @@ function createStar() {
         points: 1
     };
 
-    if (idx === 6) {
+    if (idx === 5) {
         star.points = 5;
     }
 
