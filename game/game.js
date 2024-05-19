@@ -90,7 +90,9 @@ const starSources = [
     "Green_partyhat.webp",
     "Purple_partyhat.webp",
     "Red_partyhat.webp",
-    "Yellow_partyhat.webp"
+    "Yellow_partyhat.webp",
+    "White_partyhat.webp",
+    "Rainbow_partyhat.webp"
 ];
 
 starSources.forEach(source => {
@@ -137,6 +139,11 @@ function createStar() {
         image: starVariants[idx],
         points: 1
     };
+
+    if (idx === 6) {
+        star.points = 5;
+    }
+
     stars.push(star);
 }
 
@@ -225,7 +232,7 @@ function updateStars(dt) {
             star.y < player.y + player.height &&
             star.y + star.height > player.y - hatStack.length * 20) {
             stars.splice(index, 1);
-            score++;
+            score+=star.points;
 
             // add the hat to the stack
             hatStack.push(star);
