@@ -42,7 +42,7 @@ function initializeGame() {
         y: canvas.height - 100,
         width: 90,
         height: 110,
-        dx: 7,
+        dx: 7 / 1440 * canvas.width,
         image: new Image(),
         normal_image: new Image(),
         flipped_image: new Image(),
