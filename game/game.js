@@ -42,7 +42,7 @@ function initializeGame() {
         y: canvas.height - 100,
         width: 90,
         height: 110,
-        dx: 7 / 1440 * canvas.width,
+        dx: 0.5 * canvas.width,
         image: new Image(),
         normal_image: new Image(),
         flipped_image: new Image(),
@@ -131,7 +131,7 @@ function createStar() {
         y: 0,
         width: 50,
         height: 50,
-        dy: 3,
+        dy: 180,
         idx: idx,
         image: starVariants[idx],
         points: 1
@@ -145,16 +145,16 @@ function createDynamite() {
         y: 0,
         width: 50,
         height: 50,
-        dy: 3,
+        dy: 140,
         image: dynamite_img,
         points: 1
     };
     dynamites.push(dynamite);
 }
 
-function updateDynamites() {
+function updateDynamites(dt) {
     dynamites.forEach((dynamite, index) => {
-        dynamite.y += dynamite.dy;
+        dynamite.y += dynamite.dy * dt;
         if (dynamite.y + dynamite.height > canvas.height) {
             dynamite.y = canvas.height - dynamite.height;
 
@@ -202,9 +202,9 @@ function checkPhatSet() {
 
 }
 
-function updateStars() {
+function updateStars(dt) {
     stars.forEach((star, index) => {
-        star.y += star.dy;
+        star.y += star.dy * dt;
         if (star.y + star.height > canvas.height) {
             stars.splice(index, 1);
             lives--;
@@ -230,9 +230,9 @@ function updateStars() {
     });
 }
 
-function movePlayer() {
+function movePlayer(dt) {
     if ((keys['ArrowLeft'] || keys['a']) && player.x > 0) {
-        player.x -= player.dx;
+        player.x -= player.dx * dt;
         // flip the player image
         if (!player.isFlipped) {
             player.image = player.flipped_image;
@@ -241,7 +241,7 @@ function movePlayer() {
 
     }
     if ((keys['ArrowRight'] || keys['d']) && player.x + player.width < canvas.width) {
-        player.x += player.dx;
+        player.x += player.dx * dt;
         // flip the player image
         if (player.isFlipped) {
             player.image = player.normal_image;
@@ -250,12 +250,24 @@ function movePlayer() {
     }
 
     if (tilt !== 0) {
-        player.x += player.dx * tilt;
+        player.x += player.dx * tilt * dt;
         if (player.x < 0) {
             player.x = 0;
         }
         if (player.x + player.width > canvas.width) {
             player.x = canvas.width - player.width;
+        }
+
+        if (tilt < 0) {
+            if (player.isFlipped) {
+                player.image = player.normal_image;
+                player.isFlipped = false;
+            }
+        } else {
+            if (!player.isFlipped) {
+                player.image = player.flipped_image;
+                player.isFlipped = true;
+            }
         }
     }
 
@@ -306,7 +318,11 @@ function draw() {
     requestAnimationFrame(draw);
 }
 
-function update() {
+let lastUpdate = Date.now();
+function update(timestamp) {
+    let dt = timestamp - lastUpdate;
+    dt /= 1000;
+    lastUpdate = timestamp;
     if (Date.now() - lastStarDrop > starFrequency - Math.min(score * 2, 500)) {
         let chance = generator.next() / generator.m;
         if (chance < 0.2) {
@@ -316,9 +332,9 @@ function update() {
         }
         lastStarDrop = Date.now();
     }
-    updateStars();
-    updateDynamites();
-    movePlayer();
+    updateStars(dt);
+    updateDynamites(dt);
+    movePlayer(dt);
     if (!gameOver) {
         requestAnimationFrame(update);
     }
