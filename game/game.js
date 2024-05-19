@@ -21,7 +21,7 @@ function RandomGenerator(seed) {
     }
 }
 
-let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator, hit_sound, death_sound, music, catch_sound;
+let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator, hit_sound, death_sound, music, catch_sound, tilt;
 
 function initializeGame() {
     player = {
@@ -57,6 +57,7 @@ function initializeGame() {
     lives = 3;
     gameOver = false;
     keys = {};
+    tilt = 0;
 
     hatStack = [];
 
@@ -234,6 +235,17 @@ function movePlayer() {
             player.isFlipped = false;
         }
     }
+
+    if (tilt !== 0) {
+        player.x += player.dx * tilt;
+        if (player.x < 0) {
+            player.x = 0;
+        }
+        if (player.x + player.width > canvas.width) {
+            player.x = canvas.width - player.width;
+        }
+    }
+
 }
 
 function saveScore() {
@@ -306,5 +318,25 @@ document.addEventListener('keydown', (e) => {
     }
 });
 document.addEventListener('keyup', (e) => keys[e.key] = false);
+
+// if on mobile, use tilt controls
+window.addEventListener('deviceorientation', (e) => {
+    // set tilt between -1 and 1
+    const maxAngle = 30;
+    tilt = e.gamma / maxAngle;
+    if (tilt < -1) {
+        tilt = -1;
+    }
+    if (tilt > 1) {
+        tilt = 1;
+    }
+});
+
+// use touch to restart
+canvas.addEventListener('touchstart', (e) => {
+    if (gameOver) {
+        initializeGame();
+    }
+});
 
 initializeGame();
