@@ -34,7 +34,7 @@ function RandomGenerator(seed) {
         return this.state;
     }
 }
-let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator, hit_sound, death_sound, music, catch_sound, tilt;
+let player, stars, lastStarDrop, score, lives, gameOver, keys, hatStack, dynamite_img, dynamites, generator, hit_sound, death_sound, music, catch_sound, tilt, high_alch_sound;
 
 function initializeGame() {
     player = {
@@ -42,7 +42,7 @@ function initializeGame() {
         y: canvas.height - 100,
         width: 90,
         height: 110,
-        dx: 0.5 * canvas.width,
+        dx: 1.0 * canvas.width,
         image: new Image(),
         normal_image: new Image(),
         flipped_image: new Image(),
@@ -58,6 +58,7 @@ function initializeGame() {
     dynamites = [];
 
     hit_sound = new Audio('hit-sound.mp3');
+    high_alch_sound = new Audio('high_alch.mp3');
     death_sound = new Audio('runescape-death-sound.mp3');
     music = new Audio('Sea_Shanty_2.ogg');
     music.loop = true;
@@ -131,7 +132,7 @@ function createStar() {
         y: 0,
         width: 50,
         height: 50,
-        dy: 180,
+        dy: 250,
         idx: idx,
         image: starVariants[idx],
         points: 1
@@ -145,7 +146,7 @@ function createDynamite() {
         y: 0,
         width: 50,
         height: 50,
-        dy: 140,
+        dy: 200,
         image: dynamite_img,
         points: 1
     };
@@ -195,8 +196,12 @@ function checkPhatSet() {
         hatStack = [];
 
         // clear dynamites
+        let bonus = dynamites.length * 2;
         dynamites = [];
-
+        bonus += stars.length;
+        stars = [];
+        score += bonus;
+        high_alch_sound.play();
         lives++;
     }
 
@@ -258,7 +263,7 @@ function movePlayer(dt) {
             player.x = canvas.width - player.width;
         }
 
-        if (tilt < 0) {
+        if (tilt > 0) {
             if (player.isFlipped) {
                 player.image = player.normal_image;
                 player.isFlipped = false;
