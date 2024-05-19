@@ -31,14 +31,20 @@
             z-index: 1;
             display: flex;
             justify-content: space-evenly;
-            padding: 10px 20px;
+            padding: 0;
+            margin: 0;
         }
 
         .inner-navbar {
             display: flex;
-            justify-content: space-around;
+            position: relative;
+
+            justify-content: space-evenly;
+            align-items: center;
             width: 100%;
             max-width: 600px;
+            margin: 0;
+            padding: 8px 10px;
         }
 
         .inner-navbar a {
@@ -46,10 +52,19 @@
             border-color: transparent;
             border-width: 2px;
             border-style: solid;
-            padding: 5px 10px;
+            padding: 3px 10px;
+            padding-bottom: 6px;
             border-radius: 5px;
             text-decoration: none;
             font-size: 1.5rem;
+        }
+
+        @media screen and (max-width: 500px) {
+            .inner-navbar a {
+                font-size: 1rem;
+                padding: 3px 5px;
+                padding-bottom: 4px;
+            }
         }
 
         .inner-navbar a:hover {
@@ -64,7 +79,8 @@
             align-items: center;
             flex-direction: column;
             max-width: 1200px;
-            width: 95%;
+
+            width: 95vw;
             color: #eeccff;
             background-color: transparent;
             border-radius: 20px;
