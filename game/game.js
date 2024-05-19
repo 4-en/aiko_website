@@ -174,7 +174,7 @@ function checkPhatSet() {
         // clear dynamites
         dynamites = [];
 
-        lifes++;
+        lives++;
     }
 
 }
