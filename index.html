@@ -27,6 +27,7 @@
             z-index: 1;
             animation: pulse 1s infinite;
             text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #800080, 0 0 40px #800080, 0 0 50px #800080, 0 0 60px #800080, 0 0 70px #800080;
+            cursor: default;
         }
 
         .stars {
@@ -115,9 +116,18 @@
 
     <script>
         const starsContainer = document.querySelector('.stars');
-        const numStars = 200;
+        const numStars = 250;
         var speed = 0.0005; // Speed factor
         var fontSize = 5; // Font size
+        var mousePosRel = {
+            x: 0,
+            y: 0
+        };
+
+        document.addEventListener('mousemove', function (e) {
+            mousePosRel.x = e.clientX / window.innerWidth;
+            mousePosRel.y = e.clientY / window.innerHeight;
+        });
 
         // use mousewheel to change speed
         document.addEventListener('wheel', function (e) {
@@ -177,6 +187,55 @@
                 }
             });
 
+
+            // calculate movement based on mouse position
+            let deadZone = 0.5;
+            let x = (mousePosRel.x - 0.5) * 2;
+            let y = (mousePosRel.y - 0.5) * 2;
+
+            x *=-1;
+            y *=-1;
+
+
+            if (Math.abs(x) < deadZone) {
+                x = 0;
+            } else {
+                // [-1, -0.5] & [0.5, 1] => [-1, 1]
+                x = x < 0 ? x + 0.5 : x - 0.5;
+                x *= 2;
+            }
+            if (Math.abs(y) < deadZone) {
+                y = 0;
+            } else {
+                // [-1, -0.5] & [0.5, 1] => [-1, 1]
+                y = y < 0 ? y + 0.5 : y - 0.5;
+                y *= 2;
+            }
+
+            
+
+            
+
+            // move all starts on opposite direction
+            stars.forEach(star => {
+                let angle = parseFloat(star.dataset.angle);
+                let distance = parseFloat(star.dataset.distance);
+                const sx = Math.cos(angle) * distance;
+                const sy = Math.sin(angle) * distance;
+
+                const dx = sx + x * 0.2;
+                const dy = sy + y * 0.2;
+
+                const newDistance = Math.sqrt(dx * dx + dy * dy);
+                const newAngle = Math.atan2(dy, dx);
+
+                star.dataset.angle = newAngle;
+                star.dataset.distance = newDistance;
+
+                star.style.transform = `translate(${dx}vw, ${dy}vh)`;
+
+                
+            });
 
             requestAnimationFrame(updateStars);
         }
