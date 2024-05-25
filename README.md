@@ -6,3 +6,4 @@ A placeholder website with a few simple pages for aiko.lol using vanilla HTML/CS
 - Svelte chat UI 
 - blog like posts
 - some simple games
+- more shop items
