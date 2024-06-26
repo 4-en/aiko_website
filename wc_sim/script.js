@@ -438,7 +438,7 @@ const rarities = {
     },
     "bronze": {
         "color": "peru",
-        "general": 2,
+        "general": 5,
         "name": "Bronze",
         "agility": 2,
         "strength": 3,
@@ -446,7 +446,7 @@ const rarities = {
     },
     "iron": {
         "color": "gray",
-        "general": 3,
+        "general": 10,
         "name": "Iron",
         "agility": 3,
         "strength": 4,
@@ -454,7 +454,7 @@ const rarities = {
     },
     "steel": {
         "color": "lightgray",
-        "general": 4,
+        "general": 15,
         "name": "Steel",
         "agility": 4,
         "strength": 5,
@@ -462,7 +462,7 @@ const rarities = {
     },
     "black": {
         "color": "black",
-        "general": 5,
+        "general": 20,
         "name": "Black",
         "agility": 5,
         "strength": 6,
@@ -470,7 +470,7 @@ const rarities = {
     },
     "mithril": {
         "color": "lightblue",
-        "general": 6,
+        "general": 25,
         "name": "Mithril",
         "agility": 6,
         "strength": 7,
@@ -478,7 +478,7 @@ const rarities = {
     },
     "adamant": {
         "color": "green",
-        "general": 7,
+        "general": 30,
         "name": "Adamant",
         "agility": 7,
         "strength": 8,
@@ -486,7 +486,7 @@ const rarities = {
     },
     "rune": {
         "color": "blue",
-        "general": 8,
+        "general": 35,
         "name": "Rune",
         "agility": 8,
         "strength": 9,
@@ -494,7 +494,7 @@ const rarities = {
     },
     "dragon": {
         "color": "red",
-        "general": 4,
+        "general": 40,
         "name": "Dragon",
         "agility": 4,
         "strength": 5,
@@ -502,7 +502,7 @@ const rarities = {
     },
     "crystal": {
         "color": "cyan",
-        "general": 5,
+        "general": 50,
         "name": "Crystal",
         "agility": 5,
         "strength": 6,
@@ -510,7 +510,7 @@ const rarities = {
     },
     "3a": {
         "color": "white",
-        "general": 6,
+        "general": 60,
         "name": "3rd Age",
         "agility": 6,
         "strength": 7,
@@ -518,7 +518,7 @@ const rarities = {
     },
     "infernal": {
         "color": "orange",
-        "general": 7,
+        "general": 70,
         "name": "Infernal",
         "agility": 7,
         "strength": 8,
@@ -526,7 +526,7 @@ const rarities = {
     },
     "ancestral": {
         "color": "purple",
-        "general": 8,
+        "general": 80,
         "name": "Ancestral",
         "agility": 8,
         "strength": 9,
