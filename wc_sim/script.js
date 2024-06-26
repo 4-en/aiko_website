@@ -292,7 +292,9 @@ const characters = {
         "luck": 1,
         "tick_manipulation": 1,
         "range": 1,
-        "learning_rate": 1
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
     },
     "gnome_child": {
         "name": "Gnome Child",
@@ -303,7 +305,9 @@ const characters = {
         "luck": 1,
         "tick_manipulation": 1,
         "range": 1,
-        "learning_rate": 1
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
     },
     "graador": {
         "name": "General Graador",
@@ -314,20 +318,66 @@ const characters = {
         "luck": 1,
         "tick_manipulation": 1,
         "range": 1,
-        "learning_rate": 1
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
     }
 };
 
 const rarities = {
     "common": {
         "general": 1,
-        "name": "Common"
+        "name": "Common",
+        "weight": 1000
     },
     "bronze": {
         "general": 2,
         "name": "Bronze",
         "agility": 2,
         "strength": 3,
+        "weight": 500
+    },
+    "iron": {
+        "general": 3,
+        "name": "Iron",
+        "agility": 3,
+        "strength": 4,
+        "weight": 400
+    },
+    "dragon": {
+        "general": 4,
+        "name": "Dragon",
+        "agility": 4,
+        "strength": 5,
+        "weight": 100
+    },
+    "crystal": {
+        "general": 5,
+        "name": "Crystal",
+        "agility": 5,
+        "strength": 6,
+        "weight": 50
+    },
+    "3a": {
+        "general": 6,
+        "name": "3rd Age",
+        "agility": 6,
+        "strength": 7,
+        "weight": 10
+    },
+    "infernal": {
+        "general": 7,
+        "name": "Infernal",
+        "agility": 7,
+        "strength": 8,
+        "weight": 10
+    },
+    "ancestral": {
+        "general": 8,
+        "name": "Ancestral",
+        "agility": 8,
+        "strength": 9,
+        "weight": 10
     }
 };
 
@@ -359,7 +409,9 @@ class Worker {
             "luck": luck,
             "tick_manipulation": tick_manipulation,
             "range": range,
-            "learning_rate": learning_rate
+            "learning_rate": learning_rate,
+            "farming": "1",
+            "trading": "1"
         };
     }
 
@@ -379,7 +431,10 @@ class Worker {
         let charStats = characters[this.character];
         let rarityStats = rarities[this.rarity];
         let stats = {};
-        for (let key in charStats) {
+        for (let key in this.ivs) {
+            if(key === "general") {
+                continue;
+            }
             let charStatKey = 0;
             if (charStats.hasOwnProperty(key)) {
                 charStatKey+= charStats[key];
