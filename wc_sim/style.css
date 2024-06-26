@@ -1,0 +1,140 @@
+@font-face {
+    font-family: 'runescape';
+    src: url('assets/RuneScape-Chat-Bold-07.ttf') format('truetype');
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'runescape';
+    font-size: 28px;
+    color: yellow;
+}
+
+#game {
+    background-image: url('assets/grass.jpg');
+    background-size: 64px;
+
+    width: 100%;
+    height: 100%;
+}
+
+#ui {
+    z-index: 69;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 0px;
+    padding: 20px;
+    flex-direction: column;
+    background-color: rgba(40, 54, 31, 0.8);
+    border: 10px solid rgb(38, 41, 37);
+}
+
+#ui div {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+#ui div * {
+    margin: 10px;
+}
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.tree {
+    font-size: 50px;
+    margin: 20px;
+    border: 1px solid transparent;
+    border-radius: 10%;
+    position: absolute;
+}
+
+
+.tree:hover {
+    cursor: pointer;
+    border-color: black;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: rgb(40, 46, 34);
+    color: yellow;
+    padding: 10px;
+    border-radius: 1px;
+    border: 3px solid black;
+    font-size: 16px;
+    top: 60px;
+    left: 15px;
+}
+
+.message-box {
+    position: absolute;
+    background-color: rgb(40, 46, 34);
+    color: yellow;
+    padding: 10px;
+    border-radius: 1px;
+    border: 3px solid black;
+    font-size: 16px;
+}
+
+.tree:hover .tooltip {
+    display: block;
+}
+
+.tree:hover::before {
+    content: '🪓';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 64px;
+    z-index: 1;
+}
+
+.chopping {
+    animation: chopping 0.6s infinite;
+    transform-origin: bottom;
+}
+
+.chopped {
+    display: none;
+}
+
+@keyframes chopping {
+    0% {
+        transform: rotate(0deg);
+    }
+    20% {
+        transform: rotate(7deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+#trees {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
