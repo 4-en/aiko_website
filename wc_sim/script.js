@@ -126,8 +126,8 @@ const trees = {
         "xp": 37.5,
         "coins": 1,
         "level": 15,
-        "difficulty": 2,
-        "resist": 10,
+        "difficulty": 10,
+        "resist": 8,
         "depletionChance": 1 / 8,
         "name": "Oak Tree",
         "tickCooldown": 4,
@@ -138,8 +138,8 @@ const trees = {
         "xp": 67.5,
         "coins": 15,
         "level": 30,
-        "difficulty": 3,
-        "resist": 10,
+        "difficulty": 20,
+        "resist": 25,
         "depletionChance": 1 / 16,
         "name": "Willow Tree",
         "tickCooldown": 4,
@@ -150,8 +150,8 @@ const trees = {
         "xp": 100,
         "coins": 100,
         "level": 45,
-        "difficulty": 4,
-        "restist": 10,
+        "difficulty": 30,
+        "restist": 40,
         "depletionChance": 1 / 32,
         "name": "Maple Tree",
         "tickCooldown": 4,
@@ -162,8 +162,8 @@ const trees = {
         "xp": 175,
         "coins": 500,
         "level": 60,
-        "difficulty": 5,
-        "resist": 10,
+        "difficulty": 50,
+        "resist": 60,
         "depletionChance": 1 / 64,
         "name": "Yew Tree",
         "tickCooldown": 4,
@@ -174,8 +174,8 @@ const trees = {
         "xp": 250,
         "coins": 1000,
         "level": 75,
-        "difficulty": 6,
-        "resist": 10,
+        "difficulty": 60,
+        "resist": 120,
         "depletionChance": 1 / 128,
         "name": "Magic Tree",
         "tickCooldown": 4,
@@ -376,8 +376,9 @@ function cutTree() {
     let tree = treeField[activeTree].tree;
     let treeData = treeField[activeTree];
 
+    let axePower = 1;
 
-    let cutSuccess = rollTreeCut(level, 1, 1, 10);
+    let cutSuccess = rollTreeCut(level, axePower, tree.difficulty, tree.resist);
 
     if (cutSuccess) {
         let xpGain = tree.xp;
