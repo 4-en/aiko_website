@@ -318,7 +318,7 @@ const characters = {
     "bot": {
         "weight": 1000, // "weight" is the chance of getting this character, higher weight = higher chance
         "name": "Bot",
-        "image": "gnome-child.png",
+        "image": "bot.webp",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -346,7 +346,7 @@ const characters = {
     "thurgo": {
         "weight": 100,
         "name": "Thurgo",
-        "image": "gnome-child.png",
+        "image": "thurgo.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -360,7 +360,7 @@ const characters = {
     "graador": {
         "weight": 100,
         "name": "General Graador",
-        "image": "gnome-child.png",
+        "image": "graador.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -374,7 +374,7 @@ const characters = {
     "wise_old_man": {
         "weight": 50,
         "name": "Wise Old Man",
-        "image": "gnome-child.png",
+        "image": "Wise_Old_Man.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -388,7 +388,7 @@ const characters = {
     "oziach": {
         "weight": 100,
         "name": "Oziach",
-        "image": "gnome-child.png",
+        "image": "Oziach.webp",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -402,7 +402,7 @@ const characters = {
     "bob": {
         "weight": 100,
         "name": "Bob",
-        "image": "gnome-child.png",
+        "image": "bob.webp",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -416,7 +416,7 @@ const characters = {
     "evil_bob": {
         "weight": 100,
         "name": "Evil Bob",
-        "image": "gnome-child.png",
+        "image": "evil_bob.webp",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -665,7 +665,6 @@ class Worker {
             img.src = "assets/" + characters[this.character].image;
             img.alt = characters[this.character].name;
             img.width = 64;
-            img.height = 64;
             this.div.appendChild(img);
             let tooltip = document.createElement("div");
             tooltip.classList.add("tooltip");

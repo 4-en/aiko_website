@@ -194,6 +194,5 @@ button:disabled {
 
 .worker-in-game {
     position: absolute;
-    width: 64px;
     height: 64px;
 }
