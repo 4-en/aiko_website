@@ -381,6 +381,48 @@ const rarities = {
     }
 };
 
+function pullCharacter() {
+    let charKeys = Object.keys(characters);
+    let charWeight = 0;
+    for (let i = 0; i < charKeys.length; i++) {
+        let char = characters[charKeys[i]];
+        charWeight += char.weight;
+    }
+
+    let rand = getRand() * charWeight;
+    let currentWeight = 0;
+    let char = null;
+    for (let i = 0; i < charKeys.length; i++) {
+        char = characters[charKeys[i]];
+        currentWeight += char.weight;
+        if (rand < currentWeight) {
+            break;
+        }
+    }
+
+    let rarityKeys = Object.keys(rarities);
+    let rarityWeight = 0;
+    for (let i = 0; i < rarityKeys.length; i++) {
+        let rarity = rarities[rarityKeys[i]];
+        rarityWeight += rarity.weight;
+    }
+
+    rand = getRand() * rarityWeight;
+    currentWeight = 0;
+    let rarity = null;
+    for (let i = 0; i < rarityKeys.length; i++) {
+        rarity = rarities[rarityKeys[i]];
+        currentWeight += rarity.weight;
+        if (rand < currentWeight) {
+            break;
+        }
+    }
+
+    return new Worker(char.name, rarity.name);
+}
+
+
+
 class Worker {
     constructor(character, rarity) {
         this.character = character;
@@ -388,6 +430,22 @@ class Worker {
         this.level = 1;
         this.xp = 0;
         this.ivs = this.generateIVs();
+        this.evs = this.generateEVs();
+    }
+
+    generateEVs() {
+        return {
+            "spend": 0,
+            "agility": 0,
+            "strength": 0,
+            "woodcutting": 0,
+            "luck": 0,
+            "tick_manipulation": 0,
+            "range": 0,
+            "learning_rate": 0,
+            "farming": 0,
+            "trading": 0
+        };
     }
 
     generateIVs() {
@@ -401,6 +459,8 @@ class Worker {
         let tick_manipulation = Math.floor(Math.random() * (max - min + 1) + min);
         let range = Math.floor(Math.random() * (max - min + 1) + min);
         let learning_rate = Math.floor(Math.random() * (max - min + 1) + min);
+        let farming = Math.floor(Math.random() * (max - min + 1) + min);
+        let trading = Math.floor(Math.random() * (max - min + 1) + min);
         return {
             "general": general,
             "agility": agility,
@@ -410,8 +470,8 @@ class Worker {
             "tick_manipulation": tick_manipulation,
             "range": range,
             "learning_rate": learning_rate,
-            "farming": "1",
-            "trading": "1"
+            "farming": farming,
+            "trading": trading
         };
     }
 
