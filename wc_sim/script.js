@@ -654,6 +654,7 @@ class Worker {
         this.y = 50;
         this.div = null;
         this.targetTree = null;
+        this.chopping = null;
     }
 
     tick() {
@@ -704,6 +705,14 @@ class Worker {
             this.targetTree = closestTree;
         }
 
+        if (this.targetTree !== null && (this.targetTree.respawnTime > 0 || this.targetTree.element.classList.contains("chopping")) && this.chopping !== this.targetTree) {
+            this.targetTree = null;
+        }
+
+        if(this.targetTree !== null && this.targetTree.respawnTime > 0) {
+            this.targetTree = null;
+        }
+
         if (this.targetTree === null) { // no trees to chop
             console.log("No trees to chop");
             return;
@@ -713,6 +722,7 @@ class Worker {
         let dist = Math.sqrt((this.x - tree.x) ** 2 + (this.y - tree.y) ** 2);
         if (dist < 1) {
             tree.element.classList.add("chopping");
+            this.chopping = tree;
         }
 
         let dx = tree.x - this.x;
