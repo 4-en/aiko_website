@@ -341,10 +341,80 @@ const characters = {
         "farming": 1,
         "trading": 1
     },
+    "thurgo": {
+        "weight": 100,
+        "name": "Thurgo",
+        "image": "thurgo.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck:": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
     "graador": {
         "weight": 100,
         "name": "General Graador",
         "image": "graador.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "wise_old_man": {
+        "weight": 50,
+        "name": "Wise Old Man",
+        "image": "wise_old_man.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "oziach": {
+        "weight": 100,
+        "name": "Oziach",
+        "image": "oziach.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "bob": {
+        "weight": 100,
+        "name": "Bob",
+        "image": "bob.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "evil_bob": {
+        "weight": 100,
+        "name": "Evil Bob",
+        "image": "evil_bob.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -376,6 +446,41 @@ const rarities = {
         "agility": 3,
         "strength": 4,
         "weight": 400
+    },
+    "steel": {
+        "general": 4,
+        "name": "Steel",
+        "agility": 4,
+        "strength": 5,
+        "weight": 350
+    },
+    "black": {
+        "general": 5,
+        "name": "Black",
+        "agility": 5,
+        "strength": 6,
+        "weight": 300
+    },
+    "mithril": {
+        "general": 6,
+        "name": "Mithril",
+        "agility": 6,
+        "strength": 7,
+        "weight": 250
+    },
+    "adamant": {
+        "general": 7,
+        "name": "Adamant",
+        "agility": 7,
+        "strength": 8,
+        "weight": 200
+    },
+    "rune": {
+        "general": 8,
+        "name": "Rune",
+        "agility": 8,
+        "strength": 9,
+        "weight": 150
     },
     "dragon": {
         "general": 4,
