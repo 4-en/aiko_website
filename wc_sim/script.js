@@ -317,17 +317,17 @@ const axes = {
 const characters = {
     "bot": {
         "weight": 1000, // "weight" is the chance of getting this character, higher weight = higher chance
-        "name": "Bot",
-        "image": "bot.webp",
-        "agility": 1,
-        "strength": 1,
-        "woodcutting": 1,
-        "luck": 1,
-        "tick_manipulation": 1,
-        "range": 1,
-        "learning_rate": 1,
-        "farming": 1,
-        "trading": 1
+        "name": "Bot", // name of the character
+        "image": "bot.webp", // image of the character
+        "agility": 1, // agility stat (movement speed)
+        "strength": 1, // strength stat (damage dealt)
+        "woodcutting": 1, // woodcutting stat (change of getting logs)
+        "luck": 1, // luck stat (chance of getting rare items)
+        "tick_manipulation": 1, // tick manipulation stat (chance of skipping ticks)
+        "range": 1, // range stat (view distance)
+        "learning_rate": 1, // learning rate stat (xp gain)
+        "farming": 1, // farming stat (growing new trees)
+        "trading": 1 // trading stat (more coins)
     },
     "gnome_child": {
         "weight": 500,
@@ -336,12 +336,12 @@ const characters = {
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
-        "luck": 1,
-        "tick_manipulation": 1,
+        "luck": 12,
+        "tick_manipulation": 5,
         "range": 1,
-        "learning_rate": 1,
-        "farming": 1,
-        "trading": 1
+        "learning_rate": 30,
+        "farming": 25,
+        "trading": 21
     },
     "thurgo": {
         "weight": 100,
@@ -360,30 +360,30 @@ const characters = {
     "graador": {
         "weight": 100,
         "name": "General Graador",
-        "image": "graador.png",
-        "agility": 1,
-        "strength": 1,
-        "woodcutting": 1,
-        "luck": 1,
-        "tick_manipulation": 1,
-        "range": 1,
-        "learning_rate": 1,
-        "farming": 1,
-        "trading": 1
+        "image": "graador.webp",
+        "agility": 10,
+        "strength": 100,
+        "woodcutting": 60,
+        "luck": 33,
+        "tick_manipulation": 5,
+        "range": 30,
+        "learning_rate": 5,
+        "farming": 13,
+        "trading": 20
     },
     "wise_old_man": {
         "weight": 50,
         "name": "Wise Old Man",
         "image": "Wise_Old_Man.png",
-        "agility": 1,
-        "strength": 1,
-        "woodcutting": 1,
-        "luck": 1,
-        "tick_manipulation": 1,
-        "range": 1,
-        "learning_rate": 1,
-        "farming": 1,
-        "trading": 1
+        "agility": 35,
+        "strength": 40,
+        "woodcutting": 30,
+        "luck": 100,
+        "tick_manipulation": 88,
+        "range": 57,
+        "learning_rate": 10,
+        "farming": 53,
+        "trading": 73
     },
     "oziach": {
         "weight": 100,
@@ -657,6 +657,32 @@ class Worker {
         this.chopping = null;
     }
 
+    getDescriptionString() {
+        let name = characters[this.character].name;
+        let rarity = rarities[this.rarity].name;
+        let level = this.level;
+
+        /*
+            "spend": 0,
+            "agility": 0,
+            "strength": 0,
+            "woodcutting": 0,
+            "luck": 0,
+            "tick_manipulation": 0,
+            "range": 0,
+            "learning_rate": 0,
+            "farming": 0,
+            "trading": 0
+        */
+
+        let statString = name + " (" + rarity + ")\nLevel " + level + "\n";
+        statString += "AGI: " + this.stats.agility + " STR: " + this.stats.strength + " WC: " + this.stats.woodcutting + "\n";
+        statString += "LUCK: " + this.stats.luck + " TM: " + this.stats.tick_manipulation + " RNG: " + this.stats.range + "\n";
+        statString += "LR: " + this.stats.learning_rate + " FARM: " + this.stats.farming + " TRD: " + this.stats.trading + "\n";
+
+        return statString;
+    }
+
     tick() {
         if (this.div === null) {
             this.div = document.createElement("div");
@@ -668,7 +694,7 @@ class Worker {
             this.div.appendChild(img);
             let tooltip = document.createElement("div");
             tooltip.classList.add("tooltip");
-            tooltip.innerText = characters[this.character].name + " (" + rarities[this.rarity].name + ")";
+            tooltip.innerText = this.getDescriptionString();
             this.div.appendChild(tooltip);
             treeDiv.appendChild(this.div);
 
@@ -821,7 +847,7 @@ class Worker {
                 ivStatKey += this.ivs["general"];
             }
 
-            stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey);
+            stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(10, charStatKey, rarityStatKey, ivStatKey);
         }
         return stats;
     }
