@@ -9,6 +9,8 @@ let tickCooldown = 0;
 let time = 0;
 let version = "0.1.0";
 let startTime = Date.now();
+let playerId = Math.floor(Math.random() * 1000000);
+let playerName = "Player";
 
 
 function save() {
@@ -20,7 +22,9 @@ function save() {
         axeLevel: axeLevel,
         upgradeCost: upgradeCost,
         version: version,
-        startTime: startTime
+        startTime: startTime,
+        playerId: playerId,
+        playerName: playerName
     };
 
     localStorage.setItem('saveData', JSON.stringify(saveData));
@@ -29,14 +33,38 @@ function save() {
 function load() {
     let saveData = JSON.parse(localStorage.getItem('saveData'));
     if (saveData) {
-        level = saveData.level;
-        xp = saveData.xp;
-        xpForNextLevel = saveData.xpForNextLevel;
-        coins = saveData.coins;
-        axeLevel = saveData.axeLevel;
-        upgradeCost = saveData.upgradeCost;
-        version = saveData.version;
-        startTime = saveData.startTime;
+        // try to load the save data
+        // always check if saveData has the property defined
+        if (saveData.level) {
+            level = saveData.level;
+        }
+        if (saveData.xp) {
+            xp = saveData.xp;
+        }
+        if (saveData.xpForNextLevel) {
+            xpForNextLevel = saveData.xpForNextLevel;
+        }
+        if (saveData.coins) {
+            coins = saveData.coins;
+        }
+        if (saveData.axeLevel) {
+            axeLevel = saveData.axeLevel;
+        }
+        if (saveData.upgradeCost) {
+            upgradeCost = saveData.upgradeCost;
+        }
+        if (saveData.version) {
+            version = saveData.version;
+        }
+        if (saveData.startTime) {
+            startTime = saveData.startTime;
+        }
+        if (saveData.playerId) {
+            playerId = saveData.playerId;
+        }
+        if (saveData.playerName) {
+            playerName = saveData.playerName;
+        }
     }
 }
         
@@ -253,6 +281,132 @@ const axes = {
         "name": "3rd Age Axe"
     },
 };
+
+const characters = {
+    "bot": {
+        "name": "Bot",
+        "image": "bot.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1
+    },
+    "gnome_child": {
+        "name": "Gnome Child",
+        "image": "gnome_child.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1
+    },
+    "graador": {
+        "name": "General Graador",
+        "image": "graador.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1
+    }
+};
+
+const rarities = {
+    "common": {
+        "general": 1,
+        "name": "Common"
+    },
+    "bronze": {
+        "general": 2,
+        "name": "Bronze",
+        "agility": 2,
+        "strength": 3,
+    }
+};
+
+class Worker {
+    constructor(character, rarity) {
+        this.character = character;
+        this.rarity = rarity;
+        this.level = 1;
+        this.xp = 0;
+        this.ivs = this.generateIVs();
+    }
+
+    generateIVs() {
+        let max = 100;
+        let min = 1;
+        let general = Math.floor(Math.random() * (max - min + 1) + min);
+        let agility = Math.floor(Math.random() * (max - min + 1) + min);
+        let strength = Math.floor(Math.random() * (max - min + 1) + min);
+        let woodcutting = Math.floor(Math.random() * (max - min + 1) + min);
+        let luck = Math.floor(Math.random() * (max - min + 1) + min);
+        let tick_manipulation = Math.floor(Math.random() * (max - min + 1) + min);
+        let range = Math.floor(Math.random() * (max - min + 1) + min);
+        let learning_rate = Math.floor(Math.random() * (max - min + 1) + min);
+        return {
+            "general": general,
+            "agility": agility,
+            "strength": strength,
+            "woodcutting": woodcutting,
+            "luck": luck,
+            "tick_manipulation": tick_manipulation,
+            "range": range,
+            "learning_rate": learning_rate
+        };
+    }
+
+    calculateStat(level, character, rarity, iv) {
+        let charWeight = 20;
+        let rarityWeight = 3;
+        let ivWeight = 1;
+
+        let statMultiplier = 1;
+
+        let stat = character / 100 * charWeight + rarity / 100 * rarityWeight + iv / 100 * ivWeight;
+        stat = stat / (charWeight + rarityWeight + ivWeight);
+        return Math.floor(statMultiplier * stat * level + level);
+    }
+
+    calculateStats() {
+        let charStats = characters[this.character];
+        let rarityStats = rarities[this.rarity];
+        let stats = {};
+        for (let key in charStats) {
+            let charStatKey = 0;
+            if (charStats.hasOwnProperty(key)) {
+                charStatKey+= charStats[key];
+            }
+            if (charStats.hasOwnProperty("general")) {
+                charStatKey+= rarityStats["general"];
+            }
+            let rarityStatKey = 0;
+            if (rarityStats.hasOwnProperty(key)) {
+                rarityStatKey+= rarityStats[key];
+            }
+            if (rarityStats.hasOwnProperty("general")) {
+                rarityStatKey+= rarityStats["general"];
+            }
+            let ivStatKey = 0;
+            if (this.ivs.hasOwnProperty(key)) {
+                ivStatKey+= this.ivs[key];
+            }
+            if (this.ivs.hasOwnProperty("general")) {
+                ivStatKey+= this.ivs["general"];
+            }
+
+            stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey);
+        }
+        return stats;
+    }
+}
 
 
 let worker = [];
