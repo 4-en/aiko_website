@@ -11,10 +11,13 @@ body {
     height: 100vh;
     background-color: #f0f0f0;
     margin: 0;
-    overflow: hidden;
+    
     font-family: 'runescape';
     font-size: 28px;
     color: yellow;
+    height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #game {
@@ -23,9 +26,15 @@ body {
 
     width: 100%;
     height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 #ui {
+    box-sizing: border-box;
     z-index: 69;
     display: flex;
     justify-content: center;
@@ -36,16 +45,17 @@ body {
     flex-direction: column;
     background-color: rgba(40, 54, 31, 0.8);
     border: 10px solid rgb(38, 41, 37);
+    width: 100%;
 }
 
-#ui div {
+#ui > div {
     margin: 10px;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
 }
-#ui div * {
+#ui > div > * {
     margin: 10px;
 }
 button {
@@ -97,7 +107,7 @@ button:disabled {
     font-size: 16px;
 }
 
-.tree:hover .tooltip {
+*:hover > .tooltip {
     display: block;
 }
 
@@ -132,9 +142,34 @@ button:disabled {
 }
 
 #trees {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.ui-button {
+    background-color: rgb(40, 46, 34);
+    color: yellow;
+    padding: 10px;
+    border-radius: 1px;
+    border: 3px solid black;
+    font-size: 16px;
+}
+
+.ui-button:hover {
+    background-color: white;
+    color: rgb(40, 46, 34);
+}
+
+.ui-button:active {
+    color: yellow;
+    background-color: rgb(40, 46, 34);
+}
+
+.ui-button:disabled {
+    background-color: rgba(40, 46, 34, 0.5);
+    cursor: not-allowed;
 }

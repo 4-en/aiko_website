@@ -7,6 +7,8 @@ let axeLevel = 1;
 let upgradeCost = 10;
 let tickCooldown = 0;
 let time = 0;
+let version = "0.1.0";
+let startTime = Date.now();
 
 
 function save() {
@@ -16,7 +18,9 @@ function save() {
         xpForNextLevel: xpForNextLevel,
         coins: coins,
         axeLevel: axeLevel,
-        upgradeCost: upgradeCost
+        upgradeCost: upgradeCost,
+        version: version,
+        startTime: startTime
     };
 
     localStorage.setItem('saveData', JSON.stringify(saveData));
@@ -31,6 +35,8 @@ function load() {
         coins = saveData.coins;
         axeLevel = saveData.axeLevel;
         upgradeCost = saveData.upgradeCost;
+        version = saveData.version;
+        startTime = saveData.startTime;
     }
 }
         
@@ -293,6 +299,7 @@ function rollTreeCut(level, axeBonus, treeDiff, treeResist) {
     return chance < p;
 }
 
+
 function init() {
     let seed = 421;
     let rand = createRand(seed);
@@ -302,7 +309,10 @@ function init() {
     for (let i = 0; i < fieldSize; i++) {
         let tree = trees[treeTypes[Math.floor(rand() * treeTypes.length)]];
 
+        let treesDiv = document.getElementById("trees");
+
         let treeElement = document.createElement("div");
+        treesDiv.appendChild(treeElement);
         treeElement.classList.add("tree");
         let image = document.createElement("img");
         image.src = "assets/" + tree.image;
@@ -318,8 +328,8 @@ function init() {
         tooltip.innerText = "Chop " + tree.name;
         treeElement.appendChild(tooltip);
         // set random position
-        let x = Math.floor(rand() * 100);
-        let y = Math.floor(rand() * 100);
+        let x = Math.floor(rand() * 90);
+        let y = Math.floor(rand() * 90);
         treeElement.style.left = x + "%";
         treeElement.style.top = y + "%";
 
@@ -358,13 +368,14 @@ function levelUp() {
     level++;
     xpForNextLevel = xpForLevel(level + 1);
 }
-
+let chopSound = new Audio("assets/chop.oga");
 function cutTree() {
     if (activeTree === null) {
         return;
     }
     let tree = treeField[activeTree].tree;
     let treeData = treeField[activeTree];
+
 
     let cutSuccess = rollTreeCut(level, 1, 1, 10);
 
@@ -401,8 +412,7 @@ function upgradeAxe() {
 
 upgradeAxeButton.addEventListener('click', upgradeAxe);
 
-// Initial UI update
-updateUI();
+
 let saveTimer = 0;
 function tick() {
     time += tickRate;
@@ -435,6 +445,8 @@ function tick() {
 
 function main() {
     load();
+    // Initial UI update
+    updateUI();
     setInterval(tick, tickRate * 1000);
 }
 
