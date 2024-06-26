@@ -8,6 +8,34 @@ let upgradeCost = 10;
 let tickCooldown = 0;
 let time = 0;
 
+
+function save() {
+    let saveData = {
+        level: level,
+        xp: xp,
+        xpForNextLevel: xpForNextLevel,
+        coins: coins,
+        axeLevel: axeLevel,
+        upgradeCost: upgradeCost
+    };
+
+    localStorage.setItem('saveData', JSON.stringify(saveData));
+}
+
+function load() {
+    let saveData = JSON.parse(localStorage.getItem('saveData'));
+    if (saveData) {
+        level = saveData.level;
+        xp = saveData.xp;
+        xpForNextLevel = saveData.xpForNextLevel;
+        coins = saveData.coins;
+        axeLevel = saveData.axeLevel;
+        upgradeCost = saveData.upgradeCost;
+    }
+}
+        
+
+
 function sfc32(a, b, c, d) {
     return function () {
         a |= 0; b |= 0; c |= 0; d |= 0;
@@ -41,6 +69,7 @@ const upgradeCostElement = document.getElementById('upgradeCost');
 const upgradeAxeButton = document.getElementById('upgradeAxeButton');
 
 // game constants
+const autoSaveInterval = 60; // 60 seconds
 const tickRate = 0.6; // 1 tick every 0.6 seconds
 // xp values
 const baseXp = 83;
@@ -219,6 +248,8 @@ const axes = {
     },
 };
 
+
+let worker = [];
 let activeTree = null;
 let treeField = [];
 
@@ -240,16 +271,18 @@ function treeClick(event, index) {
         return;
     }
 
+    if(activeTree === index) {
+        return;
+    }
+
+    if(activeTree !== null) {
+        treeField[activeTree].element.classList.remove("chopping");
+    }
+
     let element = treeField[index].element;
     // add class chopping
     element.classList.add("chopping");
 
-    // remove chopping from other trees
-    for (let i = 0; i < treeField.length; i++) {
-        if (i !== index) {
-            treeField[i].element.classList.remove("chopping");
-        }
-    }
 
     activeTree = index;
 }
@@ -370,9 +403,14 @@ upgradeAxeButton.addEventListener('click', upgradeAxe);
 
 // Initial UI update
 updateUI();
-
+let saveTimer = 0;
 function tick() {
     time += tickRate;
+    saveTimer += tickRate;
+    if (saveTimer >= autoSaveInterval) {
+        save();
+        saveTimer = 0;
+    }
 
     for (let i = 0; i < treeField.length; i++) {
         let treeData = treeField[i];
@@ -396,6 +434,7 @@ function tick() {
 }
 
 function main() {
+    load();
     setInterval(tick, tickRate * 1000);
 }
 
