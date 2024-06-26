@@ -160,6 +160,7 @@ function showMessageBoxAtPos(message, x, y) {
 
     messageBox.style.left = x + "px";
     messageBox.style.top = y + "px";
+    messageBox.style.zIndex = 1000;
 
     setTimeout(() => {
         document.body.removeChild(messageBox);
@@ -316,7 +317,7 @@ const characters = {
     "bot": {
         "weight": 1000, // "weight" is the chance of getting this character, higher weight = higher chance
         "name": "Bot",
-        "image": "bot.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -330,7 +331,7 @@ const characters = {
     "gnome_child": {
         "weight": 500,
         "name": "Gnome Child",
-        "image": "gnome_child.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -344,7 +345,7 @@ const characters = {
     "thurgo": {
         "weight": 100,
         "name": "Thurgo",
-        "image": "thurgo.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -358,7 +359,7 @@ const characters = {
     "graador": {
         "weight": 100,
         "name": "General Graador",
-        "image": "graador.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -372,7 +373,7 @@ const characters = {
     "wise_old_man": {
         "weight": 50,
         "name": "Wise Old Man",
-        "image": "wise_old_man.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -386,7 +387,7 @@ const characters = {
     "oziach": {
         "weight": 100,
         "name": "Oziach",
-        "image": "oziach.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -400,7 +401,7 @@ const characters = {
     "bob": {
         "weight": 100,
         "name": "Bob",
-        "image": "bob.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -414,7 +415,7 @@ const characters = {
     "evil_bob": {
         "weight": 100,
         "name": "Evil Bob",
-        "image": "evil_bob.png",
+        "image": "gnome-child.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -429,11 +430,13 @@ const characters = {
 
 const rarities = {
     "common": {
+        "color": "darkslategray",
         "general": 1,
         "name": "Common",
         "weight": 1000
     },
     "bronze": {
+        "color": "peru",
         "general": 2,
         "name": "Bronze",
         "agility": 2,
@@ -441,6 +444,7 @@ const rarities = {
         "weight": 500
     },
     "iron": {
+        "color": "gray",
         "general": 3,
         "name": "Iron",
         "agility": 3,
@@ -448,6 +452,7 @@ const rarities = {
         "weight": 400
     },
     "steel": {
+        "color": "lightgray",
         "general": 4,
         "name": "Steel",
         "agility": 4,
@@ -455,6 +460,7 @@ const rarities = {
         "weight": 350
     },
     "black": {
+        "color": "black",
         "general": 5,
         "name": "Black",
         "agility": 5,
@@ -462,6 +468,7 @@ const rarities = {
         "weight": 300
     },
     "mithril": {
+        "color": "lightblue",
         "general": 6,
         "name": "Mithril",
         "agility": 6,
@@ -469,6 +476,7 @@ const rarities = {
         "weight": 250
     },
     "adamant": {
+        "color": "green",
         "general": 7,
         "name": "Adamant",
         "agility": 7,
@@ -476,6 +484,7 @@ const rarities = {
         "weight": 200
     },
     "rune": {
+        "color": "blue",
         "general": 8,
         "name": "Rune",
         "agility": 8,
@@ -483,6 +492,7 @@ const rarities = {
         "weight": 150
     },
     "dragon": {
+        "color": "red",
         "general": 4,
         "name": "Dragon",
         "agility": 4,
@@ -490,6 +500,7 @@ const rarities = {
         "weight": 100
     },
     "crystal": {
+        "color": "cyan",
         "general": 5,
         "name": "Crystal",
         "agility": 5,
@@ -497,6 +508,7 @@ const rarities = {
         "weight": 50
     },
     "3a": {
+        "color": "white",
         "general": 6,
         "name": "3rd Age",
         "agility": 6,
@@ -504,6 +516,7 @@ const rarities = {
         "weight": 10
     },
     "infernal": {
+        "color": "orange",
         "general": 7,
         "name": "Infernal",
         "agility": 7,
@@ -511,6 +524,7 @@ const rarities = {
         "weight": 10
     },
     "ancestral": {
+        "color": "purple",
         "general": 8,
         "name": "Ancestral",
         "agility": 8,
@@ -531,8 +545,8 @@ function pullCharacter() {
     let currentWeight = 0;
     let char = null;
     for (let i = 0; i < charKeys.length; i++) {
-        char = characters[charKeys[i]];
-        currentWeight += char.weight;
+        char = charKeys[i];
+        currentWeight += characters[char].weight;
         if (rand < currentWeight) {
             break;
         }
@@ -549,14 +563,14 @@ function pullCharacter() {
     currentWeight = 0;
     let rarity = null;
     for (let i = 0; i < rarityKeys.length; i++) {
-        rarity = rarities[rarityKeys[i]];
-        currentWeight += rarity.weight;
+        rarity = rarityKeys[i];
+        currentWeight += rarities[rarity].weight;
         if (rand < currentWeight) {
             break;
         }
     }
 
-    return new Worker(char.name, rarity.name);
+    return new Worker(char, rarity);
 }
 
 
@@ -819,10 +833,22 @@ function updateUI() {
         let workerElement = document.createElement("div");
         workerElement.classList.add("worker");
         if (worker[i] !== null) {
+            let character = characters[worker[i].character];
+            let rarity = rarities[worker[i].rarity];
             let tooltip = document.createElement("div");
             tooltip.classList.add("tooltip");
-            tooltip.innerText = worker[i].character + " (" + worker[i].rarity + ")";
+            tooltip.innerText = character.name + " (" + rarity.name + ")";
             workerElement.appendChild(tooltip);
+            let img = document.createElement("img");
+            img.src = "assets/" + character.image;
+            let color = rarity.color;
+            let shadowSize = 1 +  Math.min(10,100 / rarity.weight);
+            workerElement.style.boxShadow = "0 0 10px " + shadowSize + "px " + color;
+            img.alt = character.name;
+            img.height = 64;
+            img.width = 64;
+            workerElement.appendChild(img);
+
         } else {
             let tooltip = document.createElement("div");
             tooltip.classList.add("tooltip");

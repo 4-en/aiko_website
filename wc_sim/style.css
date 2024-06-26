@@ -184,7 +184,6 @@ button:disabled {
     position: relative;
     border: 2px solid darkslategray;
     border-radius: 5px;
-    box-shadow: 0 0 10px 5px darkslategray;
     text-align: center;
     /* center the text vertically */
     display: flex;
