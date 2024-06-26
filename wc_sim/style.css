@@ -191,3 +191,9 @@ button:disabled {
     align-items: center;
     cursor: pointer;
 }
+
+.worker-in-game {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+}

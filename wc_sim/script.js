@@ -126,6 +126,7 @@ const recruitButton = document.getElementById('recruitWorkerButton');
 const plantTreeButton = document.getElementById('plantTreeButton');
 const plantTreeCostElement = document.getElementById('plantTreeCost');
 const workersElement = document.getElementById('workers');
+const treeDiv = document.getElementById("trees");
 
 // game constants
 const autoSaveInterval = 60; // 60 seconds
@@ -573,7 +574,72 @@ function pullCharacter() {
     return new Worker(char, rarity);
 }
 
+// combines 3 characters into a new character
+function craftCharacter(char1, char2, char3) {
+    let chars = [char1.character, char2.character, char3.character];
+    let rarities = [char1.rarity, char2.rarity, char3.rarity];
 
+    let betterChars = [];
+    let betterRarities = [];
+    for (let i = 0; i < chars.length; i++) {
+        let char = characters[chars[i]];
+        let rarity = rarities[i];
+        
+        // get random char with lower or equal weight
+        let lower_or_equal_char_weights = [];
+        for (let key in characters) {
+            if (characters[key].weight <= characters[char].weight) {
+                lower_or_equal_char_weights.push(key);
+            }
+        }
+        let rand = Math.random() * lower_or_equal_char_weights.length;
+        let newChar = lower_or_equal_char_weights[Math.floor(rand)];
+        betterChars.push(newChar);
+
+        // get random rarity with lower or equal weight
+        let lower_or_equal_rarity_weights = [];
+        for (let key in rarities) {
+            if (rarities[key].weight <= rarities[rarity].weight) {
+                lower_or_equal_rarity_weights.push(key);
+            }
+        }
+        rand = Math.random() * lower_or_equal_rarity_weights.length;
+        let newRarity = lower_or_equal_rarity_weights[Math.floor(rand)];
+        betterRarities.push(newRarity);
+    }
+
+    // pick one of the better chars and rarities
+    let rand = Math.random() * betterChars.length;
+    let char = betterChars[Math.floor(rand)];
+    rand = Math.random() * betterRarities.length;
+    let rarity = betterRarities[Math.floor(rand)];
+
+    chars.push(char);
+    rarities.push(rarity);
+
+    rand = Math.random() * chars.length;
+    char = chars[Math.floor(rand)];
+    rand = Math.random() * rarities.length;
+    rarity = rarities[Math.floor(rand)];
+
+    let newChar = new Worker(char, rarity);
+    for (let key in newChar.ivs) {
+        rand = Math.random() * 4;
+        rand = Math.floor(rand);
+        if(rand === 0) {
+            newChar.ivs[key] = char1.ivs[key];
+        } else if (rand === 1) {
+            newChar.ivs[key] = char2.ivs[key];
+        }
+        else if (rand === 2) {
+            newChar.ivs[key] = char3.ivs[key];
+        }
+    }
+
+    newChar.stats = newChar.calculateStats();
+
+    return newChar;
+}
 
 class Worker {
     constructor(character, rarity) {
@@ -583,7 +649,84 @@ class Worker {
         this.xp = 0;
         this.ivs = this.generateIVs();
         this.evs = this.generateEVs();
+        this.stats = this.calculateStats();
+        this.x = 50;
+        this.y = 50;
+        this.div = null;
+        this.targetTree = null;
     }
+
+    tick() {
+        if (this.div === null) {
+            this.div = document.createElement("div");
+            this.div.classList.add("worker-in-game");
+            let img = document.createElement("img");
+            img.src = "assets/" + characters[this.character].image;
+            img.alt = characters[this.character].name;
+            img.width = 64;
+            img.height = 64;
+            this.div.appendChild(img);
+            let tooltip = document.createElement("div");
+            tooltip.classList.add("tooltip");
+            tooltip.innerText = characters[this.character].name + " (" + rarities[this.rarity].name + ")";
+            this.div.appendChild(tooltip);
+            treeDiv.appendChild(this.div);
+
+            this.div.style.left = this.x + "%";
+            this.div.style.top = this.y + "%";
+        }
+
+        if (this.targetTree === null) {
+            let closestTree = null;
+            let closestDistance = 1000;
+            for (let i = 0; i < treeField.length; i++) {
+                let tree = treeField[i];
+
+                if (tree.respawnTime > 0) {
+                    continue;
+                }
+
+                if (tree.element.classList.contains("chopping")) {
+                    continue;
+                }
+
+                let x = tree.x;
+                let y = tree.y;
+
+                let dist = Math.sqrt((this.x - x) ** 2 + (this.y - y) ** 2);
+                if (dist < closestDistance) {
+                    closestTree = tree;
+                    closestDistance = dist;
+                }
+
+            }
+
+            this.targetTree = closestTree;
+        }
+
+        if (this.targetTree === null) { // no trees to chop
+            console.log("No trees to chop");
+            return;
+        }
+
+        let tree = this.targetTree;
+        let dist = Math.sqrt((this.x - tree.x) ** 2 + (this.y - tree.y) ** 2);
+        if (dist < 1) {
+            tree.element.classList.add("chopping");
+        }
+
+        let dx = tree.x - this.x;
+        let dy = tree.y - this.y;
+        let angle = Math.atan2(dy, dx);
+        let speed = 1;
+        this.x += Math.cos(angle) * speed;
+        this.y += Math.sin(angle) * speed;
+
+        this.div.style.left = this.x + "%";
+        this.div.style.top = this.y + "%";
+    }
+
+
 
     generateEVs() {
         return {
@@ -725,8 +868,6 @@ function addTree() {
     let tree = trees[treeTypes[Math.floor(Math.random() * treeTypes.length)]];
 
 
-    let treeDiv = document.getElementById("trees");
-
     let treeElement = document.createElement("div");
     treeDiv.appendChild(treeElement);
     treeElement.classList.add("tree");
@@ -754,6 +895,8 @@ function addTree() {
         tree: tree,
         respawnTime: 0,
         element: treeElement,
+        x: x,
+        y: y
     };
 
     treeField.push(treeData);
@@ -762,7 +905,6 @@ function addTree() {
 
 function addTreeOfType(treeType, x, y) {
     let tree = trees[treeType];
-    let treeDiv = document.getElementById("trees");
 
     let treeElement = document.createElement("div");
     treeDiv.appendChild(treeElement);
@@ -789,6 +931,8 @@ function addTreeOfType(treeType, x, y) {
         tree: tree,
         respawnTime: 0,
         element: treeElement,
+        x: x,
+        y: y
     };
 
     treeField.push(treeData);
@@ -969,6 +1113,12 @@ function tick() {
     if (saveTimer >= autoSaveInterval) {
         save();
         saveTimer = 0;
+    }
+
+    for (let i = 0; i < worker.length; i++) {
+        if (worker[i] !== null) {
+            worker[i].tick();
+        }
     }
 
     for (let i = 0; i < treeField.length; i++) {
