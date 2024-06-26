@@ -31,6 +31,10 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    /* disable text selection */
+    user-select: none;
+
+
 }
 
 #ui {
@@ -134,7 +138,7 @@ button:disabled {
         transform: rotate(0deg);
     }
     20% {
-        transform: rotate(7deg);
+        transform: rotate(8deg);
     }
     100% {
         transform: rotate(0deg);
@@ -172,4 +176,19 @@ button:disabled {
 .ui-button:disabled {
     background-color: rgba(40, 46, 34, 0.5);
     cursor: not-allowed;
+}
+
+.worker {
+    width: 64px;
+    height: 64px;
+    position: relative;
+    border: 2px solid darkslategray;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 5px darkslategray;
+    text-align: center;
+    /* center the text vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }

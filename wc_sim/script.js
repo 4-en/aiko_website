@@ -7,10 +7,31 @@ let axeLevel = 1;
 let upgradeCost = 10;
 let tickCooldown = 0;
 let time = 0;
+let tickCount = 0;
 let version = "0.1.0";
 let startTime = Date.now();
 let playerId = Math.floor(Math.random() * 1000000);
 let playerName = "Player";
+
+let soundPlayer = null;
+let musicPlayer = null;
+
+function playSound(sound) {
+    if (soundPlayer) {
+        soundPlayer.pause();
+    }
+    soundPlayer = new Audio("assets/" + sound);
+    soundPlayer.play();
+}
+
+function playMusic(music) {
+    if (musicPlayer) {
+        musicPlayer.pause();
+    }
+    musicPlayer = new Audio("assets/" + music);
+    musicPlayer.loop = true;
+    musicPlayer.play();
+}
 
 
 function save() {
@@ -67,7 +88,7 @@ function load() {
         }
     }
 }
-        
+
 
 
 function sfc32(a, b, c, d) {
@@ -101,13 +122,17 @@ const logsElement = document.getElementById('logs');
 const axeLevelElement = document.getElementById('axeLevel');
 const upgradeCostElement = document.getElementById('upgradeCost');
 const upgradeAxeButton = document.getElementById('upgradeAxeButton');
+const recruitButton = document.getElementById('recruitWorkerButton');
+const plantTreeButton = document.getElementById('plantTreeButton');
+const plantTreeCostElement = document.getElementById('plantTreeCost');
+const workersElement = document.getElementById('workers');
 
 // game constants
 const autoSaveInterval = 60; // 60 seconds
 const tickRate = 0.6; // 1 tick every 0.6 seconds
 // xp values
 const baseXp = 83;
-
+let _xpForLevelCache = {};
 function xpForLevel(level) {
     if (level === 1) {
         return 0;
@@ -116,10 +141,15 @@ function xpForLevel(level) {
         return baseXp;
     }
 
+    if (_xpForLevelCache[level]) {
+        return _xpForLevelCache[level];
+    }
+
     let previousLevelXp = xpForLevel(level - 1);
     let additionalXp = 1 / 4 * Math.floor(level - 1 + 300 * Math.pow(2, (level - 1) / 7));
 
-    return previousLevelXp + additionalXp;
+    _xpForLevelCache[level] = previousLevelXp + additionalXp;
+    return _xpForLevelCache[level];
 }
 
 function showMessageBoxAtPos(message, x, y) {
@@ -284,6 +314,7 @@ const axes = {
 
 const characters = {
     "bot": {
+        "weight": 1000, // "weight" is the chance of getting this character, higher weight = higher chance
         "name": "Bot",
         "image": "bot.png",
         "agility": 1,
@@ -297,6 +328,7 @@ const characters = {
         "trading": 1
     },
     "gnome_child": {
+        "weight": 500,
         "name": "Gnome Child",
         "image": "gnome_child.png",
         "agility": 1,
@@ -310,6 +342,7 @@ const characters = {
         "trading": 1
     },
     "graador": {
+        "weight": 100,
         "name": "General Graador",
         "image": "graador.png",
         "agility": 1,
@@ -492,29 +525,29 @@ class Worker {
         let rarityStats = rarities[this.rarity];
         let stats = {};
         for (let key in this.ivs) {
-            if(key === "general") {
+            if (key === "general") {
                 continue;
             }
             let charStatKey = 0;
             if (charStats.hasOwnProperty(key)) {
-                charStatKey+= charStats[key];
+                charStatKey += charStats[key];
             }
             if (charStats.hasOwnProperty("general")) {
-                charStatKey+= rarityStats["general"];
+                charStatKey += rarityStats["general"];
             }
             let rarityStatKey = 0;
             if (rarityStats.hasOwnProperty(key)) {
-                rarityStatKey+= rarityStats[key];
+                rarityStatKey += rarityStats[key];
             }
             if (rarityStats.hasOwnProperty("general")) {
-                rarityStatKey+= rarityStats["general"];
+                rarityStatKey += rarityStats["general"];
             }
             let ivStatKey = 0;
             if (this.ivs.hasOwnProperty(key)) {
-                ivStatKey+= this.ivs[key];
+                ivStatKey += this.ivs[key];
             }
             if (this.ivs.hasOwnProperty("general")) {
-                ivStatKey+= this.ivs["general"];
+                ivStatKey += this.ivs["general"];
             }
 
             stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey);
@@ -524,7 +557,7 @@ class Worker {
 }
 
 
-let worker = [];
+let worker = [null, null, null, null];
 let activeTree = null;
 let treeField = [];
 
@@ -535,7 +568,7 @@ function treeClick(event, index) {
     }
     let mouseX = event.clientX + 20;
     let mouseY = event.clientY - 100;
-    if(treeField[index].respawnTime > 0) {
+    if (treeField[index].respawnTime > 0) {
         showMessageBoxAtPos("Tree is respawning", mouseX, mouseY);
         return;
     }
@@ -546,11 +579,11 @@ function treeClick(event, index) {
         return;
     }
 
-    if(activeTree === index) {
+    if (activeTree === index) {
         return;
     }
 
-    if(activeTree !== null) {
+    if (activeTree !== null) {
         treeField[activeTree].element.classList.remove("chopping");
     }
 
@@ -568,47 +601,98 @@ function rollTreeCut(level, axeBonus, treeDiff, treeResist) {
     return chance < p;
 }
 
+function addTree() {
+    let treeTypes = Object.keys(trees);
+    let tree = trees[treeTypes[Math.floor(Math.random() * treeTypes.length)]];
+
+
+    let treeDiv = document.getElementById("trees");
+
+    let treeElement = document.createElement("div");
+    treeDiv.appendChild(treeElement);
+    treeElement.classList.add("tree");
+    let image = document.createElement("img");
+    image.src = "assets/" + tree.image;
+    image.alt = tree.name;
+    image.classList.add("tree-image");
+    image.width = 64;
+    treeElement.appendChild(image);
+    let i = treeField.length;
+    treeElement.addEventListener("click", (event) => treeClick(event, i));
+    treeDiv.appendChild(treeElement);
+
+    let tooltip = document.createElement("div");
+    tooltip.classList.add("tooltip");
+    tooltip.innerText = "Chop " + tree.name;
+    treeElement.appendChild(tooltip);
+    // set random position
+    let x = Math.floor(Math.random() * 90);
+    let y = Math.floor(Math.random() * 90);
+    treeElement.style.left = x + "%";
+    treeElement.style.top = y + "%";
+
+    let treeData = {
+        tree: tree,
+        respawnTime: 0,
+        element: treeElement,
+    };
+
+    treeField.push(treeData);
+
+}
+
+function addTreeOfType(treeType, x, y) {
+    let tree = trees[treeType];
+    let treeDiv = document.getElementById("trees");
+
+    let treeElement = document.createElement("div");
+    treeDiv.appendChild(treeElement);
+    treeElement.classList.add("tree");
+    let image = document.createElement("img");
+    image.src = "assets/" + tree.image;
+    image.alt = tree.name;
+    image.classList.add("tree-image");
+    image.width = 64;
+    treeElement.appendChild(image);
+    let i = treeField.length;
+    treeElement.addEventListener("click", (event) => treeClick(event, i));
+    treeDiv.appendChild(treeElement);
+
+    let tooltip = document.createElement("div");
+    tooltip.classList.add("tooltip");
+    tooltip.innerText = "Chop " + tree.name;
+    treeElement.appendChild(tooltip);
+    // set random position
+    treeElement.style.left = x + "%";
+    treeElement.style.top = y + "%";
+
+    let treeData = {
+        tree: tree,
+        respawnTime: 0,
+        element: treeElement,
+    };
+
+    treeField.push(treeData);
+}
 
 function init() {
     let seed = 421;
     let rand = createRand(seed);
-    let treeTypes = Object.keys(trees);
-    let fieldSize = 18;
-    let treeDiv = document.getElementById("trees");
-    for (let i = 0; i < fieldSize; i++) {
-        let tree = trees[treeTypes[Math.floor(rand() * treeTypes.length)]];
+    
+    let normalTrees = 3;
+    let oakTrees = 2;
+    let willowTrees = 1;
 
-        let treesDiv = document.getElementById("trees");
+    for (let i = 0; i < normalTrees; i++) {
+        addTreeOfType("normal", Math.floor(rand() * 90), Math.floor(rand() * 90));
+    }
 
-        let treeElement = document.createElement("div");
-        treesDiv.appendChild(treeElement);
-        treeElement.classList.add("tree");
-        let image = document.createElement("img");
-        image.src = "assets/" + tree.image;
-        image.alt = tree.name;
-        image.classList.add("tree-image");
-        image.width = 64;
-        treeElement.appendChild(image);
-        treeElement.addEventListener("click", (event) => treeClick(event, i));
-        treeDiv.appendChild(treeElement);
+    for (let i = 0; i < oakTrees; i++) {
+        addTreeOfType("oak", Math.floor(rand() * 90), Math.floor(rand() * 90));
+    }
 
-        let tooltip = document.createElement("div");
-        tooltip.classList.add("tooltip");
-        tooltip.innerText = "Chop " + tree.name;
-        treeElement.appendChild(tooltip);
-        // set random position
-        let x = Math.floor(rand() * 90);
-        let y = Math.floor(rand() * 90);
-        treeElement.style.left = x + "%";
-        treeElement.style.top = y + "%";
-
-        let treeData = {
-            tree: tree,
-            respawnTime: 0,
-            element: treeElement,
-        };
-
-        treeField.push(treeData);
+    for (let i = 0; i < willowTrees; i++) {
+        addTreeOfType("willow", Math.floor(rand() * 90), Math.floor(rand() * 90));
     }
 }
 
@@ -617,12 +701,33 @@ init();
 // Functions
 function updateUI() {
     levelElement.innerText = level;
-    xpElement.innerText = xp - Math.floor(xpForLevel(level));
-    xpForNextLevelElement.innerText = Math.floor(xpForNextLevel) - Math.floor(xpForLevel(level));
+    xpElement.innerText = Math.floor(xp - xpForLevel(level));
+    xpForNextLevelElement.innerText = Math.floor(xpForNextLevel - xpForLevel(level));
     logsElement.innerText = coins;
     axeLevelElement.innerText = axeLevel;
     upgradeCostElement.innerText = upgradeCost;
     upgradeAxeButton.disabled = coins < upgradeCost;
+    plantTreeCostElement.innerText = getNextTreeCost();
+
+    workersElement.innerText = "";
+    for (let i = 0; i < worker.length; i++) {
+        let workerElement = document.createElement("div");
+        workerElement.classList.add("worker");
+        if (worker[i] !== null) {
+            let tooltip = document.createElement("div");
+            tooltip.classList.add("tooltip");
+            tooltip.innerText = worker[i].character + " (" + worker[i].rarity + ")";
+            workerElement.appendChild(tooltip);
+        } else {
+            let tooltip = document.createElement("div");
+            tooltip.classList.add("tooltip");
+            tooltip.innerText = "Empty";
+            workerElement.innerText = "" + (i + 1);
+            workerElement.appendChild(tooltip);
+        }
+        workersElement.appendChild(workerElement);
+
+    }
 }
 
 function gainXP(amount) {
@@ -636,6 +741,7 @@ function gainXP(amount) {
 function levelUp() {
     level++;
     xpForNextLevel = xpForLevel(level + 1);
+    playSound("Woodcutting_level_up.oga");
 }
 let chopSound = new Audio("assets/chop.oga");
 function cutTree() {
@@ -656,7 +762,7 @@ function cutTree() {
         coins += logGain;
         treeData.respawnTime = tree.respawnTime;
 
-        if(getRand() < tree.depletionChance) {
+        if (getRand() < tree.depletionChance) {
             let element = treeData.element;
             element.classList.add("chopped");
             element.classList.remove("chopping");
@@ -682,10 +788,52 @@ function upgradeAxe() {
 
 upgradeAxeButton.addEventListener('click', upgradeAxe);
 
+function recruitHandler(event) {
+    let new_worker = pullCharacter();
+    for (let i = 0; i < worker.length; i++) {
+        if (worker[i] === null) {
+            worker[i] = new_worker;
+            updateUI();
+            break;
+        }
+    }
+
+    console.log(new_worker);
+    updateUI();
+}
+
+recruitButton.addEventListener('click', recruitHandler);
+
+function getNextTreeCost() {
+    return Math.floor(1000 + 1000 * treeField.length * treeField.length / 25);
+}
+
+function plantTreeHandler(event) {
+
+    if (coins < getNextTreeCost()) {
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("Not enough coins", x, y);
+        return;
+    }
+
+    coins -= getNextTreeCost();
+    addTree();
+    updateUI();
+}
+
+plantTreeButton.addEventListener('click', plantTreeHandler);
+
+function cancelRightClicks(event) {
+    event.preventDefault();
+}
+
+document.addEventListener('contextmenu', cancelRightClicks);
 
 let saveTimer = 0;
 function tick() {
     time += tickRate;
+    tickCount++;
     saveTimer += tickRate;
     if (saveTimer >= autoSaveInterval) {
         save();
@@ -705,6 +853,9 @@ function tick() {
         }
     }
 
+    if (activeTree !== null) {
+        chopSound.play();
+    }
     if (tickCooldown > 0) {
         tickCooldown -= tickRate;
         return;
