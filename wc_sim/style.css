@@ -255,3 +255,22 @@ button:disabled {
     background-color: white;
     color: rgb(40, 46, 34);
 }
+
+.xp-drop {
+    position: absolute;
+    font-size: 24px;
+    color: yellow;
+    z-index: 100;
+    animation: xp-drop 2.5s ease-out;
+}
+
+@keyframes xp-drop {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-150px);
+        opacity: 0;
+    }
+}

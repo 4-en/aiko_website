@@ -12,6 +12,9 @@ let version = "0.1.0";
 let startTime = Date.now();
 let playerId = Math.floor(Math.random() * 1000000);
 let playerName = "Player";
+let worker = [null, null, null, null, null];
+let activeTree = null;
+let treeField = [];
 
 let soundPlayer = null;
 let musicPlayer = null;
@@ -47,6 +50,10 @@ function resetEverything() {
     startTime = Date.now();
     playerId = Math.floor(Math.random() * 1000000);
     playerName = "Player";
+    treeField = [];
+    worker = [null, null, null, null, null];
+    activeTree = null;
+    init();
     save();
     location.reload();
 }
@@ -62,8 +69,35 @@ function save() {
         upgradeCost: upgradeCost,
         version: version,
         startTime: startTime,
+        time: time,
         playerId: playerId,
-        playerName: playerName
+        playerName: playerName,
+        trees: treeField.map(tree => {
+            let treeKey = Object.keys(trees).find(key => trees[key].name === tree.tree.name);
+            return {
+                x: tree.x,
+                y: tree.y,
+                tree: treeKey,
+                respawnTime: tree.respawnTime
+            };
+        }),
+        workers: worker.map(worker1 => {
+
+            if (worker1 === null) {
+                return null;
+            }
+
+            return {
+                character: worker1.character,
+                rarity: worker1.rarity,
+                level: worker1.level,
+                xp: worker1.xp,
+                ivs: worker1.ivs,
+                evs: worker1.evs,
+                x: worker1.x,
+                y: worker1.y,
+            };
+        })
     };
 
     localStorage.setItem('saveData', JSON.stringify(saveData));
@@ -98,11 +132,43 @@ function load() {
         if (saveData.startTime) {
             startTime = saveData.startTime;
         }
+        if (saveData.time) {
+            time = saveData.time;
+        }
         if (saveData.playerId) {
             playerId = saveData.playerId;
         }
         if (saveData.playerName) {
             playerName = saveData.playerName;
+        }
+        if (saveData.trees) {
+            treeField = saveData.trees.map(tree => {
+                return {
+                    x: tree.x,
+                    y: tree.y,
+                    tree: trees[tree.tree],
+                    respawnTime: tree.respawnTime,
+                    element: null
+                };
+            });
+        }
+        if (saveData.workers) {
+            worker = saveData.workers.map(worker1 => {
+
+                if (worker1 === null) {
+                    return null;
+                }
+
+                let newWorker = new Worker(worker1.character, worker1.rarity);
+                newWorker.level = worker1.level;
+                newWorker.xp = worker1.xp;
+                newWorker.ivs = worker1.ivs;
+                newWorker.evs = worker1.evs;
+                newWorker.x = worker1.x;
+                newWorker.y = worker1.y;
+                newWorker.stats = newWorker.calculateStats();
+                return newWorker;
+            });
         }
     }
 }
@@ -691,7 +757,7 @@ function craftCharacter(char1, char2, char3) {
     for (let i = 0; i < chars.length; i++) {
         let char = characters[chars[i]];
         let rarity = rarities[i];
-        
+
         // get random char with lower or equal weight
         let lower_or_equal_char_weights = [];
         for (let key in characters) {
@@ -733,7 +799,7 @@ function craftCharacter(char1, char2, char3) {
     for (let key in newChar.ivs) {
         rand = Math.random() * 4;
         rand = Math.floor(rand);
-        if(rand === 0) {
+        if (rand === 0) {
             newChar.ivs[key] = char1.ivs[key];
         } else if (rand === 1) {
             newChar.ivs[key] = char2.ivs[key];
@@ -780,7 +846,7 @@ function createDialog(title, content, onClose) {
     document.body.appendChild(dialog);
     dialog.showModal();
 }
-    
+
 
 // create test dialog
 /*
@@ -868,17 +934,17 @@ class Worker {
 
         while (Object.keys(states).length > 0) {
             let state = rollWeightedRandom(states);
-            
+
             let started = this.startAction(state);
-            if(started) {
+            if (started) {
                 return state;
             }
-            
+
             delete states[state];
         }
 
         return "idle";
-        
+
     }
 
     findTreeForChopping() {
@@ -891,7 +957,7 @@ class Worker {
                 continue;
             }
 
-            if(tree.tree.level > this.level) {
+            if (tree.tree.level > this.level) {
                 continue;
             }
 
@@ -939,11 +1005,11 @@ class Worker {
     }
 
     doCharacterChopping() {
-        if(this.cooldown>0) {
+        if (this.cooldown > 0) {
             return;
         }
 
-        if(this.chopping === null) {
+        if (this.chopping === null) {
             this.state = "idle";
             return;
         }
@@ -957,13 +1023,16 @@ class Worker {
 
         let roll = rollTreeCut(level, axeBonus, treeDiff, treeResist);
         this.cooldown = treeData.tickCooldown;
-        if(!roll) {
+        if (!roll) {
             return;
         }
 
         let xpGain = treeData.xp * (1 + this.stats.learning_rate / 200);
-        gainXP(xpGain/4);
+        xpGain = Math.floor(xpGain);
+        let playerXpGain = Math.floor(xpGain / 4);
+        gainXP(playerXpGain);
         this.addXp(xpGain);
+        spawnXpDrop(this.x, this.y, xpGain + " (+" + playerXpGain + ")");
         let logGain = treeData.coins * (1 + this.stats.trading / 100);
         coins += Math.floor(logGain);
 
@@ -980,13 +1049,13 @@ class Worker {
     }
 
     doChopping() {
-        if(this.targetTree === null) {
+        if (this.targetTree === null) {
             this.state = "idle";
             return;
         }
 
         let tree = this.targetTree;
-        if(tree.respawnTime > 0) {
+        if (tree.respawnTime > 0) {
             this.targetTree = null;
             this.chopping = null;
             this.state = "idle";
@@ -1003,6 +1072,12 @@ class Worker {
         }
 
         // walk to tree
+        if (Math.random() < 0.3) {
+            let altTree = this.findTreeForChopping();
+            if (altTree !== null) {
+                this.targetTree = altTree;
+            }
+        }
 
         let dx = tree.x - this.x;
         let dy = tree.y - this.y;
@@ -1019,12 +1094,26 @@ class Worker {
             yMov = dy;
         }
 
-        this.x += xMov;
-        this.y += yMov;
+        this.moveBy(xMov, yMov);
 
-        this.div.style.left = this.x + "%";
-        this.div.style.top = this.y + "%";
+    }
 
+    moveBy(x, y) {
+        this.x += x;
+        this.y += y;
+        if (this.div !== null) {
+            this.div.style.left = this.x + "%";
+            this.div.style.top = this.y + "%";
+        }
+    }
+
+    setPosition(x, y) {
+        this.x = x;
+        this.y = y;
+        if (this.div !== null) {
+            this.div.style.left = this.x + "%";
+            this.div.style.top = this.y + "%";
+        }
     }
 
     doFarming() {
@@ -1082,7 +1171,7 @@ class Worker {
         }
 
         this.doAction(this.state);
-        
+
     }
 
     addXp(xp) {
@@ -1093,7 +1182,7 @@ class Worker {
             this.level += 1;
         }
 
-        if(this.level !== oldLevel) {
+        if (this.level !== oldLevel) {
             this.stats = this.calculateStats();
             this.tooltip.innerText = this.getDescriptionString();
         }
@@ -1192,9 +1281,6 @@ class Worker {
 }
 
 
-let worker = [null, null, null, null];
-let activeTree = null;
-let treeField = [];
 
 function treeClick(event, index) {
     let tree = treeField[index].tree;
@@ -1312,9 +1398,12 @@ function addTreeOfType(treeType, x, y) {
 }
 
 function init() {
+    if (treeField.length > 0) {
+        return;
+    }
     let seed = 421;
     let rand = createRand(seed);
-    
+
     let normalTrees = 3;
     let oakTrees = 2;
     let willowTrees = 1;
@@ -1332,7 +1421,17 @@ function init() {
     }
 }
 
-init();
+function spawnXpDrop(x, y, xp) {
+    let xpDrop = document.createElement("div");
+    xpDrop.classList.add("xp-drop");
+    xpDrop.innerText = "+" + xp + " xp";
+    xpDrop.style.left = x + "%";
+    xpDrop.style.top = y + "%";
+    treeDiv.appendChild(xpDrop);
+    setTimeout(() => {
+        treeDiv.removeChild(xpDrop);
+    }, 2000);
+}
 
 // Functions
 function updateUI() {
@@ -1359,7 +1458,7 @@ function updateUI() {
             let img = document.createElement("img");
             img.src = "assets/" + character.image;
             let color = rarity.color;
-            let shadowSize = 1 +  Math.min(20, 100 / (rarity.weight + 4));
+            let shadowSize = 1 + Math.min(20, 100 / (rarity.weight + 4));
             workerElement.style.boxShadow = "0 0 10px " + shadowSize + "px " + color;
             img.alt = character.name;
             img.height = 64;
@@ -1399,7 +1498,7 @@ function cutTree() {
     let tree = treeField[activeTree].tree;
     let treeData = treeField[activeTree];
 
-    if(treeData.respawnTime > 0) {
+    if (treeData.respawnTime > 0) {
         activeTree = null;
         return;
     }
@@ -1412,6 +1511,7 @@ function cutTree() {
         let xpGain = tree.xp;
         let logGain = tree.coins;
         gainXP(xpGain);
+        spawnXpDrop(treeData.x, treeData.y, xpGain);
         coins += logGain;
         treeData.respawnTime = tree.respawnTime;
 
@@ -1448,6 +1548,21 @@ function recruitHandler(event) {
         let x = event.clientX + 20;
         let y = event.clientY - 100;
         showMessageBoxAtPos("Not enough coins", x, y);
+        return;
+    }
+
+    // check if there is an empty worker slot
+    let emptySlot = false;
+    for (let i = 0; i < worker.length; i++) {
+        if (worker[i] === null) {
+            emptySlot = true;
+            break;
+        }
+    }
+    if (!emptySlot) {
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("No empty worker slots", x, y);
         return;
     }
 
@@ -1504,17 +1619,38 @@ function tick() {
         saveTimer = 0;
     }
 
-    for (let i = 0; i < worker.length; i++) {
-        if (worker[i] !== null) {
-            worker[i].tick();
-        }
-    }
-
     for (let i = 0; i < treeField.length; i++) {
         let treeData = treeField[i];
         if (treeData.tree === null) {
             continue;
         }
+
+        if (treeData.element === null) {
+            let tree = treeData.tree;
+            // tree was probably loaded from save
+            // create element and add to treeDiv
+            let treeElement = document.createElement("div");
+            treeDiv.appendChild(treeElement);
+            treeElement.classList.add("tree");
+            let image = document.createElement("img");
+            image.src = "assets/" + tree.image;
+            image.alt = tree.name;
+            image.classList.add("tree-image");
+            image.width = 64;
+            treeElement.appendChild(image);
+            treeElement.addEventListener("click", (event) => treeClick(event, i));
+            treeDiv.appendChild(treeElement);
+
+            let tooltip = document.createElement("div");
+            tooltip.classList.add("tooltip");
+            tooltip.innerText = "Chop " + tree.name;
+            treeElement.appendChild(tooltip);
+            treeData.element = treeElement;
+
+            treeElement.style.left = treeData.x + "%";
+            treeElement.style.top = treeData.y + "%";
+        }
+
 
         if (treeData.respawnTime > 0 && time > treeData.respawnTime) {
             treeData.respawnTime = 0;
@@ -1522,6 +1658,14 @@ function tick() {
             element.classList.remove("chopped");
         }
     }
+
+    for (let i = 0; i < worker.length; i++) {
+        if (worker[i] !== null) {
+            worker[i].tick();
+        }
+    }
+
+
 
     if (activeTree !== null) {
         chopSound.play();
@@ -1536,6 +1680,7 @@ function tick() {
 
 function main() {
     load();
+    init();
     // Initial UI update
     updateUI();
     setInterval(tick, tickRate * 1000);
