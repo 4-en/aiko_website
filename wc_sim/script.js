@@ -344,7 +344,7 @@ const characters = {
         "trading": 21
     },
     "thurgo": {
-        "weight": 100,
+        "weight": 200,
         "name": "Thurgo",
         "image": "thurgo.png",
         "agility": 1,
@@ -386,7 +386,7 @@ const characters = {
         "trading": 73
     },
     "oziach": {
-        "weight": 100,
+        "weight": 200,
         "name": "Oziach",
         "image": "Oziach.webp",
         "agility": 1,
@@ -417,6 +417,62 @@ const characters = {
         "weight": 100,
         "name": "Evil Bob",
         "image": "evil_bob.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "hans": {
+        "weight": 200,
+        "name": "Hans",
+        "image": "Hans.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "uri": {
+        "weight": 200,
+        "name": "Uri Molotov",
+        "image": "Uri.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "sandwich_lady": {
+        "weight": 200,
+        "name": "Sandwich Lady",
+        "image": "Sandwich_lady.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "ali_morrisane": {
+        "weight": 200,
+        "name": "Ali Morrisane",
+        "image": "Ali_Morrisane.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
@@ -753,7 +809,7 @@ class Worker {
         let dx = tree.x - this.x;
         let dy = tree.y - this.y;
         let angle = Math.atan2(dy, dx);
-        let speed = 1;
+        let speed = 1 * (1 + this.stats.agility / 100);
         this.x += Math.cos(angle) * speed;
         this.y += Math.sin(angle) * speed;
 

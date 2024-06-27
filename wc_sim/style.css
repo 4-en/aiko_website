@@ -77,7 +77,6 @@ button:disabled {
 .tree {
     font-size: 50px;
     margin: 20px;
-    border: 1px solid transparent;
     border-radius: 10%;
     position: absolute;
 }
@@ -85,7 +84,6 @@ button:disabled {
 
 .tree:hover {
     cursor: pointer;
-    border-color: black;
 }
 
 .tooltip {
