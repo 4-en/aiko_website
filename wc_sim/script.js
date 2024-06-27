@@ -970,6 +970,8 @@ class Worker {
             let bestLevelMod = Math.max(0, this.level - tree.tree.level);
             distMultiplier *= (1 + bestLevelMod / 10);
 
+            distMultiplier *= (1 + Math.random());
+
             let x = tree.x;
             let y = tree.y;
 
@@ -1072,7 +1074,7 @@ class Worker {
         }
 
         // walk to tree
-        if (Math.random() < 0.3) {
+        if (Math.random() < 0.1) {
             let altTree = this.findTreeForChopping();
             if (altTree !== null) {
                 this.targetTree = altTree;
