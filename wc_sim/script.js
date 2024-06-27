@@ -847,10 +847,10 @@ class Worker {
         states["farming"] = this.stats.farming / 100;
         states["fighting"] = this.stats.strength / 100;
 
-        while (states.keys().length > 1) {
+        while (Object.keys(states).length > 0) {
             let state = rollWeightedRandom(states);
             
-            let started = startAction(state);
+            let started = this.startAction(state);
             if(started) {
                 return state;
             }
@@ -862,10 +862,181 @@ class Worker {
         
     }
 
+    findTreeForChopping() {
+        let closestTree = null;
+        let closestDistance = 60 + this.stats.range / 100 * 30;
+        for (let i = 0; i < treeField.length; i++) {
+            let tree = treeField[i];
+
+            if (tree.respawnTime > 0) {
+                continue;
+            }
+
+            if(tree.tree.level > this.level) {
+                continue;
+            }
+
+            let distMultiplier = 1;
+            if (tree.element.classList.contains("chopping")) {
+                distMultiplier = 2;
+            }
+
+            let x = tree.x;
+            let y = tree.y;
+
+            let dist = Math.sqrt((this.x - x) ** 2 + (this.y - y) ** 2) * distMultiplier;
+            if (dist < closestDistance) {
+                closestTree = tree;
+                closestDistance = dist;
+            }
+
+        }
+
+        return closestTree;
+    }
+
     startAction(state) {
+
+        switch (state) {
+            case "idle":
+                return true;
+            case "chopping":
+                let tree = this.findTreeForChopping();
+                if (tree !== null) {
+                    this.targetTree = tree;
+                    return true;
+                }
+                return false;
+            case "farming":
+                return false;
+            case "fighting":
+                return false;
+        }
+
+        return false;
+    }
+
+    doCharacterChopping() {
+        if(this.cooldown>0) {
+            return;
+        }
+
+        if(this.chopping === null) {
+            this.state = "idle";
+            return;
+        }
+
+        let tree = this.chopping;
+        let treeData = tree.tree;
+        let axeBonus = this.stats.strength / 10 + 5;
+        let treeDiff = treeData.difficulty;
+        let treeResist = treeData.resist;
+        let level = this.stats.woodcutting / 1.5;
+
+        let roll = rollTreeCut(level, axeBonus, treeDiff, treeResist);
+        this.cooldown = treeData.tickCooldown;
+        if(!roll) {
+            return;
+        }
+
+        let xpGain = treeData.xp * (1 + this.stats.learning_rate / 200);
+        gainXP(xpGain/4);
+        this.addXp(xpGain);
+        let logGain = treeData.coins * (1 + this.stats.trading / 100);
+        coins += Math.floor(logGain);
+
+        if (getRand() < treeData.depletionChance) {
+            let element = tree.element;
+            element.classList.add("chopped");
+            element.classList.remove("chopping");
+            tree.respawnTime = treeData.respawnTime + time;
+
+            this.targetTree = null;
+            this.chopping = null;
+            this.state = "idle";
+        }
+    }
+
+    doChopping() {
+        if(this.targetTree === null) {
+            this.state = "idle";
+            return;
+        }
+
+        let tree = this.targetTree;
+        if(tree.respawnTime > 0) {
+            this.targetTree = null;
+            this.chopping = null;
+            this.state = "idle";
+            return;
+        }
+
+
+        let dist = Math.sqrt((this.x - tree.x) ** 2 + (this.y - tree.y) ** 2);
+        if (dist < 1) {
+            tree.element.classList.add("chopping");
+            this.chopping = tree;
+            this.doCharacterChopping();
+            return;
+        }
+
+        // walk to tree
+
+        let dx = tree.x - this.x;
+        let dy = tree.y - this.y;
+        let angle = Math.atan2(dy, dx);
+        let speed = 2 * (1 + this.stats.agility / 100);
+        let xMov = Math.cos(angle) * speed;
+        let yMov = Math.sin(angle) * speed;
+
+        if (Math.abs(xMov) > Math.abs(dx)) {
+            xMov = dx;
+        }
+
+        if (Math.abs(yMov) > Math.abs(dy)) {
+            yMov = dy;
+        }
+
+        this.x += xMov;
+        this.y += yMov;
+
+        this.div.style.left = this.x + "%";
+        this.div.style.top = this.y + "%";
+
+    }
+
+    doFarming() {
+        this.state = "idle";
+    }
+
+    doFighting() {
+        this.state = "idle";
+    }
+
+    doAction(state) {
+        switch (state) {
+            case "idle":
+                return;
+            case "chopping":
+                this.doChopping();
+                return;
+            case "farming":
+                this.doFarming();
+                return;
+            case "fighting":
+                this.doFighting();
+                return;
+        }
+
+        this.state = "idle";
     }
 
     tick() {
+        this.cooldown -= 1;
+        if (this.cooldown < 0) {
+            this.cooldown = 0;
+        }
+
         if (this.div === null) {
             this.div = document.createElement("div");
             this.div.classList.add("worker-in-game");
@@ -884,63 +1055,26 @@ class Worker {
             this.div.style.top = this.y + "%";
         }
 
-        if (this.targetTree === null) {
-            let closestTree = null;
-            let closestDistance = 1000;
-            for (let i = 0; i < treeField.length; i++) {
-                let tree = treeField[i];
-
-                if (tree.respawnTime > 0) {
-                    continue;
-                }
-
-                if (tree.element.classList.contains("chopping")) {
-                    continue;
-                }
-
-                let x = tree.x;
-                let y = tree.y;
-
-                let dist = Math.sqrt((this.x - x) ** 2 + (this.y - y) ** 2);
-                if (dist < closestDistance) {
-                    closestTree = tree;
-                    closestDistance = dist;
-                }
-
-            }
-
-            this.targetTree = closestTree;
+        if (this.state === null || this.state === "idle") {
+            this.state = this.getNewState();
         }
 
-        if (this.targetTree !== null && (this.targetTree.respawnTime > 0 || this.targetTree.element.classList.contains("chopping")) && this.chopping !== this.targetTree) {
-            this.targetTree = null;
+        this.doAction(this.state);
+        
+    }
+
+    addXp(xp) {
+        this.xp += xp;
+
+        let oldLevel = this.level;
+        this.level = 1;
+        while (this.xp >= xpForLevel(this.level + 1)) {
+            this.level += 1;
         }
 
-        if(this.targetTree !== null && this.targetTree.respawnTime > 0) {
-            this.targetTree = null;
+        if(this.level !== oldLevel) {
+            this.stats = this.calculateStats();
         }
-
-        if (this.targetTree === null) { // no trees to chop
-            console.log("No trees to chop");
-            return;
-        }
-
-        let tree = this.targetTree;
-        let dist = Math.sqrt((this.x - tree.x) ** 2 + (this.y - tree.y) ** 2);
-        if (dist < 1) {
-            tree.element.classList.add("chopping");
-            this.chopping = tree;
-        }
-
-        let dx = tree.x - this.x;
-        let dy = tree.y - this.y;
-        let angle = Math.atan2(dy, dx);
-        let speed = 1 * (1 + this.stats.agility / 100);
-        this.x += Math.cos(angle) * speed;
-        this.y += Math.sin(angle) * speed;
-
-        this.div.style.left = this.x + "%";
-        this.div.style.top = this.y + "%";
     }
 
 
@@ -992,7 +1126,7 @@ class Worker {
         let rarityWeight = 3;
         let ivWeight = 1;
 
-        let statMultiplier = 1;
+        let statMultiplier = 1.5;
 
         let stat = character / 100 * charWeight + rarity / 100 * rarityWeight + iv / 100 * ivWeight;
         stat = stat / (charWeight + rarityWeight + ivWeight);
@@ -1029,7 +1163,7 @@ class Worker {
                 ivStatKey += this.ivs["general"];
             }
 
-            stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(10, charStatKey, rarityStatKey, ivStatKey);
+            stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(2, charStatKey, rarityStatKey, ivStatKey);
         }
         return stats;
     }
@@ -1242,6 +1376,11 @@ function cutTree() {
     }
     let tree = treeField[activeTree].tree;
     let treeData = treeField[activeTree];
+
+    if(treeData.respawnTime > 0) {
+        activeTree = null;
+        return;
+    }
 
     let axePower = 1;
 
