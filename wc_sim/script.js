@@ -582,12 +582,45 @@ const rarities = {
     },
     "ancestral": {
         "color": "purple",
-        "general": 80,
+        "general": 70,
         "name": "Ancestral",
         "agility": 8,
         "strength": 9,
         "weight": 10
+    },
+    "twisted": {
+        "color": "darkgreen",
+        "general": 70,
+        "name": "Twisted",
+        "agility": 9,
+        "strength": 10,
+        "weight": 10
+    },
+    "legendary": {
+        "color": "#f5b038",
+        "general": 80,
+        "name": "Legendary",
+        "agility": 10,
+        "strength": 11,
+        "weight": 5
+    },
+    "golden_legendary": {
+        "color": "gold",
+        "general": 90,
+        "name": "Golden Legendary",
+        "agility": 11,
+        "strength": 12,
+        "weight": 1
+    },
+    "starlight": {
+        "color": "skyblue",
+        "general": 100,
+        "name": "Starlight",
+        "agility": 12,
+        "strength": 13,
+        "weight": 0.1
     }
+
 };
 
 function pullCharacter() {
@@ -1077,7 +1110,7 @@ function updateUI() {
             let img = document.createElement("img");
             img.src = "assets/" + character.image;
             let color = rarity.color;
-            let shadowSize = 1 +  Math.min(10,100 / rarity.weight);
+            let shadowSize = 1 +  Math.min(20, 100 / (rarity.weight + 4));
             workerElement.style.boxShadow = "0 0 10px " + shadowSize + "px " + color;
             img.alt = character.name;
             img.height = 64;
