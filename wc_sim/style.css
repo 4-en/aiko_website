@@ -102,6 +102,10 @@ button:disabled {
     width: 150px;
 }
 
+*:hover > .tooltip {
+    display: block;
+}
+
 .message-box {
     position: absolute;
     background-color: rgb(40, 46, 34);
@@ -112,9 +116,7 @@ button:disabled {
     font-size: 16px;
 }
 
-*:hover > .tooltip {
-    display: block;
-}
+
 
 .tree:hover::before {
     content: '🪓';

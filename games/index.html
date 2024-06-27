@@ -73,7 +73,7 @@
 
         .root {
             margin-top: 80px;
-			margin-bottom: 40px;
+            margin-bottom: 40px;
             display: flex;
             justify-content: top;
             align-items: center;
@@ -130,6 +130,21 @@
                 transform: translateY(0);
             }
         }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            padding: 10px;
+            border: 2px solid #eeccff;
+            border-radius: 5px;
+            font-size: 16px;
+            top: 60px;
+            left: 15px;
+        }
+
+        *:hover>.tooltip {
+            display: block;
+        }
     </style>
 </head>
 
@@ -145,13 +160,19 @@
     </div>
     <div class="root">
         <div class="links">
-            <!-- Add links here -->
-            <!-- GitHub -->
-            <a href="https://github.com/4-en">GitHub</a>
-            <a href="https://nickot.is">LULE</a>
-            <a href="../game/"><img src="../game/Red_partyhat.webp" alt="game" style="width: 40px; height: 40px;"></a>
-            <a href="../wc_sim/"><img src="../wc_sim/assets/icon.webp" alt="game" style="width: 40px; height: 40px;"></a>
-            <a href="../puzzle/"><img src="../puzzle/puzzle_box.webp" alt="game" style="width: 40px; height: 40px;"></a>
+            <a href="../game/">
+                <img src="../game/Red_partyhat.webp" alt="game" style="width: 40px; height: 40px;">
+                <span class="tooltip">Dropparty</span>
+            </a>
+            <a href="../wc_sim/">
+                <img src="../wc_sim/assets/icon.webp" alt="game"
+                    style="width: 40px; height: 40px;">
+                    <span class="tooltip">Woodcutting Simulator</span>
+                </a>
+            <a href="../puzzle/">
+                <img src="../puzzle/puzzle_box.webp" alt="game" style="width: 40px; height: 40px;">
+                <span class="tooltip">Puzzlebox</span>
+            </a>
         </div>
 </body>
 
