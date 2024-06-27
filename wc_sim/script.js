@@ -1,6 +1,7 @@
 // Initial game state
 let level = 1;
 let xp = 0;
+let _achsh = Math.floor(xp * Math.PI / 180);
 let xpForNextLevel = 83;
 let coins = 0;
 let axeLevel = 1;
@@ -270,7 +271,7 @@ const trees = {
         "xp": 37.5,
         "coins": 1,
         "level": 15,
-        "difficulty": 10,
+        "difficulty": 2,
         "resist": 8,
         "depletionChance": 1 / 8,
         "name": "Oak Tree",
@@ -282,7 +283,7 @@ const trees = {
         "xp": 67.5,
         "coins": 15,
         "level": 30,
-        "difficulty": 20,
+        "difficulty": 5,
         "resist": 25,
         "depletionChance": 1 / 16,
         "name": "Willow Tree",
@@ -294,7 +295,7 @@ const trees = {
         "xp": 100,
         "coins": 100,
         "level": 45,
-        "difficulty": 30,
+        "difficulty": 10,
         "restist": 40,
         "depletionChance": 1 / 32,
         "name": "Maple Tree",
@@ -306,7 +307,7 @@ const trees = {
         "xp": 175,
         "coins": 500,
         "level": 60,
-        "difficulty": 50,
+        "difficulty": 20,
         "resist": 60,
         "depletionChance": 1 / 64,
         "name": "Yew Tree",
@@ -318,7 +319,7 @@ const trees = {
         "xp": 250,
         "coins": 1000,
         "level": 75,
-        "difficulty": 60,
+        "difficulty": 30,
         "resist": 120,
         "depletionChance": 1 / 128,
         "name": "Magic Tree",
@@ -338,61 +339,61 @@ const axes = {
     },
     "iron": {
         "level": 1,
-        "power": 2,
+        "power": 15,
         "cost": 20,
         "name": "Iron Axe"
     },
     "steel": {
         "level": 5,
-        "power": 3,
+        "power": 30,
         "cost": 40,
         "name": "Steel Axe"
     },
     "black": {
         "level": 10,
-        "power": 4,
+        "power": 35,
         "cost": 80,
         "name": "Black Axe"
     },
     "mithril": {
         "level": 20,
-        "power": 5,
+        "power": 45,
         "cost": 160,
         "name": "Mithril Axe"
     },
     "adamant": {
         "level": 30,
-        "power": 6,
+        "power": 55,
         "cost": 320,
         "name": "Adamant Axe"
     },
     "rune": {
         "level": 40,
-        "power": 7,
+        "power": 60,
         "cost": 640,
         "name": "Rune Axe"
     },
     "dragon": {
         "level": 60,
-        "power": 8,
+        "power": 75,
         "cost": 1280,
         "name": "Dragon Axe"
     },
     "infernal": {
         "level": 61,
-        "power": 9,
+        "power": 80,
         "cost": 2560,
         "name": "Infernal Axe"
     },
     "crystal": {
         "level": 71,
-        "power": 10,
+        "power": 85,
         "cost": 5120,
         "name": "Crystal Axe"
     },
     "3a": {
         "level": 80,
-        "power": 11,
+        "power": 100,
         "cost": 102400,
         "name": "3rd Age Axe"
     },
@@ -1018,10 +1019,9 @@ class Worker {
         let treeData = tree.tree;
         let axeBonus = this.stats.strength / 10 + 5;
         let treeDiff = treeData.difficulty;
-        let treeResist = treeData.resist;
         let level = this.stats.woodcutting / 1.5;
 
-        let roll = rollTreeCut(level, axeBonus, treeDiff, treeResist);
+        let roll = rollTreeCut(level, axeBonus, treeDiff);
         this.cooldown = treeData.tickCooldown;
         if (!roll) {
             return;
@@ -1316,9 +1316,9 @@ function treeClick(event, index) {
     activeTree = index;
 }
 
-function rollTreeCut(level, axeBonus, treeDiff, treeResist) {
+function rollTreeCut(level, axeBonus, treeDiff) {
     let chance = Math.random();
-    let p = (level + axeBonus - treeDiff) / (treeResist);
+    let p = (3/10*treeDiff) + (level * ( 1 + axeBonus / 30)) / (150*treeDiff);
     return chance < p;
 }
 
@@ -1505,7 +1505,7 @@ function cutTree() {
 
     let axePower = 1;
 
-    let cutSuccess = rollTreeCut(level, axePower, tree.difficulty, tree.resist);
+    let cutSuccess = rollTreeCut(level, axePower, tree.difficulty);
 
     if (cutSuccess) {
         let xpGain = tree.xp;
@@ -1529,7 +1529,12 @@ function cutTree() {
     updateUI();
 }
 
-function upgradeAxe() {
+function upgradeAxe(event) {
+
+    // show disabled function message
+    showMessageBoxAtPos("This function is disabled", event.clientX + 20, event.clientY - 100);
+    return;
+
     if (coins >= upgradeCost) {
         coins -= upgradeCost;
         axeLevel++;
