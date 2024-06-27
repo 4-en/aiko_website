@@ -765,6 +765,9 @@ function craftCharacter(char1, char2, char3) {
                 lower_or_equal_char_weights.push(key);
             }
         }
+        if(lower_or_equal_char_weights.length === 0) {
+            lower_or_equal_char_weights.push(chars[i]);
+        }
         let rand = Math.random() * lower_or_equal_char_weights.length;
         let newChar = lower_or_equal_char_weights[Math.floor(rand)];
         betterChars.push(newChar);
@@ -776,12 +779,16 @@ function craftCharacter(char1, char2, char3) {
                 lower_or_equal_rarity_weights.push(key);
             }
         }
+        if (lower_or_equal_rarity_weights.length === 0) {
+            lower_or_equal_rarity_weights.push(rarity);
+        }
         rand = Math.random() * lower_or_equal_rarity_weights.length;
         let newRarity = lower_or_equal_rarity_weights[Math.floor(rand)];
         betterRarities.push(newRarity);
     }
 
     // pick one of the better chars and rarities
+    /*
     let rand = Math.random() * betterChars.length;
     let char = betterChars[Math.floor(rand)];
     rand = Math.random() * betterRarities.length;
@@ -789,11 +796,24 @@ function craftCharacter(char1, char2, char3) {
 
     chars.push(char);
     rarities_l.push(rarity);
+    */
+    chars = betterChars;
+    rarities_l = betterRarities;
 
-    rand = Math.random() * chars.length;
-    char = chars[Math.floor(rand)];
-    rand = Math.random() * rarities_l.length;
-    rarity = rarities_l[Math.floor(rand)];
+    let charWeights = {};
+    for (let i = 0; i < chars.length; i++) {
+        let char = characters[chars[i]];
+        charWeights[chars[i]] = char.weight;
+    }
+
+    let rarWeights = {};
+    for (let i = 0; i < rarities_l.length; i++) {
+        let rarity = rarities[rarities_l[i]];
+        rarWeights[rarities_l[i]] = rarity.weight;
+    }
+
+    char = rollWeightedRandom(charWeights);
+    rarity = rollWeightedRandom(rarWeights);
 
     let newChar = new Worker(char, rarity);
     for (let key in newChar.ivs) {
@@ -1257,7 +1277,6 @@ class Worker {
     generateIVs() {
         let max = 100;
         let min = 1;
-        let general = Math.floor(Math.random() * (max - min + 1) + min);
         let agility = Math.floor(Math.random() * (max - min + 1) + min);
         let strength = Math.floor(Math.random() * (max - min + 1) + min);
         let woodcutting = Math.floor(Math.random() * (max - min + 1) + min);
@@ -1268,7 +1287,6 @@ class Worker {
         let farming = Math.floor(Math.random() * (max - min + 1) + min);
         let trading = Math.floor(Math.random() * (max - min + 1) + min);
         return {
-            "general": general,
             "agility": agility,
             "strength": strength,
             "woodcutting": woodcutting,
@@ -1330,11 +1348,8 @@ class Worker {
             if (this.ivs.hasOwnProperty(key)) {
                 ivStatKey += this.ivs[key];
             }
-            if (this.ivs.hasOwnProperty("general")) {
-                ivStatKey += this.ivs["general"];
-            }
 
-            stats[key] = this.calculateStat(this.level, charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(2, charStatKey, rarityStatKey, ivStatKey);
+            stats[key] = this.calculateStat(Math.min(99, this.level), charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(2, charStatKey, rarityStatKey, ivStatKey);
         }
         return stats;
     }
@@ -1653,6 +1668,7 @@ function recruitHandler(event) {
 
     console.log(new_worker);
     updateUI();
+    save(); // save after recruiting to prevent save scumming
 }
 
 recruitButton.addEventListener('click', recruitHandler);
