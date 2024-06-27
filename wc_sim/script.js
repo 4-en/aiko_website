@@ -1378,7 +1378,7 @@ function treeClick(event, index) {
 
 function rollTreeCut(level, axeBonus, treeDiff) {
     let chance = Math.random();
-    let p = (3/10*treeDiff) + (level * ( 1 + axeBonus / 30)) / (150*treeDiff);
+    let p = (3/(10*treeDiff)) + (level * ( 1 + axeBonus / 30)) / (150*treeDiff);
     return chance < p;
 }
 
