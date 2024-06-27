@@ -1708,7 +1708,7 @@ craftWorkerButton.addEventListener('click', craftHandler);
 
 
 function getNextTreeCost() {
-    return Math.floor(1000 + 1000 * treeField.length * treeField.length / 25);
+    return Math.floor(500 + 1000 * treeField.length * treeField.length / 35);
 }
 
 function plantTreeHandler(event) {
