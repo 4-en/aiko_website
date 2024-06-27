@@ -1,0 +1,12 @@
+# planned features
+- quests / missions / exploration
+- pull / craft animations
+- random events
+- abilities / skills that can be inherited
+- positioning characters
+- buy xp
+- random tree drops
+  - bird nests
+  - axes
+- tree planting / farming
+- 

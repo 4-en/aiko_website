@@ -211,6 +211,8 @@ const plantTreeCostElement = document.getElementById('plantTreeCost');
 const workersElement = document.getElementById('workers');
 const treeDiv = document.getElementById("trees");
 const craftWorkerButton = document.getElementById("craftWorkerButton");
+const buyXpButton = document.getElementById("buyXPButton");
+const buyXpCostElement = document.getElementById("buyXPCost");
 
 // game constants
 const autoSaveInterval = 60; // 60 seconds
@@ -758,7 +760,7 @@ function craftCharacter(char1, char2, char3) {
         let char = characters[chars[i]];
         let rarity = rarities_l[i];
 
-        // get random char with lower or equal weight
+        // get all chars with lower or equal weight
         let lower_or_equal_char_weights = [];
         for (let key in characters) {
             if (characters[key].weight <= char.weight) {
@@ -766,13 +768,16 @@ function craftCharacter(char1, char2, char3) {
             }
         }
         if(lower_or_equal_char_weights.length === 0) {
+            // if no lower or equal weight, add the current char
             lower_or_equal_char_weights.push(chars[i]);
         }
+
+        // pick one of the better chars and add to the pool
         let rand = Math.random() * lower_or_equal_char_weights.length;
         let newChar = lower_or_equal_char_weights[Math.floor(rand)];
         betterChars.push(newChar);
 
-        // get random rarity with lower or equal weight
+        // get all rarities with lower or equal weight
         let lower_or_equal_rarity_weights = [];
         for (let key in rarities) {
             if (rarities[key].weight <= rarities[rarity].weight) {
@@ -782,6 +787,8 @@ function craftCharacter(char1, char2, char3) {
         if (lower_or_equal_rarity_weights.length === 0) {
             lower_or_equal_rarity_weights.push(rarity);
         }
+
+        // pick one of the better rarities and add to the pool
         rand = Math.random() * lower_or_equal_rarity_weights.length;
         let newRarity = lower_or_equal_rarity_weights[Math.floor(rand)];
         betterRarities.push(newRarity);
@@ -800,6 +807,9 @@ function craftCharacter(char1, char2, char3) {
     chars = betterChars;
     rarities_l = betterRarities;
 
+    // pick a new character and rarity for the new worker
+    // one of the three better_or_equal characters
+    // character/rarity based on weight
     let charWeights = {};
     for (let i = 0; i < chars.length; i++) {
         let char = characters[chars[i]];
@@ -1537,6 +1547,7 @@ function updateUI() {
     logsElement.innerText = Math.floor(coins);
     axeLevelElement.innerText = axeLevel;
     plantTreeCostElement.innerText = getNextTreeCost();
+    buyXpCostElement.innerText = 100 * selectedCharacters.length;
 
     workersElement.innerText = "";
     for (let i = 0; i < worker.length; i++) {
@@ -1715,6 +1726,42 @@ function plantTreeHandler(event) {
 }
 
 plantTreeButton.addEventListener('click', plantTreeHandler);
+
+function buyXpHandler(event) {
+    const cost = 100;
+    const xpAmount = 1000;
+
+    let selected = selectedCharacters;
+    if (selected.length === 0) {
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("Select a worker", x, y);
+        return;
+    }
+
+    let xpCost = cost * selected.length;
+    if (coins < xpCost) {
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("Not enough coins", x, y);
+        return;
+    }
+
+    coins -= xpCost;
+    for (let i = 0; i < selected.length; i++) {
+        let workerIndex = selected[i];
+        let workerData = worker[workerIndex];
+        workerData.addXp(xpAmount);
+
+        let x = workerData.x;
+        let y = workerData.y;
+        spawnXpDrop(x, y, xpAmount);
+    }
+
+    updateUI();
+}
+
+buyXpButton.addEventListener('click', buyXpHandler);
 
 function cancelRightClicks(event) {
     event.preventDefault();
