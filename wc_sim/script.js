@@ -1016,7 +1016,7 @@ function updateUI() {
             let rarity = rarities[worker[i].rarity];
             let tooltip = document.createElement("div");
             tooltip.classList.add("tooltip");
-            tooltip.innerText = character.name + " (" + rarity.name + ")";
+            tooltip.innerText = worker[i].getDescriptionString();
             workerElement.appendChild(tooltip);
             let img = document.createElement("img");
             img.src = "assets/" + character.image;
