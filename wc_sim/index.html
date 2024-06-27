@@ -11,11 +11,24 @@
 <body>
     <div id="game">
         <div id="ui">
-            <button class="ui-button saveButton" onclick="save();">Save</button>
-            <div class="stats">
-                <p>Level: <span id="level">1</span> (XP: <span id="xp">0</span>/<span id="xpForNextLevel">83</span>)</p>
-                <p>Coins: <span id="logs">0</span></p>
-                <p>Axe Level: <span id="axeLevel">1</span></p>
+            <dialog id="guide" class="dialog">
+                <h2>Guide</h2>
+                <p>Useful text here.</p>
+                <button class="ui-button dialog-close" onclick="closeGuide();">X</button>
+            </dialog>
+            <div class="header">
+                <div class="left-header">
+                    <div class="stats">
+                        <div>Level: <span id="level">1</span> (XP: <span id="xp">0</span>/<span
+                                id="xpForNextLevel">83</span>)
+                        </div>
+                        <div>Coins: <span id="logs">0</span></div>
+                    </div>
+                </div>
+                <div class="right-header">
+                    <button class="ui-button guideButton" onclick="openGuide();">Guide</button>
+                    <button class="ui-button saveButton" onclick="save();">Save</button>
+                </div>
             </div>
             <div class="shop">
                 <button class="ui-button" id="plantTreeButton">Plant Tree (<span
@@ -41,6 +54,15 @@
 
     </div>
     <script src="script.js"></script>
+    <script>
+        function openGuide() {
+            document.getElementById("guide").showModal();
+        }
+
+        function closeGuide() {
+            document.getElementById("guide").close();
+        }
+    </script>
 </body>
 
 </html>

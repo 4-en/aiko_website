@@ -18,6 +18,7 @@ body {
     height: 100vh;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 #game {
@@ -44,22 +45,33 @@ body {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    margin-top: 0px;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
     flex-direction: column;
     background-color: rgba(40, 54, 31, 0.8);
     border: 10px solid rgb(38, 41, 37);
     width: 100%;
 }
 
-#ui > div {
-    margin: 10px;
+.shop {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
 }
-#ui > div > * {
+
+.workers {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.workers > * {
     margin: 10px;
 }
 button {
@@ -86,13 +98,48 @@ button:disabled {
     cursor: pointer;
 }
 
-.saveButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+.header {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+
+.right-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0;
+}
+
+.left-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-right: auto;
+    padding: 0;
+}
+
+
+
+.stats {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.stats > * {
+    margin: 10px;
 }
 
 .tooltip {
@@ -107,6 +154,7 @@ button:disabled {
     top: 60px;
     left: 15px;
     text-wrap: nowrap;
+    z-index: 1;
 }
 
 *:hover > .tooltip {
@@ -128,10 +176,12 @@ button:disabled {
 .tree:hover::before {
     content: '🪓';
     position: absolute;
-    top: 20px;
+    top: 0px;
     left: 20px;
     font-size: 64px;
-    z-index: 1;
+    z-index: 5;
+    animation: chopping 0.6s infinite;
+    transform-origin: 100% 100%;
 }
 
 .chopping {
@@ -167,10 +217,11 @@ button:disabled {
 .ui-button {
     background-color: rgb(40, 46, 34);
     color: yellow;
-    padding: 10px;
+    padding: 8px 10px;
     border-radius: 1px;
     border: 3px solid black;
     font-size: 16px;
+    font-family: 'runescape';
 }
 
 .ui-button:hover {
@@ -207,8 +258,55 @@ button:disabled {
     height: 64px;
 }
 
+@media screen and (max-width: 600px){
+    .ui-button {
+        font-size: 12px;
+        padding: 5px 8px;
+        border: 2px solid black;
+    }
+
+    .header {
+        font-size: 12px;
+    }
+
+    .stats {
+        font-size: 12px;
+    }
+
+    .tooltip {
+        font-size: 12px;
+    }
+
+    .message-box {
+        font-size: 12px;
+    }
+
+    .worker {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .worker > img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .worker-in-game > img {
+        width: 32px;
+    }
+
+    .tree {
+        font-size: 32px;
+    }
+
+    .tree > img {
+        width: 42px;
+    }
+    
+}
+
 .dialog {
-    position: absolute;
     background-color: rgb(40, 46, 34);
     color: yellow;
     padding: 10px;
@@ -221,7 +319,6 @@ button:disabled {
     max-height: 600px;
     z-index: 100;
     box-sizing: border-box;
-    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;

@@ -204,7 +204,6 @@ const levelElement = document.getElementById('level');
 const xpElement = document.getElementById('xp');
 const xpForNextLevelElement = document.getElementById('xpForNextLevel');
 const logsElement = document.getElementById('logs');
-const axeLevelElement = document.getElementById('axeLevel');
 const recruitButton = document.getElementById('recruitWorkerButton');
 const plantTreeButton = document.getElementById('plantTreeButton');
 const plantTreeCostElement = document.getElementById('plantTreeCost');
@@ -258,7 +257,7 @@ function showMessageBoxAtPos(message, x, y) {
 const trees = {
     "normal": {
         "xp": 25,
-        "coins": 10,
+        "coins": 20,
         "level": 1,
         "difficulty": 1,
         "resist": 10,
@@ -270,7 +269,7 @@ const trees = {
     },
     "oak": {
         "xp": 37.5,
-        "coins": 5,
+        "coins": 10,
         "level": 15,
         "difficulty": 2,
         "resist": 8,
@@ -282,11 +281,11 @@ const trees = {
     },
     "willow": {
         "xp": 67.5,
-        "coins": 15,
+        "coins": 40,
         "level": 30,
         "difficulty": 5,
         "resist": 25,
-        "depletionChance": 1 / 16,
+        "depletionChance": 1 / 10,
         "name": "Willow Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
@@ -298,7 +297,7 @@ const trees = {
         "level": 45,
         "difficulty": 10,
         "restist": 40,
-        "depletionChance": 1 / 32,
+        "depletionChance": 1 / 12,
         "name": "Maple Tree",
         "tickCooldown": 4,
         "respawnTime": 35.4,
@@ -306,11 +305,11 @@ const trees = {
     },
     "yew": {
         "xp": 175,
-        "coins": 500,
+        "coins": 200,
         "level": 60,
         "difficulty": 20,
         "resist": 60,
-        "depletionChance": 1 / 64,
+        "depletionChance": 1 / 15,
         "name": "Yew Tree",
         "tickCooldown": 4,
         "respawnTime": 59.4,
@@ -318,11 +317,11 @@ const trees = {
     },
     "magic": {
         "xp": 250,
-        "coins": 1000,
+        "coins": 500,
         "level": 75,
         "difficulty": 30,
         "resist": 120,
-        "depletionChance": 1 / 128,
+        "depletionChance": 1 / 20,
         "name": "Magic Tree",
         "tickCooldown": 4,
         "respawnTime": 119.4,
@@ -430,7 +429,7 @@ const characters = {
         "trading": 21
     },
     "thurgo": {
-        "weight": 200,
+        "weight": 160,
         "name": "Thurgo",
         "image": "thurgo.png",
         "agility": 1,
@@ -444,7 +443,7 @@ const characters = {
         "trading": 1
     },
     "graador": {
-        "weight": 100,
+        "weight": 70,
         "name": "General Graador",
         "image": "graador.webp",
         "agility": 10,
@@ -472,7 +471,7 @@ const characters = {
         "trading": 73
     },
     "oziach": {
-        "weight": 200,
+        "weight": 180,
         "name": "Oziach",
         "image": "Oziach.webp",
         "agility": 1,
@@ -486,7 +485,7 @@ const characters = {
         "trading": 1
     },
     "bob": {
-        "weight": 100,
+        "weight": 150,
         "name": "Bob",
         "image": "bob.webp",
         "agility": 1,
@@ -500,7 +499,7 @@ const characters = {
         "trading": 1
     },
     "evil_bob": {
-        "weight": 100,
+        "weight": 150,
         "name": "Evil Bob",
         "image": "evil_bob.webp",
         "agility": 1,
@@ -514,7 +513,7 @@ const characters = {
         "trading": 1
     },
     "hans": {
-        "weight": 200,
+        "weight": 220,
         "name": "Hans",
         "image": "Hans.webp",
         "agility": 1,
@@ -528,7 +527,7 @@ const characters = {
         "trading": 1
     },
     "uri": {
-        "weight": 100,
+        "weight": 120,
         "name": "Uri Molotov",
         "image": "Uri.webp",
         "agility": 74,
@@ -542,7 +541,7 @@ const characters = {
         "trading": 51
     },
     "sandwich_lady": {
-        "weight": 100,
+        "weight": 90,
         "name": "Sandwich Lady",
         "image": "Sandwich_lady.png",
         "agility": 50,
@@ -556,7 +555,7 @@ const characters = {
         "trading": 90
     },
     "ali_morrisane": {
-        "weight": 100,
+        "weight": 80,
         "name": "Ali Morrisane",
         "image": "Ali_Morrisane.png",
         "agility": 1,
@@ -1251,6 +1250,10 @@ class Worker {
         if (this.div !== null) {
             treeDiv.removeChild(this.div);
         }
+
+        if (this.chopping !== null) {
+            this.chopping.element.classList.remove("chopping");
+        }
     }
 
     addXp(xp) {
@@ -1545,7 +1548,6 @@ function updateUI() {
     xpElement.innerText = Math.floor(xp - xpForLevel(level));
     xpForNextLevelElement.innerText = Math.floor(xpForNextLevel - xpForLevel(level));
     logsElement.innerText = Math.floor(coins);
-    axeLevelElement.innerText = axeLevel;
     plantTreeCostElement.innerText = getNextTreeCost();
     buyXpCostElement.innerText = 100 * selectedCharacters.length;
 
