@@ -34,6 +34,24 @@ function playMusic(music) {
 }
 
 
+function resetEverything() {
+    level = 1;
+    xp = 0;
+    xpForNextLevel = 83;
+    coins = 0;
+    axeLevel = 1;
+    upgradeCost = 10;
+    tickCooldown = 0;
+    time = 0;
+    tickCount = 0;
+    startTime = Date.now();
+    playerId = Math.floor(Math.random() * 1000000);
+    playerName = "Player";
+    save();
+    location.reload();
+}
+
+
 function save() {
     let saveData = {
         level: level,
@@ -476,12 +494,12 @@ const characters = {
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
-        "luck": 1,
+        "luck": 100,
         "tick_manipulation": 1,
         "range": 1,
         "learning_rate": 1,
         "farming": 1,
-        "trading": 1
+        "trading": 100
     }
 };
 
@@ -807,6 +825,7 @@ class Worker {
         this.chopping = null;
         this.state = "idle";
         this.cooldown = 0;
+        this.tooltip = null;
     }
 
     getDescriptionString() {
@@ -864,7 +883,7 @@ class Worker {
 
     findTreeForChopping() {
         let closestTree = null;
-        let closestDistance = 60 + this.stats.range / 100 * 30;
+        let closestDistance = 6660 + this.stats.range / 100 * 30;
         for (let i = 0; i < treeField.length; i++) {
             let tree = treeField[i];
 
@@ -878,8 +897,11 @@ class Worker {
 
             let distMultiplier = 1;
             if (tree.element.classList.contains("chopping")) {
-                distMultiplier = 2;
+                distMultiplier = 3;
             }
+
+            let bestLevelMod = Math.max(0, this.level - tree.tree.level);
+            distMultiplier *= (1 + bestLevelMod / 10);
 
             let x = tree.x;
             let y = tree.y;
@@ -1045,10 +1067,10 @@ class Worker {
             img.alt = characters[this.character].name;
             img.width = 64;
             this.div.appendChild(img);
-            let tooltip = document.createElement("div");
-            tooltip.classList.add("tooltip");
-            tooltip.innerText = this.getDescriptionString();
-            this.div.appendChild(tooltip);
+            this.tooltip = document.createElement("div");
+            this.tooltip.classList.add("tooltip");
+            this.tooltip.innerText = this.getDescriptionString();
+            this.div.appendChild(this.tooltip);
             treeDiv.appendChild(this.div);
 
             this.div.style.left = this.x + "%";
@@ -1067,13 +1089,13 @@ class Worker {
         this.xp += xp;
 
         let oldLevel = this.level;
-        this.level = 1;
         while (this.xp >= xpForLevel(this.level + 1)) {
             this.level += 1;
         }
 
         if(this.level !== oldLevel) {
             this.stats = this.calculateStats();
+            this.tooltip.innerText = this.getDescriptionString();
         }
     }
 
@@ -1317,7 +1339,7 @@ function updateUI() {
     levelElement.innerText = level;
     xpElement.innerText = Math.floor(xp - xpForLevel(level));
     xpForNextLevelElement.innerText = Math.floor(xpForNextLevel - xpForLevel(level));
-    logsElement.innerText = coins;
+    logsElement.innerText = Math.floor(coins);
     axeLevelElement.innerText = axeLevel;
     upgradeCostElement.innerText = upgradeCost;
     upgradeAxeButton.disabled = coins < upgradeCost;
@@ -1420,6 +1442,17 @@ function upgradeAxe() {
 upgradeAxeButton.addEventListener('click', upgradeAxe);
 
 function recruitHandler(event) {
+
+    const cost = 1000;
+    if (coins < cost) {
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("Not enough coins", x, y);
+        return;
+    }
+
+    coins -= cost;
+
     let new_worker = pullCharacter();
     for (let i = 0; i < worker.length; i++) {
         if (worker[i] === null) {
