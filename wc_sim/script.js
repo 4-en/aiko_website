@@ -730,6 +730,67 @@ function craftCharacter(char1, char2, char3) {
     return newChar;
 }
 
+function createDialog(title, content, onClose) {
+    let dialog = document.createElement("dialog");
+    dialog.classList.add("dialog");
+    let dialogTitle = document.createElement("div");
+    dialogTitle.classList.add("dialog-title");
+    dialogTitle.innerText = title;
+    dialog.appendChild(dialogTitle);
+    let dialogContent = document.createElement("div");
+    dialogContent.classList.add("dialog-content");
+    dialogContent.innerText = content;
+    dialog.appendChild(dialogContent);
+    let dialogClose = document.createElement("button");
+    dialogClose.classList.add("dialog-close");
+    dialogClose.innerText = "Close";
+    dialogClose.onclick = () => {
+        document.body.removeChild(dialog);
+        if (onClose) {
+            onClose();
+        }
+    };
+
+    dialog.onclose = () => {
+        document.body.removeChild(dialog);
+        if (onClose) {
+            onClose();
+        }
+    };
+
+    dialog.appendChild(dialogClose);
+    document.body.appendChild(dialog);
+    dialog.showModal();
+}
+    
+
+// create test dialog
+/*
+createDialog("Test Dialog", "This is a test dialog", () => {
+    console.log("Dialog closed");
+});
+*/
+
+function rollWeightedRandom(weights) {
+    // weights is a dictionary with keys as the item and values as the weight
+    let totalWeight = 0;
+    for (let key in weights) {
+        totalWeight += weights[key];
+    }
+
+    let rand = Math.random() * totalWeight;
+    let currentWeight = 0;
+    for (let key in weights) {
+        currentWeight += weights[key];
+        if (rand < currentWeight) {
+            return key;
+        }
+
+    }
+
+    return null;
+}
+
 class Worker {
     constructor(character, rarity) {
         this.character = character;
@@ -744,6 +805,8 @@ class Worker {
         this.div = null;
         this.targetTree = null;
         this.chopping = null;
+        this.state = "idle";
+        this.cooldown = 0;
     }
 
     getDescriptionString() {
@@ -770,6 +833,36 @@ class Worker {
         statString += "LR: " + this.stats.learning_rate + " FARM: " + this.stats.farming + " TRD: " + this.stats.trading + "\n";
 
         return statString;
+    }
+
+    getNewState() {
+        let states = {
+            "idle": 0.1,
+            "chopping": 2,
+            "farming": 1,
+            "fighting": 0
+        };
+
+        states["chopping"] = this.stats.woodcutting / 100;
+        states["farming"] = this.stats.farming / 100;
+        states["fighting"] = this.stats.strength / 100;
+
+        while (states.keys().length > 1) {
+            let state = rollWeightedRandom(states);
+            
+            let started = startAction(state);
+            if(started) {
+                return state;
+            }
+            
+            delete states[state];
+        }
+
+        return "idle";
+        
+    }
+
+    startAction(state) {
     }
 
     tick() {
