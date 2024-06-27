@@ -1065,7 +1065,7 @@ class Worker {
         let level = this.stats.woodcutting / 1.5;
 
         let roll = rollTreeCut(level, axeBonus, treeDiff);
-        this.cooldown = treeData.tickCooldown;
+        this.setCooldown(treeData.tickCooldown);
         if (!roll) {
             return;
         }
@@ -1279,6 +1279,17 @@ class Worker {
             "farming": farming,
             "trading": trading
         };
+    }
+
+    setCooldown(cooldown) {
+        let tick_manip_chance = this.stats.tick_manipulation / 200;
+        let saved_ticks = Math.random() * (1 + tick_manip_chance) / 2 * cooldown;
+        saved_ticks = Math.ceil(saved_ticks);
+        saved_ticks = Math.min(saved_ticks, cooldown-1);
+        if (Math.random() < tick_manip_chance) {
+            cooldown -= saved_ticks;
+        }
+        this.cooldown = cooldown;
     }
 
     calculateStat(level, character, rarity, iv) {

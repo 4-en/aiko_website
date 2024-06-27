@@ -97,7 +97,7 @@ button:disabled {
     font-size: 16px;
     top: 60px;
     left: 15px;
-    width: 150px;
+    text-wrap: nowrap;
 }
 
 *:hover > .tooltip {
