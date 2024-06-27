@@ -268,7 +268,7 @@ const trees = {
     },
     "oak": {
         "xp": 37.5,
-        "coins": 1,
+        "coins": 5,
         "level": 15,
         "difficulty": 2,
         "resist": 8,
