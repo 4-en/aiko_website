@@ -274,3 +274,7 @@ button:disabled {
         opacity: 0;
     }
 }
+
+.selectedChar {
+    border: 2px solid yellow;
+}

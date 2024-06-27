@@ -205,13 +205,12 @@ const xpElement = document.getElementById('xp');
 const xpForNextLevelElement = document.getElementById('xpForNextLevel');
 const logsElement = document.getElementById('logs');
 const axeLevelElement = document.getElementById('axeLevel');
-const upgradeCostElement = document.getElementById('upgradeCost');
-const upgradeAxeButton = document.getElementById('upgradeAxeButton');
 const recruitButton = document.getElementById('recruitWorkerButton');
 const plantTreeButton = document.getElementById('plantTreeButton');
 const plantTreeCostElement = document.getElementById('plantTreeCost');
 const workersElement = document.getElementById('workers');
 const treeDiv = document.getElementById("trees");
+const craftWorkerButton = document.getElementById("craftWorkerButton");
 
 // game constants
 const autoSaveInterval = 60; // 60 seconds
@@ -527,41 +526,41 @@ const characters = {
         "trading": 1
     },
     "uri": {
-        "weight": 200,
+        "weight": 100,
         "name": "Uri Molotov",
         "image": "Uri.webp",
-        "agility": 1,
-        "strength": 1,
+        "agility": 74,
+        "strength": 38,
         "woodcutting": 1,
-        "luck": 1,
-        "tick_manipulation": 1,
-        "range": 1,
-        "learning_rate": 1,
-        "farming": 1,
-        "trading": 1
+        "luck": 100,
+        "tick_manipulation": 74,
+        "range": 53,
+        "learning_rate": 41,
+        "farming": 30,
+        "trading": 51
     },
     "sandwich_lady": {
-        "weight": 200,
+        "weight": 100,
         "name": "Sandwich Lady",
         "image": "Sandwich_lady.png",
-        "agility": 1,
-        "strength": 1,
-        "woodcutting": 1,
-        "luck": 1,
-        "tick_manipulation": 1,
-        "range": 1,
-        "learning_rate": 1,
-        "farming": 1,
-        "trading": 1
+        "agility": 50,
+        "strength": 21,
+        "woodcutting": 34,
+        "luck": 75,
+        "tick_manipulation": 20,
+        "range": 40,
+        "learning_rate": 60,
+        "farming": 60,
+        "trading": 90
     },
     "ali_morrisane": {
-        "weight": 200,
+        "weight": 100,
         "name": "Ali Morrisane",
         "image": "Ali_Morrisane.png",
         "agility": 1,
         "strength": 1,
         "woodcutting": 1,
-        "luck": 100,
+        "luck": 80,
         "tick_manipulation": 1,
         "range": 1,
         "learning_rate": 1,
@@ -751,18 +750,18 @@ function pullCharacter() {
 // combines 3 characters into a new character
 function craftCharacter(char1, char2, char3) {
     let chars = [char1.character, char2.character, char3.character];
-    let rarities = [char1.rarity, char2.rarity, char3.rarity];
+    let rarities_l = [char1.rarity, char2.rarity, char3.rarity];
 
     let betterChars = [];
     let betterRarities = [];
     for (let i = 0; i < chars.length; i++) {
         let char = characters[chars[i]];
-        let rarity = rarities[i];
+        let rarity = rarities_l[i];
 
         // get random char with lower or equal weight
         let lower_or_equal_char_weights = [];
         for (let key in characters) {
-            if (characters[key].weight <= characters[char].weight) {
+            if (characters[key].weight <= char.weight) {
                 lower_or_equal_char_weights.push(key);
             }
         }
@@ -789,12 +788,12 @@ function craftCharacter(char1, char2, char3) {
     let rarity = betterRarities[Math.floor(rand)];
 
     chars.push(char);
-    rarities.push(rarity);
+    rarities_l.push(rarity);
 
     rand = Math.random() * chars.length;
     char = chars[Math.floor(rand)];
-    rand = Math.random() * rarities.length;
-    rarity = rarities[Math.floor(rand)];
+    rand = Math.random() * rarities_l.length;
+    rarity = rarities_l[Math.floor(rand)];
 
     let newChar = new Worker(char, rarity);
     for (let key in newChar.ivs) {
@@ -811,6 +810,48 @@ function craftCharacter(char1, char2, char3) {
     }
 
     newChar.stats = newChar.calculateStats();
+
+    return newChar;
+}
+
+function craftWithSelected() {
+    if (selectedCharacters.length < 3) {
+        console.log("Not enough characters selected");
+        return;
+    }
+    if (selectedCharacters.length > 3) {
+        console.log("Too many characters selected");
+        return;
+    }
+
+    let char1idx = selectedCharacters[0];
+    let char2idx = selectedCharacters[1];
+    let char3idx = selectedCharacters[2];
+
+    selectedCharacters = [];
+    let char1 = worker[char1idx];
+    let char2 = worker[char2idx];
+    let char3 = worker[char3idx];
+
+    worker[char1idx] = null;
+    worker[char2idx] = null;
+    worker[char3idx] = null;
+
+    let newChar = craftCharacter(char1, char2, char3);
+    char1.delete();
+    char2.delete();
+    char3.delete();
+
+    for (let i = 0; i < worker.length; i++) {
+        if (worker[i] === null) {
+            worker[i] = newChar;
+            break;
+        }
+    }
+
+    console.log("Crafted new character");
+    console.log(newChar);
+    updateUI();
 
     return newChar;
 }
@@ -1176,6 +1217,12 @@ class Worker {
 
     }
 
+    delete() {
+        if (this.div !== null) {
+            treeDiv.removeChild(this.div);
+        }
+    }
+
     addXp(xp) {
         this.xp += xp;
 
@@ -1435,6 +1482,27 @@ function spawnXpDrop(x, y, xp) {
     }, 2000);
 }
 
+let selectedCharacters = [];
+
+function clickCharacterUi(event, index) {
+    let mouseX = event.clientX + 20;
+    let mouseY = event.clientY - 100;
+    if (worker[index] === null) {
+        showMessageBoxAtPos("Empty worker slot", mouseX, mouseY);
+        return;
+    }
+    let workerData = worker[index];
+
+    // if selected, deselect
+    if (selectedCharacters.includes(index)) {
+        selectedCharacters = selectedCharacters.filter((value) => value !== index);
+    } else {
+        selectedCharacters.push(index);
+    }
+
+    updateUI();
+}
+
 // Functions
 function updateUI() {
     levelElement.innerText = level;
@@ -1442,8 +1510,6 @@ function updateUI() {
     xpForNextLevelElement.innerText = Math.floor(xpForNextLevel - xpForLevel(level));
     logsElement.innerText = Math.floor(coins);
     axeLevelElement.innerText = axeLevel;
-    upgradeCostElement.innerText = upgradeCost;
-    upgradeAxeButton.disabled = coins < upgradeCost;
     plantTreeCostElement.innerText = getNextTreeCost();
 
     workersElement.innerText = "";
@@ -1466,6 +1532,12 @@ function updateUI() {
             img.height = 64;
             img.width = 64;
             workerElement.appendChild(img);
+
+            workerElement.addEventListener("click", (event) => clickCharacterUi(event, i));
+
+            if (selectedCharacters.includes(i)) {
+                workerElement.classList.add("selectedChar");
+            }
 
         } else {
             let tooltip = document.createElement("div");
@@ -1531,22 +1603,6 @@ function cutTree() {
     updateUI();
 }
 
-function upgradeAxe(event) {
-
-    // show disabled function message
-    showMessageBoxAtPos("This function is disabled", event.clientX + 20, event.clientY - 100);
-    return;
-
-    if (coins >= upgradeCost) {
-        coins -= upgradeCost;
-        axeLevel++;
-        upgradeCost = Math.floor(upgradeCost * 1.5); // Increase cost for next upgrade
-        updateUI();
-    }
-}
-
-
-upgradeAxeButton.addEventListener('click', upgradeAxe);
 
 function recruitHandler(event) {
 
@@ -1589,6 +1645,29 @@ function recruitHandler(event) {
 }
 
 recruitButton.addEventListener('click', recruitHandler);
+
+function craftHandler(event) {
+    if (selectedCharacters.length !== 3) {
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("Select 3 workers", x, y);
+        return;
+    }
+
+    let newWorker = craftWithSelected();
+    if (newWorker !== null) {
+        let char = characters[newWorker.character];
+        let rar = rarities[newWorker.rarity];
+        let newWorkerString = "Crafted new worker:\n" + char.name + "\n(" + rar.name + ")";
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos(newWorkerString, x, y);
+        save(); // save after crafting to prevent save scumming
+    }
+}
+
+craftWorkerButton.addEventListener('click', craftHandler);
+
 
 function getNextTreeCost() {
     return Math.floor(1000 + 1000 * treeField.length * treeField.length / 25);
