@@ -967,7 +967,9 @@ function pullCharacter() {
         }
     }
 
-    return new Worker(char, rarity);
+    let worker =  new Worker(char, rarity);
+    createCharacterRollAnimation(worker);
+    return worker;
 }
 
 // combines 3 characters into a new character
@@ -1108,6 +1110,8 @@ function craftWithSelected() {
     console.log(newChar);
     updateUI();
 
+    createCharacterRollAnimation(newChar);
+
     return newChar;
 }
 
@@ -1142,6 +1146,102 @@ function createDialog(title, content, onClose) {
     dialog.appendChild(dialogClose);
     document.body.appendChild(dialog);
     dialog.showModal();
+}
+
+function createCharacterRollAnimation(character) {
+    let characterImage = document.createElement("img");
+    characterImage.src = "assets/" + characters[character.character].image;
+    characterImage.classList.add("character-roll-image");
+    
+    let characterCard = document.createElement("dialog");
+    characterCard.classList.add("character-roll-card");
+
+    let rarity = rarities[character.rarity];
+    let color = rarity.color;
+    let shadowSize = 5 + Math.min(25, 250 / (rarity.weight/10 + 10));
+    characterCard.style.boxShadow = "0 0 20px " + shadowSize + "px " + color;
+
+    let header = document.createElement("div");
+    header.classList.add("character-roll-header");
+    header.style.color = color;
+
+    let body = document.createElement("div");
+    body.classList.add("character-roll-body");
+
+    let characterName = document.createElement("div");
+    characterName.classList.add("character-roll-name");
+    characterName.innerText = characters[character.character].name + " Lv. " + character.level;
+    let characterRarity = document.createElement("div");
+    characterRarity.classList.add("character-roll-rarity");
+    characterRarity.innerText = rarities[character.rarity].name;
+    
+    let characterStats = document.createElement("div");
+    characterStats.classList.add("character-roll-stats");
+    
+    let stats = character.stats;
+    const getBaseStatDiv = (name, value, desc) => {
+        let statDiv = document.createElement("div");
+        statDiv.classList.add("character-roll-stat");
+        statDiv.innerText = name + ": " + value;
+        let tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        tooltip.innerText = desc;
+        tooltip.style.width = "150px";
+        tooltip.style.textWrap = "wrap";
+        tooltip.style.transform = "translateX(-50%)";
+        statDiv.appendChild(tooltip);
+        return statDiv;
+    };
+
+    characterStats.appendChild(getBaseStatDiv("AGI", stats.agility, "Agility: Increases movement speed"));
+    characterStats.appendChild(getBaseStatDiv("STR", stats.strength, "Strength: Increases damage dealt"));
+    characterStats.appendChild(getBaseStatDiv("WC", stats.woodcutting, "Woodcutting: Increases woodcutting chance"));
+    characterStats.appendChild(getBaseStatDiv("LUCK", stats.luck, "Luck: Increases rare item chance"));
+    characterStats.appendChild(getBaseStatDiv("TM", stats.tick_manipulation, "Tick Manipulation: Increases chance to skip ticks"));
+    characterStats.appendChild(getBaseStatDiv("VSN", stats.range, "Vision: Increases vision range"));
+    characterStats.appendChild(getBaseStatDiv("INT", stats.learning_rate, "Intelligence: Increases XP gain"));
+    characterStats.appendChild(getBaseStatDiv("FARM", stats.farming, "Farming: wip"));
+    characterStats.appendChild(getBaseStatDiv("TRD", stats.trading, "Trading: Increases coins gained"));
+
+
+    characterCard.appendChild(header);
+    header.appendChild(characterName);
+    characterCard.appendChild(body);
+    header.appendChild(characterRarity);
+    body.appendChild(characterImage);
+    body.appendChild(characterStats);
+    
+    document.body.appendChild(characterCard);
+
+    let wasClosed = false;
+
+    characterCard.onclose = () => {
+        if(wasClosed) {
+            return;
+        }
+        wasClosed = true;
+        document.body.removeChild(characterCard);
+    }
+
+    characterCard.onclick = () => {
+        if(wasClosed) {
+            return;
+        }
+        wasClosed = true;
+        document.body.removeChild(characterCard);
+    }
+
+    setTimeout(() => {
+        if(wasClosed) {
+            return;
+        }
+        wasClosed = true;
+        characterCard.close();
+        document.body.removeChild(characterCard);
+    }, 10000);
+
+    characterCard.showModal();
+
 }
 
 function createConfirmDialog(message, onConfirm, onCancel) {
@@ -1255,11 +1355,12 @@ class Worker {
 
         let statString = name + " (" + rarity + ")\nLevel " + level + "\n";
         statString += "AGI: " + this.stats.agility + " STR: " + this.stats.strength + " WC: " + this.stats.woodcutting + "\n";
-        statString += "LUCK: " + this.stats.luck + " TM: " + this.stats.tick_manipulation + " RNG: " + this.stats.range + "\n";
-        statString += "LR: " + this.stats.learning_rate + " FARM: " + this.stats.farming + " TRD: " + this.stats.trading + "\n";
+        statString += "LUCK: " + this.stats.luck + " TM: " + this.stats.tick_manipulation + " VSN: " + this.stats.range + "\n";
+        statString += "INT: " + this.stats.learning_rate + " FARM: " + this.stats.farming + " TRD: " + this.stats.trading + "\n";
 
         return statString;
     }
+
 
     getNewState() {
         let states = {
@@ -1597,14 +1698,15 @@ class Worker {
 
     calculateStat(level, character, rarity, iv) {
         let charWeight = 20;
-        let rarityWeight = 3;
-        let ivWeight = 1;
+        let rarityWeight = 5;
+        let ivWeight = 3;
 
-        let statMultiplier = 1.5;
+        let statMultiplier = 2;
 
         let stat = character / 100 * charWeight + rarity / 100 * rarityWeight + iv / 100 * ivWeight;
         stat = stat / (charWeight + rarityWeight + ivWeight);
-        return Math.floor(statMultiplier * stat * level + level);
+        stat = Math.floor(statMultiplier * stat * level + level/10);
+        return Math.max(1, stat);
     }
 
     calculateStats() {
@@ -1634,7 +1736,7 @@ class Worker {
                 ivStatKey += this.ivs[key];
             }
 
-            stats[key] = this.calculateStat(Math.min(99, this.level), charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(2, charStatKey, rarityStatKey, ivStatKey);
+            stats[key] = this.calculateStat(Math.min(99, this.level), charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(3, charStatKey, rarityStatKey, ivStatKey);
         }
         return stats;
     }
@@ -1986,12 +2088,14 @@ function craftHandler(event) {
 
     let newWorker = craftWithSelected();
     if (newWorker !== null) {
+        /*
         let char = characters[newWorker.character];
         let rar = rarities[newWorker.rarity];
         let newWorkerString = "Crafted new worker:\n" + char.name + "\n(" + rar.name + ")";
         let x = event.clientX + 20;
         let y = event.clientY - 100;
         showMessageBoxAtPos(newWorkerString, x, y);
+        */
         save(); // save after crafting to prevent save scumming
     }
 }

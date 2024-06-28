@@ -412,3 +412,211 @@ button:disabled {
 .selectedChar {
     border: 2px solid yellow;
 }
+
+.characterRollAnimation {
+    animation: characterRoll 3s ease-in-out;
+    width: 69vw;
+    height: 69vw;
+    max-width: 69vh;
+    max-height: 69vh;
+    border-radius: 50%;
+    background-color: whitesmoke;
+    position: absolute;
+    filter: blur(0vw);
+    z-index: 69;
+    transform: scale(0);
+}
+
+.characterRollAnimation * *::after {
+    content: '';
+    position: absolute;
+    /* special effects */
+    width: 256px;
+    height: 256px;
+    left: 25%;
+    top: 25%;
+    border-radius: 50%;
+    background-color: orangered;
+    display: block;
+    animation: characterRollEffect 11s linear infinite, characterMoveEffect 6s linear infinite, characterScaleEffect 7s linear infinite;
+    z-index: 59;
+}
+
+.characterRollAnimation * *::before {
+    content: '';
+    position: absolute;
+    /* special effects */
+    width: 256px;
+    height: 256px;
+    left: 75%;
+    top: 75%;
+    transform: rotate(180deg);
+    border-radius: 50%;
+    background-color: purple;
+    display: block;
+    animation: characterRollEffect 7s linear infinite, characterMoveEffect 6s linear infinite, characterScaleEffect 5s linear infinite;
+    z-index: 59;
+}
+
+
+@keyframes characterRollEffect {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
+@keyframes characterMoveEffect {
+    0% {
+        transform: translate(-450px, -450px)
+    }
+    50% {
+        transform: translate(450px, 450px)
+    }
+    100% {
+        transform: translate(-450px, -450px)
+    }
+}
+
+@keyframes characterScaleEffect {
+    0% {
+        transform: scale(0.5)
+    }
+    50% {
+        transform: scale(1.5)
+    }
+    100% {
+        transform: scale(0.5)
+    }
+}
+
+@keyframes characterBounceEffect {
+    0% {
+        transform: translateY(0)
+    }
+    50% {
+        transform: translateY(-50%)
+    }
+    100% {
+        transform: translateY(0)
+    }
+}
+
+@keyframes characterRoll {
+    0% {
+        transform: scale(0)
+    }
+    100% {
+        transform: scale(1)
+    }
+}
+
+.character-roll-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(40, 46, 34);
+    color: yellow;
+    padding: 10px;
+    border-radius: 1px;
+    border: 3px solid black;
+    font-size: 16px;
+    width: 90vw;
+    max-width: 800px;
+    height: 50vh;
+    max-height: 600px;
+    z-index: 100;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 0 10px black;
+    transform: scale(0);
+
+    animation: characterRoll 3s ease-in-out 1;
+    animation-fill-mode: forwards;
+}
+
+.character-roll-card::backdrop {
+    backdrop-filter: blur(5px);
+    /* no events on the backdrop */
+    pointer-events: none;
+    animation: backdropAnimation 3s ease-in-out 1;
+}
+
+@keyframes backdropAnimation {
+    0% {
+        backdrop-filter: blur(0px);
+    }
+    100% {
+        backdrop-filter: blur(10px);
+    }
+}
+
+.character-roll-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.character-roll-header > * {
+    margin: 10px;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.character-roll-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.character-roll-name {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.character-roll-rarity {
+    font-size: 36px;
+}
+
+.character-roll-stats {
+    font-size: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 20px;
+    margin: 20px;
+}
+
+.character-roll-stat {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+    background-color: rgb(61, 66, 56);
+    cursor: pointer;
+}
+
+.character-roll-image {
+    width: 30%;
+    margin: 24px;
+    border-radius: 5px;
+    text-align: center;
+    /* center the text vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
