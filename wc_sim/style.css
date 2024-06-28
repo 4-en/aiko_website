@@ -63,6 +63,66 @@ body {
     padding: 0;
 }
 
+.workers-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+}
+
+
+.worker-storage-container > h2 {
+    margin: 10;
+    padding: 0;
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.worker-storage-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+}
+
+#worker-storage-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#worker-storage-content > * {
+    margin: 10px;
+}
+
+.worker-storage-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    margin-left: 32px;
+}
+
+.worker-storage-button > img {
+    width: 100%;
+    height: 100%;
+}
+
 .workers {
     margin: 0;
     display: flex;
@@ -150,6 +210,7 @@ button:disabled {
 .tooltip {
     display: none;
     position: absolute;
+
     background-color: rgb(40, 46, 34);
     color: yellow;
     padding: 10px;
@@ -161,6 +222,7 @@ button:disabled {
     text-wrap: nowrap;
     z-index: 1;
 }
+
 
 *:hover > .tooltip {
     display: block;

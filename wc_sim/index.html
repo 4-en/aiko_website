@@ -10,10 +10,19 @@
 
 <body>
     <div id="game">
-        
+
         <div id="ui">
+            <dialog id="worker-storage" class="dialog">
+                <div class="worker-storage-container">
+                    <h2>Worker Storage</h2>
+                    <div class="storage" id="worker-storage-content">
+                    </div>
+                    <button class="ui-button dialog-close" onclick="closeWorkerStorage();">X</button>
+                </div>
+            </dialog>
             <dialog id="guide" class="dialog">
                 <h2>Menu</h2>
+                <button class="ui-button" onclick="toggleRollAnimation();">Toggle Recruit Animation</button>
                 <button class="ui-button" onclick="confirmReset();">Reset Game</button>
                 <p>Useful text here.</p>
                 <button class="ui-button dialog-close" onclick="closeGuide();">X</button>
@@ -29,7 +38,8 @@
                 </div>
                 <div class="right-header">
                     <button class="ui-button saveButton" onclick="save();">Save</button>
-                    <button class="ui-button guideButton" onclick="openGuide();"><img class="button-icon" src="menu.svg" alt="Menu"></button>
+                    <button class="ui-button guideButton" onclick="openGuide();"><img class="button-icon" src="menu.svg"
+                            alt="Menu"></button>
                 </div>
             </div>
             <div class="shop">
@@ -39,14 +49,22 @@
                 <button class="ui-button" id="craftWorkerButton">Craft Worker</button>
                 <button class="ui-button" id="buyXPButton">Buy XP (<span id="buyXPCost">0</span>gp)</button>
             </div>
-            <div class="workers" id="workers">
-                <div class="worker" id="testworker">
+            <div class="workers-container">
+                <div class="workers" id="workers">
+                    <div class="worker" id="testworker">
+                        <div class="tooltip">
+                            <p>Worker: Test Worker</p>
+                            <p>Level: 1</p>
+                            <p>XP: 0/83</p>
+                            <p>Logs: 0</p>
+                            <p>Upgrade Cost: 10gp</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="worker-storage-button worker" onclick="openStorage();">
+                    <img src="assets/bank_depo.png" alt="Storage">
                     <div class="tooltip">
-                        <p>Worker: Test Worker</p>
-                        <p>Level: 1</p>
-                        <p>XP: 0/83</p>
-                        <p>Logs: 0</p>
-                        <p>Upgrade Cost: 10gp</p>
+                        Worker Storage
                     </div>
                 </div>
             </div>
@@ -68,6 +86,20 @@
         function confirmReset() {
             createConfirmDialog("Are you sure you want to reset the game?", resetEverything);
         }
+
+        function openStorage() {
+            updateWorkerStorageUI();
+            document.getElementById("worker-storage").showModal();
+        }
+
+        function closeWorkerStorage() {
+            document.getElementById("worker-storage").close();
+        }
+
+        function toggleRollAnimation() {
+            showRollAnimation = !showRollAnimation;
+        }
+
     </script>
 </body>
 

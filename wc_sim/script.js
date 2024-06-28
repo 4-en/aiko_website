@@ -14,8 +14,10 @@ let startTime = Date.now();
 let playerId = Math.floor(Math.random() * 1000000);
 let playerName = "Player";
 let worker = [null, null, null, null, null];
+let worker_storage = [];
 let activeTree = null;
 let treeField = [];
+let showRollAnimation = true;
 
 let soundPlayer = null;
 let musicPlayer = null;
@@ -71,6 +73,7 @@ function save() {
         version: version,
         startTime: startTime,
         time: time,
+        showRollAnimation: showRollAnimation,
         playerId: playerId,
         playerName: playerName,
         trees: treeField.map(tree => {
@@ -88,6 +91,18 @@ function save() {
                 return null;
             }
 
+            return {
+                character: worker1.character,
+                rarity: worker1.rarity,
+                level: worker1.level,
+                xp: worker1.xp,
+                ivs: worker1.ivs,
+                evs: worker1.evs,
+                x: worker1.x,
+                y: worker1.y,
+            };
+        }),
+        worker_storage: worker_storage.map(worker1 => {
             return {
                 character: worker1.character,
                 rarity: worker1.rarity,
@@ -130,6 +145,9 @@ function load() {
         if (saveData.version) {
             version = saveData.version;
         }
+        if (saveData.showRollAnimation) {
+            showRollAnimation = saveData.showRollAnimation;
+        }
         if (saveData.startTime) {
             startTime = saveData.startTime;
         }
@@ -160,6 +178,19 @@ function load() {
                     return null;
                 }
 
+                let newWorker = new Worker(worker1.character, worker1.rarity);
+                newWorker.level = worker1.level;
+                newWorker.xp = worker1.xp;
+                newWorker.ivs = worker1.ivs;
+                newWorker.evs = worker1.evs;
+                newWorker.x = worker1.x;
+                newWorker.y = worker1.y;
+                newWorker.stats = newWorker.calculateStats();
+                return newWorker;
+            });
+        }
+        if (saveData.worker_storage) {
+            worker_storage = saveData.worker_storage.map(worker1 => {
                 let newWorker = new Worker(worker1.character, worker1.rarity);
                 newWorker.level = worker1.level;
                 newWorker.xp = worker1.xp;
@@ -212,6 +243,7 @@ const treeDiv = document.getElementById("trees");
 const craftWorkerButton = document.getElementById("craftWorkerButton");
 const buyXpButton = document.getElementById("buyXPButton");
 const buyXpCostElement = document.getElementById("buyXPCost");
+const workerStorageElement = document.getElementById("worker-storage-content");
 
 // game constants
 const autoSaveInterval = 60; // 60 seconds
@@ -251,6 +283,8 @@ function showMessageBoxAtPos(message, x, y) {
     setTimeout(() => {
         document.body.removeChild(messageBox);
     }, 2000);
+
+    return messageBox;
 }
 
 // tree data
@@ -967,8 +1001,10 @@ function pullCharacter() {
         }
     }
 
-    let worker =  new Worker(char, rarity);
-    createCharacterRollAnimation(worker);
+    let worker = new Worker(char, rarity);
+    if(showRollAnimation) {
+        createCharacterRollAnimation(worker);
+    }
     return worker;
 }
 
@@ -1110,7 +1146,9 @@ function craftWithSelected() {
     console.log(newChar);
     updateUI();
 
-    createCharacterRollAnimation(newChar);
+    if(showRollAnimation) {
+        createCharacterRollAnimation(newChar);
+    }
 
     return newChar;
 }
@@ -1152,13 +1190,13 @@ function createCharacterRollAnimation(character) {
     let characterImage = document.createElement("img");
     characterImage.src = "assets/" + characters[character.character].image;
     characterImage.classList.add("character-roll-image");
-    
+
     let characterCard = document.createElement("dialog");
     characterCard.classList.add("character-roll-card");
 
     let rarity = rarities[character.rarity];
     let color = rarity.color;
-    let shadowSize = 5 + Math.min(25, 250 / (rarity.weight/10 + 10));
+    let shadowSize = 5 + Math.min(25, 250 / (rarity.weight / 10 + 10));
     characterCard.style.boxShadow = "0 0 20px " + shadowSize + "px " + color;
 
     let header = document.createElement("div");
@@ -1174,10 +1212,10 @@ function createCharacterRollAnimation(character) {
     let characterRarity = document.createElement("div");
     characterRarity.classList.add("character-roll-rarity");
     characterRarity.innerText = rarities[character.rarity].name;
-    
+
     let characterStats = document.createElement("div");
     characterStats.classList.add("character-roll-stats");
-    
+
     let stats = character.stats;
     const getBaseStatDiv = (name, value, desc) => {
         let statDiv = document.createElement("div");
@@ -1210,13 +1248,13 @@ function createCharacterRollAnimation(character) {
     header.appendChild(characterRarity);
     body.appendChild(characterImage);
     body.appendChild(characterStats);
-    
+
     document.body.appendChild(characterCard);
 
     let wasClosed = false;
 
     characterCard.onclose = () => {
-        if(wasClosed) {
+        if (wasClosed) {
             return;
         }
         wasClosed = true;
@@ -1224,7 +1262,7 @@ function createCharacterRollAnimation(character) {
     }
 
     characterCard.onclick = () => {
-        if(wasClosed) {
+        if (wasClosed) {
             return;
         }
         wasClosed = true;
@@ -1232,7 +1270,7 @@ function createCharacterRollAnimation(character) {
     }
 
     setTimeout(() => {
-        if(wasClosed) {
+        if (wasClosed) {
             return;
         }
         wasClosed = true;
@@ -1620,11 +1658,15 @@ class Worker {
     delete() {
         if (this.div !== null) {
             treeDiv.removeChild(this.div);
+            this.div = null;
         }
 
         if (this.chopping !== null) {
             this.chopping.element.classList.remove("chopping");
         }
+
+        this.chopping = null;
+        this.targetTree = null;
     }
 
     addXp(xp) {
@@ -1705,7 +1747,7 @@ class Worker {
 
         let stat = character / 100 * charWeight + rarity / 100 * rarityWeight + iv / 100 * ivWeight;
         stat = stat / (charWeight + rarityWeight + ivWeight);
-        stat = Math.floor(statMultiplier * stat * level + level/10);
+        stat = Math.floor(statMultiplier * stat * level + level / 10);
         return Math.max(1, stat);
     }
 
@@ -1982,6 +2024,65 @@ function updateUI() {
     }
 }
 
+function swapStorageWorkerWithActive(storageIndex, activeIndex) {
+    let temp = worker[activeIndex];
+    temp.delete();
+    worker[activeIndex] = worker_storage[storageIndex];
+    worker_storage[storageIndex] = temp;
+    updateUI();
+}
+
+function updateWorkerStorageUI() {
+    workerStorageElement.innerText = "";
+    for (let i = 0; i < worker_storage.length; i++) {
+        let workerElement = document.createElement("div");
+        workerElement.classList.add("worker");
+        let workerData = worker_storage[i];
+        let character = characters[workerData.character];
+        let rarity = rarities[workerData.rarity];
+        let tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        tooltip.innerText = workerData.getDescriptionString();
+        workerElement.appendChild(tooltip);
+        let img = document.createElement("img");
+        img.src = "assets/" + character.image;
+        let color = rarity.color;
+        let shadowSize = 1 + Math.min(20, 100 / (rarity.weight + 4));
+        workerElement.style.boxShadow = "0 0 10px " + shadowSize + "px " + color;
+        img.alt = character.name;
+        img.height = 64;
+        img.width = 64;
+        workerElement.appendChild(img);
+
+        workerElement.addEventListener("click", (event) => {
+            
+            // add to active workers
+            if(selectedCharacters.length !== 1) {
+                let x = event.clientX + 20;
+                let y = event.clientY - 100;
+                let mbx = showMessageBoxAtPos("Select 1 active worker to swap with", x, y);
+                mbx.style.zIndex = 1000;
+                closeWorkerStorage();
+                return;
+            }
+
+            swapStorageWorkerWithActive(i, selectedCharacters[0]);
+            selectedCharacters = [];
+
+            // close dialog
+            closeWorkerStorage();
+
+            updateUI();
+
+            
+
+        }
+        );
+
+        workerStorageElement.appendChild(workerElement);
+    }
+}
+
 function gainXP(amount) {
     xp += amount;
     while (xp >= xpForLevel(level + 1)) {
@@ -2053,21 +2154,25 @@ function recruitHandler(event) {
             break;
         }
     }
-    if (!emptySlot) {
-        let x = event.clientX + 20;
-        let y = event.clientY - 100;
-        showMessageBoxAtPos("No empty worker slots", x, y);
-        return;
-    }
 
     coins -= cost;
 
     let new_worker = pullCharacter();
-    for (let i = 0; i < worker.length; i++) {
-        if (worker[i] === null) {
-            worker[i] = new_worker;
-            updateUI();
-            break;
+
+    if (!emptySlot) {
+        // add to worker_storage
+        worker_storage.push(new_worker);
+        let x = event.clientX + 20;
+        let y = event.clientY - 100;
+        showMessageBoxAtPos("Worker added to storage", x, y);
+    } else {
+
+        for (let i = 0; i < worker.length; i++) {
+            if (worker[i] === null) {
+                worker[i] = new_worker;
+                updateUI();
+                break;
+            }
         }
     }
 
