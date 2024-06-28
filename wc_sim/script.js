@@ -1369,13 +1369,13 @@ class Worker {
             return;
         }
 
-        let xpGain = treeData.xp * (1 + this.stats.learning_rate / 200);
+        let xpGain = treeData.xp * (1 + this.stats.learning_rate / 50);
         xpGain = Math.floor(xpGain);
         let playerXpGain = Math.floor(xpGain / 4);
         gainXP(playerXpGain);
         this.addXp(xpGain);
         spawnXpDrop(this.x, this.y, xpGain + " (+" + playerXpGain + ")");
-        let logGain = treeData.coins * (1 + this.stats.trading / 100);
+        let logGain = treeData.coins * (1 + this.stats.trading / 50);
         coins += Math.floor(logGain);
 
         if (getRand() < treeData.depletionChance) {
