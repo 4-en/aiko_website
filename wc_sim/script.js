@@ -277,7 +277,8 @@ const trees = {
         "name": "Oak Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
-        "image": "Oak_tree.png"
+        "image": "Oak_tree.png",
+        "luck": 1
     },
     "willow": {
         "xp": 67.5,
@@ -289,7 +290,8 @@ const trees = {
         "name": "Willow Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
-        "image": "Willow_tree.png"
+        "image": "Willow_tree.png",
+        "luck": 5
     },
     "maple": {
         "xp": 100,
@@ -301,7 +303,8 @@ const trees = {
         "name": "Maple Tree",
         "tickCooldown": 4,
         "respawnTime": 35.4,
-        "image": "Maple_tree.webp"
+        "image": "Maple_tree.webp",
+        "luck": 10
     },
     "yew": {
         "xp": 175,
@@ -313,7 +316,8 @@ const trees = {
         "name": "Yew Tree",
         "tickCooldown": 4,
         "respawnTime": 59.4,
-        "image": "Yew_tree.png"
+        "image": "Yew_tree.png",
+        "luck": 20
     },
     "magic": {
         "xp": 250,
@@ -325,7 +329,8 @@ const trees = {
         "name": "Magic Tree",
         "tickCooldown": 4,
         "respawnTime": 119.4,
-        "image": "Magic_tree.png"
+        "image": "Magic_tree.png",
+        "luck": 30
     }
 };
 
