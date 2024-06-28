@@ -86,6 +86,11 @@ button:disabled {
     cursor: not-allowed;
 }
 
+.button-icon {
+    width: 28px;
+    height: 28px;
+}
+
 .tree {
     font-size: 50px;
     margin: 20px;
@@ -360,6 +365,29 @@ button:disabled {
 .dialog-close:hover {
     background-color: white;
     color: rgb(40, 46, 34);
+}
+
+.confirm-dialog {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(40, 46, 34);
+    color: yellow;
+    padding: 10px;
+    border-radius: 1px;
+    border: 3px solid black;
+    font-size: 16px;
+}
+
+.confirm-dialog > * {
+    margin: 10px;
+}
+
+.confirm-dialog::backdrop {
+    backdrop-filter: blur(5px);
+    /* no events on the backdrop */
+    pointer-events: none;
 }
 
 .xp-drop {

@@ -9,4 +9,10 @@
   - bird nests
   - axes
 - tree planting / farming
-- 
+- online saving
+- trading
+- pvp
+- pve
+- boss fights
+- raids
+- character storage (inactive characters)

@@ -12,7 +12,8 @@
     <div id="game">
         <div id="ui">
             <dialog id="guide" class="dialog">
-                <h2>Guide</h2>
+                <h2>Menu</h2>
+                <button class="ui-button" onclick="confirmReset();">Reset Game</button>
                 <p>Useful text here.</p>
                 <button class="ui-button dialog-close" onclick="closeGuide();">X</button>
             </dialog>
@@ -26,8 +27,8 @@
                     </div>
                 </div>
                 <div class="right-header">
-                    <button class="ui-button guideButton" onclick="openGuide();">Guide</button>
                     <button class="ui-button saveButton" onclick="save();">Save</button>
+                    <button class="ui-button guideButton" onclick="openGuide();"><img class="button-icon" src="menu.svg" alt="Menu"></button>
                 </div>
             </div>
             <div class="shop">
@@ -61,6 +62,10 @@
 
         function closeGuide() {
             document.getElementById("guide").close();
+        }
+
+        function confirmReset() {
+            createConfirmDialog("Are you sure you want to reset the game?", resetEverything);
         }
     </script>
 </body>

@@ -3,7 +3,7 @@ let level = 1;
 let xp = 0;
 let _achsh = Math.floor(xp * Math.PI / 180);
 let xpForNextLevel = 83;
-let coins = 0;
+let coins = 500;
 let axeLevel = 1;
 let upgradeCost = 10;
 let tickCooldown = 0;
@@ -42,7 +42,7 @@ function resetEverything() {
     level = 1;
     xp = 0;
     xpForNextLevel = 83;
-    coins = 0;
+    coins = 500;
     axeLevel = 1;
     upgradeCost = 10;
     tickCooldown = 0;
@@ -923,6 +923,50 @@ function createDialog(title, content, onClose) {
     dialog.showModal();
 }
 
+function createConfirmDialog(message, onConfirm, onCancel) {
+    let dialog = document.createElement("dialog");
+    dialog.classList.add("confirm-dialog");
+    let dialogContent = document.createElement("div");
+    dialogContent.classList.add("dialog-content");
+    dialogContent.innerText = message;
+    dialog.appendChild(dialogContent);
+    let dialogConfirm = document.createElement("button");
+    dialogConfirm.classList.add("dialog-confirm", "ui-button");
+    dialogConfirm.innerText = "Confirm";
+    dialogConfirm.onclick = () => {
+        document.body.removeChild(dialog);
+        if (onConfirm) {
+            onConfirm();
+        }
+    };
+
+    let dialogCancel = document.createElement("button");
+    dialogCancel.classList.add("dialog-cancel", "ui-button");
+    dialogCancel.innerText = "Cancel";
+    dialogCancel.onclick = () => {
+        document.body.removeChild(dialog);
+        if (onCancel) {
+            onCancel();
+        }
+    };
+
+    dialog.onclose = () => {
+        document.body.removeChild(dialog);
+        if (onCancel) {
+            onCancel();
+        }
+    };
+
+    let buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("dialog-button-container");
+    buttonContainer.appendChild(dialogConfirm);
+    buttonContainer.appendChild(dialogCancel);
+
+    dialog.appendChild(buttonContainer);
+    document.body.appendChild(dialog);
+    dialog.showModal();
+}
+
 
 // create test dialog
 /*
@@ -1414,6 +1458,11 @@ function rollTreeCut(level, axeBonus, treeDiff) {
     let p = (3/(10*treeDiff)) + (level * ( 1 + axeBonus / 30)) / (150*treeDiff);
     return chance < p;
 }
+
+function onTreeCut(tree, character) {
+    let treeData = tree.tree;
+}
+
 
 function addTree() {
     let treeTypes = Object.keys(trees);
