@@ -451,9 +451,9 @@ const characters = {
         "agility": 2,
         "strength": 16,
         "woodcutting": 22,
-        "luck": 8,
+        "luck": 1,
         "tick_manipulation": 1,
-        "range": 21,
+        "range": 10,
         "learning_rate": 1,
         "farming": 7,
         "trading": 10 // trading stat (more coins)
@@ -463,17 +463,17 @@ const characters = {
         "name": "Gnome Child",
         "image": "gnome-child.png",
         "agility": 29,
-        "strength": 19,
-        "woodcutting": 27,
+        "strength": 20,
+        "woodcutting": 25,
         "luck": 8,
         "tick_manipulation": 15,
         "range": 11,
         "learning_rate": 17,
-        "farming": 28,
-        "trading": 23
+        "farming": 25,
+        "trading": 25
     },
     "thurgo": {
-        "weight": 160,
+        "weight": 188,
         "name": "Thurgo",
         "image": "thurgo.png",
         "agility": 1,
@@ -487,7 +487,7 @@ const characters = {
         "trading": 34
     },
     "graador": {
-        "weight": 35,
+        "weight": 41,
         "name": "General Graador",
         "image": "graador.webp",
         "agility": 29,
@@ -501,7 +501,7 @@ const characters = {
         "trading": 57
     },
     "wise_old_man": {
-        "weight": 120,
+        "weight": 121,
         "name": "Wise Old Man",
         "image": "Wise_Old_Man.png",
         "agility": 10,
@@ -515,7 +515,7 @@ const characters = {
         "trading": 54
     },
     "oziach": {
-        "weight": 180,
+        "weight": 201,
         "name": "Oziach",
         "image": "Oziach.webp",
         "agility": 38,
@@ -529,7 +529,7 @@ const characters = {
         "trading": 31
     },
     "bob": {
-        "weight": 133,
+        "weight": 173,
         "name": "Bob",
         "image": "bob.webp",
         "agility": 41,
@@ -543,7 +543,7 @@ const characters = {
         "trading": 34
     },
     "evil_bob": {
-        "weight": 133,
+        "weight": 173,
         "name": "Evil Bob",
         "image": "evil_bob.webp",
         "agility": 40,
@@ -627,7 +627,7 @@ const characters = {
         "trading": 34
     },
     "evil_chicken": {
-        "weight": 149,
+        "weight": 169,
         "name": "Evil Chicken",
         "image": "evil_chicken.webp",
         "agility": 63,
@@ -669,7 +669,7 @@ const characters = {
         "trading": 31
     },
     "dharok": {
-        "weight": 69,
+        "weight": 79,
         "name": "Dharok",
         "image": "dharok.webp",
         "agility": 24,
@@ -710,6 +710,90 @@ const characters = {
         "farming": 63,
         "trading": 38
     },
+    "mrhankey": {
+        "weight": 1,
+        "name": "Mr. Hankey",
+        "image": "mrhankey.webp",
+        "agility": 90,
+        "strength": 90,
+        "woodcutting": 95,
+        "luck": 90,
+        "tick_manipulation": 90,
+        "range": 50,
+        "learning_rate": 83,
+        "farming": 83,
+        "trading": 80
+    },
+    "pot_of_greed": {
+        "weight": 30,
+        "name": "Pot of Greed",
+        "image": "potofgreed.png",
+        "agility": 1,
+        "strength": 20,
+        "woodcutting": 45,
+        "luck": 99,
+        "tick_manipulation": 99,
+        "range": 77,
+        "learning_rate": 74,
+        "farming": 98,
+        "trading": 92
+    },
+    "jesus": {
+        "weight": 5,
+        "name": "Jesus",
+        "image": "Jesus.webp",
+        "agility": 99,
+        "strength": 85,
+        "woodcutting": 89,
+        "luck": 80,
+        "tick_manipulation": 66,
+        "range": 75,
+        "learning_rate": 99,
+        "farming": 70,
+        "trading": 49
+    },
+    "krug": {
+        "weight": 125,
+        "name": "Krug",
+        "image": "krug.webp",
+        "agility": 85,
+        "strength": 69,
+        "woodcutting": 63,
+        "luck": 39,
+        "tick_manipulation": 45,
+        "range": 44,
+        "learning_rate": 30,
+        "farming": 41,
+        "trading": 36
+    },
+    "demonic": {
+        "weight": 80,
+        "name": "Demonic Gorilla",
+        "image": "demonic_gorilla.webp",
+        "agility": 33,
+        "strength": 86,
+        "woodcutting": 26,
+        "luck": 58.0,
+        "tick_manipulation": 59,
+        "range": 85,
+        "learning_rate": 66,
+        "farming": 46,
+        "trading": 66
+    },
+    "forsen": {
+        "weight": 13,
+        "name": "Forsen",
+        "image": "forsen.png",
+        "agility": 90,
+        "strength": 90,
+        "woodcutting": 90,
+        "luck": -99,
+        "tick_manipulation": 90,
+        "range": 90,
+        "learning_rate": 1,
+        "farming": 90,
+        "trading": 90
+    },
     "senko": {
         "weight": 0.1,
         "name": "Senko-san",
@@ -739,7 +823,7 @@ const rarities = {
         "farming": 14,
         "trading": 12,
         "name": "Common",
-        "weight": 700
+        "weight": 800
     },
     "bronze": {
         "color": "peru",
@@ -754,7 +838,7 @@ const rarities = {
         "trading": 37,
         "name": "Bronze",
         "strength": 3,
-        "weight": 500
+        "weight": 550
     },
     "iron": {
         "color": "gray",
@@ -768,7 +852,7 @@ const rarities = {
         "learning_rate": 10,
         "farming": 36,
         "trading": 59,
-        "weight": 400
+        "weight": 450
     },
     "steel": {
         "color": "lightgray",
@@ -782,7 +866,7 @@ const rarities = {
         "learning_rate": 31,
         "farming": 30,
         "trading": 35,
-        "weight": 350
+        "weight": 400
     },
     "black": {
         "color": "black",
@@ -796,7 +880,7 @@ const rarities = {
         "learning_rate": 17,
         "farming": 51,
         "trading": 45.0,
-        "weight": 300
+        "weight": 350
     },
     "mithril": {
         "color": "lightblue",
@@ -810,7 +894,7 @@ const rarities = {
         "learning_rate": 43,
         "farming": 6,
         "trading": 67,
-        "weight": 250
+        "weight": 300
     },
     "adamant": {
         "color": "green",
@@ -824,7 +908,7 @@ const rarities = {
         "learning_rate": 20,
         "farming": 5,
         "trading": 44,
-        "weight": 200
+        "weight": 250
     },
     "rune": {
         "color": "blue",
@@ -838,7 +922,7 @@ const rarities = {
         "learning_rate": 17.0,
         "farming": 89,
         "trading": 40,
-        "weight": 150
+        "weight": 200
     },
     "dragon": {
         "color": "red",
@@ -852,7 +936,7 @@ const rarities = {
         "learning_rate": 16,
         "farming": 61,
         "trading": 38,
-        "weight": 100
+        "weight": 150
     },
     "crystal": {
         "color": "cyan",
@@ -866,7 +950,7 @@ const rarities = {
         "learning_rate": 59,
         "farming": 46,
         "trading": 31,
-        "weight": 80
+        "weight": 60
     },
     "3a": {
         "color": "white",
@@ -1007,7 +1091,7 @@ function pullCharacter() {
     }
 
     let worker = new Worker(char, rarity);
-    if(showRollAnimation) {
+    if (showRollAnimation) {
         createCharacterRollAnimation(worker);
     }
     return worker;
@@ -1156,7 +1240,7 @@ function craftWithSelected() {
     console.log(newChar);
     updateUI();
 
-    if(showRollAnimation) {
+    if (showRollAnimation) {
         createCharacterRollAnimation(newChar);
     }
 
@@ -1941,7 +2025,7 @@ function init() {
 }
 
 function spawnXpDrop(x, y, xp) {
-    if(typeof xp === "number") {
+    if (typeof xp === "number") {
         xp = numToOsrs(xp);
     }
     let xpDrop = document.createElement("div");
@@ -2049,13 +2133,13 @@ function swapStorageWorkerWithActive(storageIndex, activeIndex) {
     updateUI();
 }
 
-function numToOsrs(num, roundUp=false) {
+function numToOsrs(num, roundUp = false) {
     let kMin = 100000;
     let mMin = 10000000;
 
-    if(num >= mMin) {
+    if (num >= mMin) {
         let m = num / 1000000;
-        if(roundUp) {
+        if (roundUp) {
             m = Math.ceil(m);
         } else {
             m = Math.floor(m);
@@ -2063,9 +2147,9 @@ function numToOsrs(num, roundUp=false) {
         // insert commas
         m = m.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return m + "M";
-    } else if(num >= kMin) {
+    } else if (num >= kMin) {
         let k = num / 1000;
-        if(roundUp) {
+        if (roundUp) {
             k = Math.ceil(k);
         } else {
             k = Math.floor(k);
@@ -2102,9 +2186,9 @@ function updateWorkerStorageUI() {
         workerElement.appendChild(img);
 
         workerElement.addEventListener("click", (event) => {
-            
+
             // add to active workers
-            if(selectedCharacters.length !== 1) {
+            if (selectedCharacters.length !== 1) {
                 let x = event.clientX + 20;
                 let y = event.clientY - 100;
                 let mbx = showMessageBoxAtPos("Select 1 active worker to swap with", x, y);
@@ -2121,7 +2205,7 @@ function updateWorkerStorageUI() {
 
             updateUI();
 
-            
+
 
         }
         );
@@ -2276,8 +2360,8 @@ function plantTreeHandler(event) {
 plantTreeButton.addEventListener('click', plantTreeHandler);
 
 let _lastXpClick = 0;
-function buyXpHandler(event, multiplier=1) {
-    
+function buyXpHandler(event, multiplier = 1) {
+
     // this is to prevent double buying when using the right click context menu
     if (tickCount === _lastXpClick) {
         return;

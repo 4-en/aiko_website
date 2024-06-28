@@ -58,13 +58,13 @@ def smooth_weight_to_total(weight):
         (100, VERY_GOOD_TOTAL),
         (200, GOOD_TOTAL),
         (400, OKAY_TOTAL),
-        (600, BAD_TOTAL)
+        (700, BAD_TOTAL)
     ]
     threshholds = reversed(threshholds)
     lower = UBER_TOTAL
     lower_weight = 0
     upper = TRASH_TOTAL
-    upper_weight = 700
+    upper_weight = 1000
     for thresh, total in threshholds:
         if weight <= thresh:
             upper = total
