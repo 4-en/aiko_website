@@ -240,7 +240,7 @@ button:disabled {
     border-radius: 1px;
     border: 3px solid black;
     font-size: 16px;
-    z-index: 100;
+    z-index: 1200;
     width: 150px;
 }
 
