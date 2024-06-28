@@ -572,7 +572,105 @@ const characters = {
         "learning_rate": 1,
         "farming": 1,
         "trading": 100
-    }
+    },
+    "goblin": {
+        "weight": 800,
+        "name": "Goblin",
+        "image": "goblin.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "evil_chicken": {
+        "weight": 100,
+        "name": "Evil Chicken",
+        "image": "evil_chicken.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "hill_giant": {
+        "weight": 100,
+        "name": "Hill Giant",
+        "image": "hill_giant.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "durial321": {
+        "weight": 50,
+        "name": "Durial321",
+        "image": "durial321.png",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "dharok": {
+        "weight": 50,
+        "name": "Dharok",
+        "image": "dharok.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "mimic": {
+        "weight": 50,
+        "name": "Mimic",
+        "image": "mimic.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
+    "tekton": {
+        "weight": 50,
+        "name": "Tekton",
+        "image": "tekton.webp",
+        "agility": 1,
+        "strength": 1,
+        "woodcutting": 1,
+        "luck": 1,
+        "tick_manipulation": 1,
+        "range": 1,
+        "learning_rate": 1,
+        "farming": 1,
+        "trading": 1
+    },
 };
 
 const rarities = {
@@ -760,6 +858,7 @@ function craftCharacter(char1, char2, char3) {
 
     let betterChars = [];
     let betterRarities = [];
+    let totalXp = char1.xp + char2.xp + char3.xp;
     for (let i = 0; i < chars.length; i++) {
         let char = characters[chars[i]];
         let rarity = rarities_l[i];
@@ -771,7 +870,7 @@ function craftCharacter(char1, char2, char3) {
                 lower_or_equal_char_weights.push(key);
             }
         }
-        if(lower_or_equal_char_weights.length === 0) {
+        if (lower_or_equal_char_weights.length === 0) {
             // if no lower or equal weight, add the current char
             lower_or_equal_char_weights.push(chars[i]);
         }
@@ -843,7 +942,10 @@ function craftCharacter(char1, char2, char3) {
         }
     }
 
-    newChar.stats = newChar.calculateStats();
+    // give xp based on the total xp of the 3 characters
+    let givenXp = Math.floor(totalXp / 3);
+    console.log("Given XP: " + givenXp);
+    newChar.addXp(givenXp);
 
     return newChar;
 }
@@ -1315,7 +1417,9 @@ class Worker {
 
         if (this.level !== oldLevel) {
             this.stats = this.calculateStats();
-            this.tooltip.innerText = this.getDescriptionString();
+            if (this.tooltip !== null) {
+                this.tooltip.innerText = this.getDescriptionString();
+            }
         }
     }
 
@@ -1365,7 +1469,7 @@ class Worker {
         let tick_manip_chance = this.stats.tick_manipulation / 200;
         let saved_ticks = Math.random() * (1 + tick_manip_chance) / 2 * cooldown;
         saved_ticks = Math.ceil(saved_ticks);
-        saved_ticks = Math.min(saved_ticks, cooldown-1);
+        saved_ticks = Math.min(saved_ticks, cooldown - 1);
         if (Math.random() < tick_manip_chance) {
             cooldown -= saved_ticks;
         }
@@ -1455,7 +1559,7 @@ function treeClick(event, index) {
 
 function rollTreeCut(level, axeBonus, treeDiff) {
     let chance = Math.random();
-    let p = (3/(10*treeDiff)) + (level * ( 1 + axeBonus / 30)) / (150*treeDiff);
+    let p = (3 / (10 * treeDiff)) + (level * (1 + axeBonus / 30)) / (150 * treeDiff);
     return chance < p;
 }
 
