@@ -21,11 +21,63 @@
                 </div>
             </dialog>
             <dialog id="guide" class="dialog">
+                <button class="ui-button dialog-close" onclick="closeGuide();">X</button>
                 <h2>Menu</h2>
                 <button class="ui-button" onclick="toggleRollAnimation();">Toggle Recruit Animation</button>
                 <button class="ui-button" onclick="confirmReset();">Reset Game</button>
-                <p>Useful text here.</p>
-                <button class="ui-button dialog-close" onclick="closeGuide();">X</button>
+                <div class="tile-container">
+                    <div>
+                        <h3>Crafting</h3>
+                        <div class="content">
+                            <div>
+                                1. Get the 3 characters
+                            </div>
+                            <div>
+                                2. For each character, do the following:<br>
+                                - Get all characters with lower or equal weight (ie. better or equal characters)<br>
+                                - Pick one of the better or equal characters based on their weight<br>
+                                - add the picked character to the pool<br>
+                                - do the same for the rarity<br>
+                            </div>
+                            <div>
+                                3. Pick one of the 3 characters
+                            </div>
+                            <div>
+                                4. Pick one of the 3 rarities (same as step 3)
+                            </div>
+                            <div>
+                                5. Create a new character with the picked character and rarity
+                            </div>
+                            <div>
+                                6. Pick ivs from input characters or random
+                            </div>
+                            <div>
+                                7. Give the new character xp based on the average xp of the 3 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Stats</h3>
+                        <span>
+                            AGI: Agility<br>
+                            STR: Strength<br>
+                            INT: Intelligence<br>
+                            WC: Woodcutting<br>
+                            LUCK: Luck<br>
+                            TM: Tick Manipulation<br>
+                            VSN: Vision<br>
+                            FARM: Farming<br>
+                            TRD: Trading<br>
+                        </span>
+                    </div>
+                    <div>
+                        <h3>LULE</h3>
+                        <div class="content" justify-content="center" align-items="center">
+                            <img src="assets/LULE.png" width="512" height="512" alt="LULE">
+                        </div>
+                    </div>
+                </div>
+
             </dialog>
             <div class="header">
                 <div class="left-header">
@@ -53,10 +105,14 @@
                     </div>
                     Buy XP (<span id="buyXPCost">0</span>gp)
                     <div class="right-click-menu">
-                        <button class="ui-button" onclick="buyXpHandler(event, 1);">1,000xp for <span id="buyXPCost1">0</span>gp</button>
-                        <button class="ui-button" onclick="buyXpHandler(event, 10);">10,000xp for <span id="buyXPCost10">0</span>gp</button>
-                        <button class="ui-button" onclick="buyXpHandler(event, 100);">100,000xp for <span id="buyXPCost100">0</span>gp</button>
-                        <button class="ui-button" onclick="buyXpHandler(event, 1000);">1,000,000xp for <span id="buyXPCost1000">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 1);">1,000xp for <span
+                                id="buyXPCost1">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 10);">10,000xp for <span
+                                id="buyXPCost10">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 100);">100,000xp for <span
+                                id="buyXPCost100">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 1000);">1,000,000xp for <span
+                                id="buyXPCost1000">0</span>gp</button>
                     </div>
                 </div>
             </div>

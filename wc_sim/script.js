@@ -1015,6 +1015,31 @@ function pullCharacter() {
 
 // combines 3 characters into a new character
 function craftCharacter(char1, char2, char3) {
+
+    /*
+     * Idea:
+     * 1. Get the 3 characters
+     * 2. For each character, do the following:
+     *    - Get all characters with lower or equal weight (ie. better or equal characters)
+     *    - Pick one of the better or equal characters based on their weight
+     *    - add the picked character to the pool
+     *    - do the same for the rarity
+     * 3. Pick one of the 3 characters (this is not based on weight)
+     *    (this gives the possibility offering one worker with a good character and a bad rarity,
+     *    and another worker with a bad character and a good rarity, while giving the player a
+     *    relatively good chance to combine their properties)
+     * 4. Pick one of the 3 rarities (same as step 3)
+     * 5. Create a new character with the picked character and rarity
+     * 6. For each iv stat, choose one of the following options:
+     *    - Pick the stat from char1
+     *    - Pick the stat from char2
+     *    - Pick the stat from char3
+     *    - keep the random new stat
+     *    (this gives the possibility of combining the stats of the 3 characters, maybe a bit too random)
+     * 7. Give the new character xp based on the average xp of the 3 characters
+     * 8. Return the new character
+     */
+
     let chars = [char1.character, char2.character, char3.character];
     let rarities_l = [char1.rarity, char2.rarity, char3.rarity];
 
@@ -1038,9 +1063,12 @@ function craftCharacter(char1, char2, char3) {
         }
 
         // pick one of the better chars and add to the pool
-        let rand = Math.random() * lower_or_equal_char_weights.length;
-        let newChar = lower_or_equal_char_weights[Math.floor(rand)];
-        betterChars.push(newChar);
+        let loe = {};
+        for (let j = 0; j < lower_or_equal_char_weights.length; j++) {
+            let char = characters[lower_or_equal_char_weights[j]];
+            loe[lower_or_equal_char_weights[j]] = char.weight;
+        }
+        betterChars.push(rollWeightedRandom(loe));
 
         // get all rarities with lower or equal weight
         let lower_or_equal_rarity_weights = [];
@@ -1054,41 +1082,18 @@ function craftCharacter(char1, char2, char3) {
         }
 
         // pick one of the better rarities and add to the pool
-        rand = Math.random() * lower_or_equal_rarity_weights.length;
-        let newRarity = lower_or_equal_rarity_weights[Math.floor(rand)];
-        betterRarities.push(newRarity);
+        loe = {};
+        for (let j = 0; j < lower_or_equal_rarity_weights.length; j++) {
+            let rarity = rarities[lower_or_equal_rarity_weights[j]];
+            loe[lower_or_equal_rarity_weights[j]] = rarity.weight;
+        }
+        betterRarities.push(rollWeightedRandom(loe));
     }
 
-    // pick one of the better chars and rarities
-    /*
-    let rand = Math.random() * betterChars.length;
-    let char = betterChars[Math.floor(rand)];
-    rand = Math.random() * betterRarities.length;
-    let rarity = betterRarities[Math.floor(rand)];
-
-    chars.push(char);
-    rarities_l.push(rarity);
-    */
-    chars = betterChars;
-    rarities_l = betterRarities;
-
-    // pick a new character and rarity for the new worker
-    // one of the three better_or_equal characters
-    // character/rarity based on weight
-    let charWeights = {};
-    for (let i = 0; i < chars.length; i++) {
-        let char = characters[chars[i]];
-        charWeights[chars[i]] = char.weight;
-    }
-
-    let rarWeights = {};
-    for (let i = 0; i < rarities_l.length; i++) {
-        let rarity = rarities[rarities_l[i]];
-        rarWeights[rarities_l[i]] = rarity.weight;
-    }
-
-    char = rollWeightedRandom(charWeights);
-    rarity = rollWeightedRandom(rarWeights);
+    // pick one of the 3 chars
+    let char = betterChars[Math.floor(getRand() * 3)];
+    // pick one of the 3 rarities
+    let rarity = betterRarities[Math.floor(getRand() * 3)];
 
     let newChar = new Worker(char, rarity);
     for (let key in newChar.ivs) {
