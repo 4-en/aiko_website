@@ -63,6 +63,8 @@ body {
     padding: 0;
 }
 
+
+
 .workers-container {
     display: flex;
     flex-direction: row;
@@ -94,6 +96,7 @@ body {
 
 #worker-storage-content {
     display: grid;
+    position: relative;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     
@@ -220,7 +223,7 @@ button:disabled {
     top: 60px;
     left: 15px;
     text-wrap: nowrap;
-    z-index: 1;
+    z-index: 999;
 }
 
 
