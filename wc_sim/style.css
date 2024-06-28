@@ -228,6 +228,38 @@ button:disabled {
     display: block;
 }
 
+.right-click-menu {
+    display: none;
+    position: fixed;
+    background-color: rgb(40, 46, 34);
+    color: yellow;
+    padding: 0;
+    border-radius: 1px;
+    border: 3px solid black;
+    font-size: 16px;
+    z-index: 100;
+    width: 150px;
+}
+
+.right-click-menu:hover {
+    display: flex;
+    flex-direction: column;
+    transition: 0s display;
+}
+
+.right-click-menu.clicked {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.right-click-menu > div:hover {
+    background-color: white;
+    color: rgb(40, 46, 34);
+}
+
+
+
 .message-box {
     position: absolute;
     background-color: rgb(40, 46, 34);
@@ -284,11 +316,18 @@ button:disabled {
 .ui-button {
     background-color: rgb(40, 46, 34);
     color: yellow;
-    padding: 8px 10px;
     border-radius: 1px;
     border: 3px solid black;
     font-size: 16px;
     font-family: 'runescape';
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#buyXPButton {
+    position: relative;
 }
 
 .ui-button:hover {
@@ -681,4 +720,13 @@ button:disabled {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+.right-click-menu > * {
+    cursor: pointer;
+    padding: 5px;
+    margin: 0;
+    border: 0;
+    font-size: 16px;
+
 }

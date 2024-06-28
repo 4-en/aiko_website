@@ -55,6 +55,7 @@ function resetEverything() {
     playerName = "Player";
     treeField = [];
     worker = [null, null, null, null, null];
+    worker_storage = [];
     activeTree = null;
     init();
     save();
@@ -243,6 +244,10 @@ const treeDiv = document.getElementById("trees");
 const craftWorkerButton = document.getElementById("craftWorkerButton");
 const buyXpButton = document.getElementById("buyXPButton");
 const buyXpCostElement = document.getElementById("buyXPCost");
+const buyXpCostElement1 = document.getElementById("buyXPCost1");
+const buyXpCostElement10 = document.getElementById("buyXPCost10");
+const buyXpCostElement100 = document.getElementById("buyXPCost100");
+const buyXpCostElement1000 = document.getElementById("buyXPCost1000");
 const workerStorageElement = document.getElementById("worker-storage-content");
 
 // game constants
@@ -1931,6 +1936,9 @@ function init() {
 }
 
 function spawnXpDrop(x, y, xp) {
+    if(typeof xp === "number") {
+        xp = numToOsrs(xp);
+    }
     let xpDrop = document.createElement("div");
     xpDrop.classList.add("xp-drop");
     xpDrop.innerText = "+" + xp + " xp";
@@ -1979,11 +1987,15 @@ function clickCharacterUi(event, index) {
 // Functions
 function updateUI() {
     levelElement.innerText = level;
-    xpElement.innerText = Math.floor(xp - xpForLevel(level));
-    xpForNextLevelElement.innerText = Math.floor(xpForNextLevel - xpForLevel(level));
-    logsElement.innerText = Math.floor(coins);
-    plantTreeCostElement.innerText = getNextTreeCost();
+    xpElement.innerText = numToOsrs(xp - xpForLevel(level));
+    xpForNextLevelElement.innerText = numToOsrs(xpForNextLevel - xpForLevel(level));
+    logsElement.innerText = numToOsrs(coins);
+    plantTreeCostElement.innerText = numToOsrs(getNextTreeCost(), true);
     buyXpCostElement.innerText = 100 * selectedCharacters.length;
+    buyXpCostElement1.innerText = 100 * selectedCharacters.length;
+    buyXpCostElement10.innerText = numToOsrs(1000 * selectedCharacters.length);
+    buyXpCostElement100.innerText = numToOsrs(10000 * selectedCharacters.length);
+    buyXpCostElement1000.innerText = numToOsrs(100000 * selectedCharacters.length);
 
     workersElement.innerText = "";
     for (let i = 0; i < worker.length; i++) {
@@ -2031,6 +2043,36 @@ function swapStorageWorkerWithActive(storageIndex, activeIndex) {
     worker_storage[storageIndex] = temp;
     updateUI();
 }
+
+function numToOsrs(num, roundUp=false) {
+    let kMin = 100000;
+    let mMin = 10000000;
+
+    if(num >= mMin) {
+        let m = num / 1000000;
+        if(roundUp) {
+            m = Math.ceil(m);
+        } else {
+            m = Math.floor(m);
+        }
+        // insert commas
+        m = m.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return m + "M";
+    } else if(num >= kMin) {
+        let k = num / 1000;
+        if(roundUp) {
+            k = Math.ceil(k);
+        } else {
+            k = Math.floor(k);
+        }
+        k = k.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return k + "K";
+    } else {
+        num = Math.floor(num);
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+}
+
 
 function updateWorkerStorageUI() {
     workerStorageElement.innerText = "";
@@ -2228,9 +2270,16 @@ function plantTreeHandler(event) {
 
 plantTreeButton.addEventListener('click', plantTreeHandler);
 
-function buyXpHandler(event) {
-    const cost = 100;
-    const xpAmount = 1000;
+let _lastXpClick = 0;
+function buyXpHandler(event, multiplier=1) {
+    
+    // this is to prevent double buying when using the right click context menu
+    if (tickCount === _lastXpClick) {
+        return;
+    }
+    _lastXpClick = tickCount;
+    const cost = 100 * multiplier;
+    const xpAmount = 1000 * multiplier;
 
     let selected = selectedCharacters;
     if (selected.length === 0) {
@@ -2265,7 +2314,10 @@ function buyXpHandler(event) {
 buyXpButton.addEventListener('click', buyXpHandler);
 
 function cancelRightClicks(event) {
-    event.preventDefault();
+    // only cancel default context menu if right click
+    if (event.button === 2) {
+        event.preventDefault();
+    }
 }
 
 document.addEventListener('contextmenu', cancelRightClicks);

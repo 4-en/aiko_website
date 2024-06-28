@@ -47,7 +47,18 @@
                         id="plantTreeCost">1000</span>gp)</button>
                 <button class="ui-button" id="recruitWorkerButton">Recruit Worker (1000gp)</button>
                 <button class="ui-button" id="craftWorkerButton">Craft Worker</button>
-                <button class="ui-button" id="buyXPButton">Buy XP (<span id="buyXPCost">0</span>gp)</button>
+                <div class="ui-button" id="buyXPButton" oncontextmenu="startRightClickMenu(event);">
+                    <div class="tooltip">
+                        Buy 1000 XP for 100gp
+                    </div>
+                    Buy XP (<span id="buyXPCost">0</span>gp)
+                    <div class="right-click-menu">
+                        <button class="ui-button" onclick="buyXpHandler(event, 1);">1,000xp for <span id="buyXPCost1">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 10);">10,000xp for <span id="buyXPCost10">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 100);">100,000xp for <span id="buyXPCost100">0</span>gp</button>
+                        <button class="ui-button" onclick="buyXpHandler(event, 1000);">1,000,000xp for <span id="buyXPCost1000">0</span>gp</button>
+                    </div>
+                </div>
             </div>
             <div class="workers-container">
                 <div class="workers" id="workers">
@@ -98,6 +109,32 @@
 
         function toggleRollAnimation() {
             showRollAnimation = !showRollAnimation;
+        }
+
+        function startRightClickMenu(event) {
+
+
+            let menu = null;
+            for (let i = 0; i < event.target.children.length; i++) {
+                if (event.target.children[i].classList.contains("right-click-menu")) {
+                    menu = event.target.children[i];
+                    break;
+                }
+            }
+            if (menu === null) {
+                return;
+            }
+
+            menu.classList.add("clicked");
+
+            // move menu to mouse position
+            menu.style.left = event.clientX - 50 + "px";
+            menu.style.top = event.clientY - 50 + "px";
+
+            setTimeout(() => {
+                menu.classList.remove("clicked");
+            }, 100);
+
         }
 
     </script>
