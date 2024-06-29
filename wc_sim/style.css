@@ -434,6 +434,7 @@ button:disabled {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    user-select: none;
 }
 
 .floating-window-titlebar {
@@ -742,15 +743,17 @@ button:disabled {
 
 .character-roll-header {
     display: flex;
+    position: relative;
     flex-direction: column;
 }
 
 .character-roll-header > * {
-    margin: 10px;
+    margin: 5px;
     text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
 }
 
 .character-roll-body {
+    
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -769,6 +772,10 @@ button:disabled {
 
 .character-roll-rarity {
     font-size: 36px;
+}
+
+.character-roll-stars {
+    font-size: 52px;
 }
 
 .character-roll-stats {

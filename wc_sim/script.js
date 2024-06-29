@@ -1472,33 +1472,58 @@ function createCharacterCard(character) {
     let body = document.createElement("div");
     body.classList.add("character-roll-body");
 
+    let characterStars = document.createElement("div");
+    characterStars.classList.add("character-roll-stars");
+
     let characterName = document.createElement("div");
     characterName.classList.add("character-roll-name");
     characterName.innerText = characters[character.character].name + " Lv. " + character.level;
+    let characterTrueRarity = 1 /characters[character.character].rarity;
+    characterTrueRarity = numToOsrs(Math.round(characterTrueRarity));
+    let characterTrueRarityStr = "1 / " + characterTrueRarity;
+    let nameTooltip = document.createElement("div");
+    nameTooltip.classList.add("tooltip");
+    nameTooltip.innerText = characterTrueRarityStr;
+    characterName.appendChild(nameTooltip);
+
     let characterRarity = document.createElement("div");
     characterRarity.classList.add("character-roll-rarity");
     characterRarity.innerText = rarities[character.rarity].name;
+    let rarityTooltipx = document.createElement("div");
+    rarityTooltipx.classList.add("tooltip");
+    rarityTooltipx.innerText = "1 / " + numToOsrs(Math.round(1 / rarities[character.rarity].rarity));
+    characterRarity.appendChild(rarityTooltipx);
 
-    let rarityValue = rarities[character.rarity].rarity * 20;
-    let rarityStr = "";
+    let rarityValue = rarities[character.rarity].rarity * 10;
+    let rarityStr = "★";
     while (rarityValue < 1) {
         rarityValue *= 5;
         // add star
         rarityStr += "★";
     }
 
-    rarityValue = characters[character.character].rarity * 20;
+    rarityValue = characters[character.character].rarity * 10;
     while (rarityValue < 1) {
-        rarityValue *= 4;
+        rarityValue *= 5;
         // add star
         rarityStr += "★";
     }
 
-    if (rarityStr.length > 6) {
-        rarityStr = "★★★★★★";
+    if (rarityStr.length > 10) {
+        rarityStr = "★★★★★★★★★★";
     }
 
-    characterRarity.innerText = rarityStr + " " + characterRarity.innerText + " " + rarityStr;
+    //characterRarity.innerText = rarityStr + " " + characterRarity.innerText + " " + rarityStr;
+    characterStars.innerText = rarityStr;
+
+    let trueRarity = rarities[character.rarity].rarity * characters[character.character].rarity;
+    trueRarity = numToOsrs(Math.round(1 / trueRarity));
+    let trueRarityStr = "1 / " + trueRarity;
+
+    let rarityTooltip = document.createElement("div");
+    rarityTooltip.classList.add("tooltip");
+    rarityTooltip.innerText = trueRarityStr;
+    characterStars.appendChild(rarityTooltip);
 
     let characterStats = document.createElement("div");
     characterStats.classList.add("character-roll-stats");
@@ -1530,6 +1555,7 @@ function createCharacterCard(character) {
 
 
     characterCard.appendChild(header);
+    header.appendChild(characterStars);
     header.appendChild(characterName);
     characterCard.appendChild(body);
     header.appendChild(characterRarity);
