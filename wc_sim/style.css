@@ -367,6 +367,7 @@ button:disabled {
     height: 64px;
 }
 
+
 @media screen and (max-width: 600px){
     .ui-button {
         font-size: 12px;
@@ -714,7 +715,8 @@ button:disabled {
 }
 
 .character-roll-image {
-    width: 30%;
+    width: 25%;
+    max-width: 25%;
     max-height: 100%;
     margin: 24px;
     border-radius: 5px;

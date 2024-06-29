@@ -57,7 +57,7 @@ function resetEverything() {
     worker = [null, null, null, null, null];
     worker_storage = [];
     activeTree = null;
-    init();
+    initTrees();
     save();
     location.reload();
 }
@@ -966,6 +966,20 @@ const rarities = {
         "trading": 31,
         "weight": 60
     },
+    "graceful": {
+        "color": "lightgreen",
+        "name": "Graceful",
+        "agility": 99,
+        "strength": 1,
+        "woodcutting": 90,
+        "luck": 54,
+        "tick_manipulation": 40,
+        "range": 30,
+        "learning_rate": 79,
+        "farming": 81,
+        "trading": 20,
+        "weight": 60
+    },
     "3a": {
         "color": "white",
         "name": "3rd Age",
@@ -992,7 +1006,7 @@ const rarities = {
         "learning_rate": 68,
         "farming": 59,
         "trading": 73,
-        "weight": 25
+        "weight": 20
     },
     "ancestral": {
         "color": "purple",
@@ -1006,7 +1020,7 @@ const rarities = {
         "learning_rate": 99,
         "farming": 91,
         "trading": 53,
-        "weight": 25
+        "weight": 20
     },
     "twisted": {
         "color": "darkgreen",
@@ -1020,7 +1034,7 @@ const rarities = {
         "learning_rate": 63,
         "farming": 53,
         "trading": 57,
-        "weight": 25
+        "weight": 20
     },
     "legendary": {
         "color": "#f5b038",
@@ -1080,7 +1094,7 @@ const rarities = {
     },
     "parallel": {
         "color": "darkblue",
-        "name": "Parallel Universe Enigmatic",
+        "name": "Parallel Universe Stardust Enigmatic",
         "agility": 200,
         "strength": 200,
         "woodcutting": 200,
@@ -1131,6 +1145,7 @@ function pullCharacter() {
             break;
         }
     }
+
 
     let worker = new Worker(char, rarity);
     if (showRollAnimation) {
@@ -1332,8 +1347,8 @@ function createCharacterRollAnimation(character) {
 
     let rarity = rarities[character.rarity];
     let color = rarity.color;
-    let shadowSize = 5 + Math.min(25, 250 / (rarity.weight / 10 + 10));
-    characterCard.style.boxShadow = "0 0 20px " + shadowSize + "px " + color;
+    let shadowSize = character.getRarityBorderSize() * 3;
+    characterCard.style.boxShadow = "0 0 40px " + shadowSize + "px " + color;
 
     let header = document.createElement("div");
     header.classList.add("character-roll-header");
@@ -1348,6 +1363,27 @@ function createCharacterRollAnimation(character) {
     let characterRarity = document.createElement("div");
     characterRarity.classList.add("character-roll-rarity");
     characterRarity.innerText = rarities[character.rarity].name;
+
+    let rarityValue = rarities[character.rarity].rarity * 20;
+    let rarityStr = "";
+    while(rarityValue < 1) {
+        rarityValue *= 5;
+        // add star
+        rarityStr += "★";
+    }
+
+    rarityValue = characters[character.character].rarity * 20;
+    while(rarityValue < 1) {
+        rarityValue *= 4;
+        // add star
+        rarityStr += "★";
+    }
+
+    if (rarityStr.length > 6) {
+        rarityStr = "★★★★★★";
+    }
+
+    characterRarity.innerText = rarityStr + " " + characterRarity.innerText + " " + rarityStr;
 
     let characterStats = document.createElement("div");
     characterStats.classList.add("character-roll-stats");
@@ -1535,6 +1571,20 @@ class Worker {
         return statString;
     }
 
+    getRarityBorderSize() {
+        let rar = rarities[this.rarity];
+        let shadowSize = 10 * Math.log10(1/(rar.weight+40)) + 25;
+
+        return shadowSize;
+    }
+
+    getRarityShadowString() {
+        let rar = rarities[this.rarity];
+        let color = rar.color;
+        let shadowSize = this.getRarityBorderSize();
+        let shadowString = "0 0 10px " + shadowSize + "px " + color;
+        return shadowString;
+    }
 
     getNewState() {
         let states = {
@@ -1772,6 +1822,8 @@ class Worker {
             img.src = "assets/" + characters[this.character].image;
             img.alt = characters[this.character].name;
             img.width = 64;
+            let shadowSize = this.getRarityBorderSize();
+            img.style.filter = "drop-shadow(0px 0px "+shadowSize+"px " + rarities[this.rarity].color + ")";
             this.div.appendChild(img);
             this.tooltip = document.createElement("div");
             this.tooltip.classList.add("tooltip");
@@ -1884,7 +1936,7 @@ class Worker {
         let stat = character / 100 * charWeight + rarity / 100 * rarityWeight + iv / 100 * ivWeight;
         stat = stat / (charWeight + rarityWeight + ivWeight);
         stat = Math.floor(statMultiplier * stat * level + level / 10);
-        return Math.max(1, stat);
+        return Math.max(0, stat);
     }
 
     calculateStats() {
@@ -1914,7 +1966,7 @@ class Worker {
                 ivStatKey += this.ivs[key];
             }
 
-            stats[key] = this.calculateStat(Math.min(99, this.level), charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(3, charStatKey, rarityStatKey, ivStatKey);
+            stats[key] = this.calculateStat(Math.min(99, this.level), charStatKey, rarityStatKey, ivStatKey) + this.calculateStat(3, charStatKey, rarityStatKey, ivStatKey) + 1;
         }
         return stats;
     }
@@ -2042,7 +2094,26 @@ function addTreeOfType(treeType, x, y) {
     treeField.push(treeData);
 }
 
-function init() {
+function initRarities() {
+    // calulate the rarities of characters and rarity
+    let totalCharWeight = 0;
+    for (let key in characters) {
+        totalCharWeight += characters[key].weight;
+    }
+    for (let key in characters) {
+        characters[key].rarity = characters[key].weight / totalCharWeight;
+    }
+
+    let totalRarityWeight = 0;
+    for (let key in rarities) {
+        totalRarityWeight += rarities[key].weight;
+    }
+    for (let key in rarities) {
+        rarities[key].rarity = rarities[key].weight / totalRarityWeight;
+    }
+}
+
+function initTrees() {
     if (treeField.length > 0) {
         return;
     }
@@ -2141,9 +2212,7 @@ function updateUI() {
             workerElement.appendChild(tooltip);
             let img = document.createElement("img");
             img.src = "assets/" + character.image;
-            let color = rarity.color;
-            let shadowSize = 1 + Math.min(20, 100 / (rarity.weight + 4));
-            workerElement.style.boxShadow = "0 0 10px " + shadowSize + "px " + color;
+            workerElement.style.boxShadow = worker[i].getRarityShadowString();
             img.alt = character.name;
             img.height = 64;
             img.width = 64;
@@ -2219,9 +2288,7 @@ function updateWorkerStorageUI() {
         workerElement.appendChild(tooltip);
         let img = document.createElement("img");
         img.src = "assets/" + character.image;
-        let color = rarity.color;
-        let shadowSize = 1 + Math.min(20, 100 / (rarity.weight + 4));
-        workerElement.style.boxShadow = "0 0 10px " + shadowSize + "px " + color;
+        workerElement.style.boxShadow = workerData.getRarityShadowString();
         img.alt = character.name;
         img.height = 64;
         img.width = 64;
@@ -2524,7 +2591,8 @@ function tick() {
 
 function main() {
     load();
-    init();
+    initRarities();
+    initTrees();
     // Initial UI update
     updateUI();
     setInterval(tick, tickRate * 1000);
