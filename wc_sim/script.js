@@ -811,7 +811,7 @@ const characters = {
     "aiko": {
         "weight": 0.01,
         "name": "Aiko",
-        "image": "aiko.webp",
+        "image": "aiko.png",
         "agility": 120,
         "strength": 120,
         "woodcutting": 120,
