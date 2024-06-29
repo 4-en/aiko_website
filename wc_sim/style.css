@@ -886,3 +886,38 @@ button:disabled {
 .tile-container > div:hover > .content {
     display: flex;
 }
+
+.rarity-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding: 25px;
+    height: 50vh;
+    overflow-x: hidden;
+    position: relative;
+    overflow-y: auto;
+}
+
+div > .rarity-list {
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.rarity-element {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    font-size: 36px;
+    width: 100%;
+}
+
+.rarity-element > div:first-child {
+    margin-top: 10px;
+    margin-right: 100px;
+}

@@ -457,7 +457,7 @@ const axes = {
 
 const characters = {
     "bot": {
-        "weight": 1000, // "weight" is the chance of getting this character, higher weight = higher chance
+        "weight": 2000, // "weight" is the chance of getting this character, higher weight = higher chance
         "name": "Bot", // name of the character
         "image": "bot.webp", // image of the character
         "agility": 2,
@@ -849,7 +849,7 @@ const rarities = {
         "farming": 14,
         "trading": 12,
         "name": "Common",
-        "weight": 800
+        "weight": 2000
     },
     "bronze": {
         "color": "peru",
@@ -1121,6 +1121,22 @@ const rarities = {
 
 };
 
+function addToDex(character, rarity) {
+    if (!characterDex[character]) {
+        characterDex[character] = 1;
+    } else {
+        characterDex[character]++;
+    }
+
+    if (!rarityDex[rarity]) {
+        rarityDex[rarity] = 1;
+    }
+    else {
+        rarityDex[rarity]++;
+    }
+    
+}
+
 function pullCharacter() {
     let charKeys = Object.keys(characters);
     let charWeight = 0;
@@ -1158,6 +1174,7 @@ function pullCharacter() {
         }
     }
 
+    addToDex(char, rarity);
 
     let worker = new Worker(char, rarity);
     if (showRollAnimation) {
@@ -1248,6 +1265,8 @@ function craftCharacter(char1, char2, char3) {
     // pick one of the 3 rarities
     let rarity = betterRarities[Math.floor(getRand() * 3)];
 
+    addToDex(char, rarity);
+
     let newChar = new Worker(char, rarity);
     for (let key in newChar.ivs) {
         rand = Math.random() * 4;
@@ -1328,6 +1347,98 @@ function createCharacterWindow(character) {
 
     return window;
 }
+
+function showRarities() {
+    let allRarities = rarities;
+    // sort rarities by weight
+    let sortable = [];
+    for (let rarity in allRarities) {
+        sortable.push([rarity, allRarities[rarity].weight]);
+    }
+    sortable.sort(function (a, b) {
+        return b[1] - a[1];
+    });
+
+    for(let i = 0; i < sortable.length; i++) {
+        let rarity = sortable[i][0];
+        if (rarityDex[rarity]) {
+            sortable[i].push(allRarities[rarity].name);
+        } else {
+            sortable[i].push("???");
+        }
+    }
+
+    let rarityList = document.createElement("div");
+    rarityList.classList.add("rarity-list");
+
+    for (let i = 0; i < sortable.length; i++) {
+        let rarity = allRarities[sortable[i][0]].rarity;
+        rarity = numToOsrs(Math.round(1/rarity));
+        let rarityStr = "1 / " + rarity;
+        let rarityName = sortable[i][2];
+        let color = allRarities[sortable[i][0]].color;
+        let rarityElement = document.createElement("div");
+        rarityElement.classList.add("rarity-element");
+        rarityElement.style.color = color;
+        let rarityNameElement = document.createElement("div");
+        rarityNameElement.innerText = rarityName;
+        let rarityTooltip = document.createElement("div");
+        rarityTooltip.innerText = rarityStr;
+        
+        rarityElement.appendChild(rarityNameElement);
+        rarityElement.appendChild(rarityTooltip);
+        rarityList.appendChild(rarityElement);
+    }
+
+    let dialog = createWindow(rarityList, "Rarities");
+    return dialog;
+}
+
+function showCharacters() {
+    let allChars = characters;
+    // sort characters by weight
+    let sortable = [];
+    for (let char in allChars) {
+        sortable.push([char, allChars[char].weight]);
+    }
+    sortable.sort(function (a, b) {
+        return b[1] - a[1];
+    });
+
+    for (let i = 0; i < sortable.length; i++) {
+        let char = sortable[i][0];
+        if (characterDex[char]) {
+            sortable[i].push(allChars[char].name);
+        } else {
+            sortable[i].push("???");
+        }
+    }
+
+    let charList = document.createElement("div");
+    charList.classList.add("rarity-list");
+
+    for (let i = 0; i < sortable.length; i++) {
+        let rarity = allChars[sortable[i][0]].rarity;
+        rarity = numToOsrs(Math.round(1/rarity));
+        let rarityStr = "1 / " + rarity;
+        let charName = sortable[i][2];
+        let charElement = document.createElement("div");
+        charElement.classList.add("rarity-element");
+        let charNameElement = document.createElement("div");
+        charNameElement.innerText = charName;
+        let charTooltip = document.createElement("div");
+        charTooltip.innerText = rarityStr;
+        
+        charElement.appendChild(charNameElement);
+        charElement.appendChild(charTooltip);
+        charList.appendChild(charElement);
+    }
+
+    let dialog = createWindow(charList, "Characters");
+    return dialog;
+
+}
+
 
 function createWindow(element, title, onClose) {
     let window = document.createElement("div");
@@ -2407,8 +2518,19 @@ function swapStorageWorkerWithActive(storageIndex, activeIndex) {
 function numToOsrs(num, roundUp = false) {
     let kMin = 100000;
     let mMin = 10000000;
+    let bMin = 1000000000;
 
-    if (num >= mMin) {
+    if (num >= bMin) {
+        let b = num / 1000000000;
+        if (roundUp) {
+            b = Math.ceil(b);
+        } else {
+            b = Math.floor(b);
+        }
+        // insert commas
+        b = b.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return b + "B";
+    } else if (num >= mMin) {
         let m = num / 1000000;
         if (roundUp) {
             m = Math.ceil(m);

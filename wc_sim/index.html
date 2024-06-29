@@ -25,6 +25,8 @@
                 <h2>Menu</h2>
                 <button class="ui-button" onclick="toggleRollAnimation();">Toggle Recruit Animation</button>
                 <button class="ui-button" onclick="confirmReset();">Reset Game</button>
+                <button class="ui-button" onclick="closeAndShowRarities();">Show Rarities</button>
+                <button class="ui-button" onclick="closeAndShowCharacters();">Show Characters</button>
                 <div class="tile-container">
                     <div>
                         <h3>Crafting</h3>
@@ -191,6 +193,16 @@
                 menu.classList.remove("clicked");
             }, 100);
 
+        }
+
+        function closeAndShowCharacters() {
+            closeGuide();
+            showCharacters();
+        }
+
+        function closeAndShowRarities() {
+            closeGuide();
+            showRarities();
         }
 
     </script>
