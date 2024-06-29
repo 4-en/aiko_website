@@ -808,6 +808,20 @@ const characters = {
         "farming": 99,
         "trading": 84
     },
+    "aiko": {
+        "weight": 0.01,
+        "name": "Aiko",
+        "image": "aiko.webp",
+        "agility": 120,
+        "strength": 120,
+        "woodcutting": 120,
+        "luck": 120,
+        "tick_manipulation": 120,
+        "range": 120,
+        "learning_rate": 120,
+        "farming": 120,
+        "trading": 120
+    }
 };
 
 const rarities = {
@@ -1040,15 +1054,43 @@ const rarities = {
         "color": "skyblue",
         "name": "Starlight",
         "agility": 86,
-        "strength": 89,
+        "strength": 99,
         "woodcutting": 99,
         "luck": 99,
         "tick_manipulation": 99,
         "range": 54,
         "learning_rate": 1,
-        "farming": 32,
+        "farming": 42,
         "trading": 99,
         "weight": 0.1
+    },
+    "divine": {
+        "color": "lightyellow",
+        "name": "Divine Legendary",
+        "agility": 120,
+        "strength": 120,
+        "woodcutting": 120,
+        "luck": 120,
+        "tick_manipulation": 120,
+        "range": 120,
+        "learning_rate": 120,
+        "farming": 120,
+        "trading": 120,
+        "weight": 0.01
+    },
+    "parallel": {
+        "color": "darkblue",
+        "name": "Parallel Universe Enigmatic",
+        "agility": 200,
+        "strength": 200,
+        "woodcutting": 200,
+        "luck": 200,
+        "tick_manipulation": 200,
+        "range": 200,
+        "learning_rate": 200,
+        "farming": 200,
+        "trading": 200,
+        "weight": 0.001
     }
 
 };
