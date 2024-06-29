@@ -1376,6 +1376,7 @@ function showRarities() {
         rarity = numToOsrs(Math.round(1/rarity));
         let rarityStr = "1 / " + rarity;
         let rarityName = sortable[i][2];
+        rarityStr = rarityName === "???" ? "???" : rarityStr;
         let color = allRarities[sortable[i][0]].color;
         let rarityElement = document.createElement("div");
         rarityElement.classList.add("rarity-element");
@@ -1422,6 +1423,7 @@ function showCharacters() {
         rarity = numToOsrs(Math.round(1/rarity));
         let rarityStr = "1 / " + rarity;
         let charName = sortable[i][2];
+        rarityStr = charName === "???" ? "???" : rarityStr;
         let charElement = document.createElement("div");
         charElement.classList.add("rarity-element");
         let charNameElement = document.createElement("div");
