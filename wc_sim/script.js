@@ -17,6 +17,8 @@ let worker = [null, null, null, null, null];
 let worker_storage = [];
 let activeTree = null;
 let treeField = [];
+let characterDex = {};
+let rarityDex = {};
 let showRollAnimation = true;
 
 let soundPlayer = null;
@@ -56,6 +58,8 @@ function resetEverything() {
     treeField = [];
     worker = [null, null, null, null, null];
     worker_storage = [];
+    characterDex = {};
+    rarityDex = {};
     activeTree = null;
     initTrees();
     save();
@@ -77,6 +81,8 @@ function save() {
         showRollAnimation: showRollAnimation,
         playerId: playerId,
         playerName: playerName,
+        characterDex: characterDex,
+        rarityDex: rarityDex,
         trees: treeField.map(tree => {
             let treeKey = Object.keys(trees).find(key => trees[key].name === tree.tree.name);
             return {
@@ -139,6 +145,12 @@ function load() {
         }
         if (saveData.axeLevel) {
             axeLevel = saveData.axeLevel;
+        }
+        if (saveData.characterDex) {
+            characterDex = saveData.characterDex;
+        }
+        if (saveData.rarityDex) {
+            rarityDex = saveData.rarityDex;
         }
         if (saveData.upgradeCost) {
             upgradeCost = saveData.upgradeCost;
@@ -1304,46 +1316,149 @@ function craftWithSelected() {
     return newChar;
 }
 
+function createCharacterWindow(character) {
+    let characterName = characters[character.character].name;
+    let card = createCharacterCard(character);
+    let window = createWindow(card, characterName);
+
+    window.style.boxShadow = card.style.boxShadow;
+    card.style.boxShadow = "none";
+    card.style.border = "none";
+    card.style.margin = "0px";
+
+    return window;
+}
+
+function createWindow(element, title, onClose) {
+    let window = document.createElement("div");
+    window.classList.add("floating-window");
+
+    let windowContent = document.createElement("div");
+    windowContent.classList.add("floating-window-content");
+    windowContent.appendChild(element);
+
+    let cleanedUp = false;
+    function cleanup() {
+        if (cleanedUp) {
+            return;
+        }
+        cleanedUp = true;
+        document.onmouseup = null;
+        document.onmousemove = null;
+        document.onkeydown = null;
+        document.body.removeChild(window);
+        if(onClose) {
+            onClose();
+        }
+    }
+
+    let windowClose = document.createElement("button");
+    windowClose.classList.add("floating-window-close");
+    windowClose.innerText = "X";
+    windowClose.onclick = () => {
+        cleanup();
+    };
+
+    let titlebar = document.createElement("div");
+    titlebar.classList.add("floating-window-titlebar");
+    if (title !== null && title !== undefined) {
+        let titleText = document.createElement("div");
+        titleText.classList.add("floating-window-title");
+        titleText.innerText = title;
+        titlebar.appendChild(titleText);
+    }
+
+    titlebar.appendChild(windowClose);
+    window.appendChild(titlebar);
+    
+    window.appendChild(windowContent);
+    document.body.appendChild(window);
+
+    // make draggable
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    titlebar.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        window.style.top = (window.offsetTop - pos2) + "px";
+        window.style.left = (window.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+
+    // close on escape
+    document.onkeydown = (e) => {
+        if (e.key === "Escape") {
+            cleanup();
+        }
+    };
+
+    return window;
+}
+
+
 function createDialog(title, content, onClose) {
     let dialog = document.createElement("dialog");
     dialog.classList.add("dialog");
-    let dialogTitle = document.createElement("div");
-    dialogTitle.classList.add("dialog-title");
-    dialogTitle.innerText = title;
-    dialog.appendChild(dialogTitle);
+
+    if (title !== null) {
+
+        let dialogTitle = document.createElement("div");
+        dialogTitle.classList.add("dialog-title");
+        dialogTitle.innerText = title;
+        dialog.appendChild(dialogTitle);
+    }
     let dialogContent = document.createElement("div");
     dialogContent.classList.add("dialog-content");
+    if(typeof content === "string") {
     dialogContent.innerText = content;
+    } else {
+        dialogContent.appendChild(content);
+    }
     dialog.appendChild(dialogContent);
     let dialogClose = document.createElement("button");
     dialogClose.classList.add("dialog-close");
     dialogClose.innerText = "Close";
     dialogClose.onclick = () => {
-        document.body.removeChild(dialog);
-        if (onClose) {
-            onClose();
-        }
+        cleanup();
     };
 
     dialog.onclose = () => {
-        document.body.removeChild(dialog);
-        if (onClose) {
-            onClose();
-        }
+        cleanup();
     };
 
     dialog.appendChild(dialogClose);
     document.body.appendChild(dialog);
     dialog.showModal();
+
+    return dialog;
 }
 
-function createCharacterRollAnimation(character) {
+function createCharacterCard(character) {
     let characterImage = document.createElement("img");
     characterImage.src = "assets/" + characters[character.character].image;
     characterImage.classList.add("character-roll-image");
 
-    let characterCard = document.createElement("dialog");
-    characterCard.classList.add("character-roll-card");
+    let characterCard = document.createElement("div");
+    characterCard.classList.add("character-card");
 
     let rarity = rarities[character.rarity];
     let color = rarity.color;
@@ -1366,14 +1481,14 @@ function createCharacterRollAnimation(character) {
 
     let rarityValue = rarities[character.rarity].rarity * 20;
     let rarityStr = "";
-    while(rarityValue < 1) {
+    while (rarityValue < 1) {
         rarityValue *= 5;
         // add star
         rarityStr += "★";
     }
 
     rarityValue = characters[character.character].rarity * 20;
-    while(rarityValue < 1) {
+    while (rarityValue < 1) {
         rarityValue *= 4;
         // add star
         rarityStr += "★";
@@ -1420,6 +1535,20 @@ function createCharacterRollAnimation(character) {
     header.appendChild(characterRarity);
     body.appendChild(characterImage);
     body.appendChild(characterStats);
+
+    return characterCard;
+}
+
+function createCharacterRollAnimation(character) {
+    let characterCardInner = createCharacterCard(character);
+
+    let characterCard = document.createElement("dialog");
+    characterCard.classList.add("character-roll-card");
+    characterCard.appendChild(characterCardInner);
+
+    // add inner shadow to outer card
+    characterCard.style.boxShadow = characterCardInner.style.boxShadow;
+
 
     document.body.appendChild(characterCard);
 
@@ -1573,7 +1702,7 @@ class Worker {
 
     getRarityBorderSize() {
         let rar = rarities[this.rarity];
-        let shadowSize = 10 * Math.log10(1/(rar.weight+40)) + 25;
+        let shadowSize = 10 * Math.log10(1 / (rar.weight + 40)) + 25;
 
         return shadowSize;
     }
@@ -1822,8 +1951,13 @@ class Worker {
             img.src = "assets/" + characters[this.character].image;
             img.alt = characters[this.character].name;
             img.width = 64;
+
+            img.onclick = () => {
+                createCharacterWindow(this);
+            };
+
             let shadowSize = this.getRarityBorderSize();
-            img.style.filter = "drop-shadow(0px 0px "+shadowSize+"px " + rarities[this.rarity].color + ")";
+            img.style.filter = "drop-shadow(0px 0px " + shadowSize + "px " + rarities[this.rarity].color + ")";
             this.div.appendChild(img);
             this.tooltip = document.createElement("div");
             this.tooltip.classList.add("tooltip");
