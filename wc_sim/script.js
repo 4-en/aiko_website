@@ -316,7 +316,7 @@ const trees = {
         "name": "Tree",
         "tickCooldown": 4,
         "respawnTime": 4,
-        "image": "Tree.png"
+        "image": "Tree_pa.png"
     },
     "oak": {
         "xp": 37.5,
@@ -328,7 +328,7 @@ const trees = {
         "name": "Oak Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
-        "image": "Oak_tree.png",
+        "image": "Oak_tree_pa.png",
         "luck": 1
     },
     "willow": {
@@ -341,7 +341,7 @@ const trees = {
         "name": "Willow Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
-        "image": "Willow_tree.png",
+        "image": "Willow_tree_pa.png",
         "luck": 5
     },
     "maple": {
@@ -354,7 +354,7 @@ const trees = {
         "name": "Maple Tree",
         "tickCooldown": 4,
         "respawnTime": 35.4,
-        "image": "Maple_tree.webp",
+        "image": "Maple_tree_pa.png",
         "luck": 10
     },
     "yew": {
@@ -367,7 +367,7 @@ const trees = {
         "name": "Yew Tree",
         "tickCooldown": 4,
         "respawnTime": 59.4,
-        "image": "Yew_tree.png",
+        "image": "Yew_tree_pa.png",
         "luck": 20
     },
     "magic": {
@@ -380,7 +380,7 @@ const trees = {
         "name": "Magic Tree",
         "tickCooldown": 4,
         "respawnTime": 119.4,
-        "image": "Magic_tree.png",
+        "image": "Magic_tree_pa.png",
         "luck": 30
     }
 };
@@ -823,7 +823,7 @@ const characters = {
     "aiko": {
         "weight": 0.01,
         "name": "Aiko",
-        "image": "aiko.png",
+        "image": "aiko_pa.png",
         "agility": 120,
         "strength": 120,
         "woodcutting": 120,
