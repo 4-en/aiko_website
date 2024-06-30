@@ -200,17 +200,26 @@ button:disabled {
 
 
 .stats {
-    position: relative;
+    position: absolute;
     display: flex;
-    flex-direction: row;
+    left: 0;
+    top: 0;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     margin: 0;
-    padding: 0;
+    padding: 10px;
 }
 
 .stats > * {
     margin: 10px;
+    
+}
+
+.stats > div > img {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
 }
 
 .tooltip {
@@ -370,6 +379,13 @@ button:disabled {
     height: 64px;
 }
 
+@media screen and (max-width: 1200px) 
+{
+    .stats {
+        flex-direction: row;
+    }
+}
+
 
 @media screen and (max-width: 600px){
     .ui-button {
@@ -383,7 +399,12 @@ button:disabled {
     }
 
     .stats {
-        font-size: 12px;
+        font-size: 16px;
+    }
+
+    .stats > div > img {
+        width: 24px;
+        height: 24px;
     }
 
     .tooltip {
