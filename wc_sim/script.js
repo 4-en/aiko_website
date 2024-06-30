@@ -304,6 +304,55 @@ function showMessageBoxAtPos(message, x, y) {
     return messageBox;
 }
 
+// stats data
+const statsMeta = {
+    "agility": {
+        "name": "Agility",
+        "description": "Increases movement speed",
+        "short": "AGI"
+    },
+    "strength": {
+        "name": "Strength",
+        "description": "Increases damage dealt",
+        "short": "STR"
+    },
+    "woodcutting": {
+        "name": "Woodcutting",
+        "description": "Increases woodcutting speed",
+        "short": "WC"
+    },
+    "luck": {
+        "name": "Luck",
+        "description": "Increases chance of rare events",
+        "short": "LUCK"
+    },
+    "tick_manipulation": {
+        "name": "Tick Manipulation",
+        "description": "Increases chance of skipping ticks",
+        "short": "TK"
+    },
+    "range": {
+        "name": "Vision",
+        "description": "Increases vision range",
+        "short": "VSN"
+    },
+    "learning_rate": {
+        "name": "Intelligence",
+        "description": "Increases xp gain",
+        "short": "INT"
+    },
+    "farming": {
+        "name": "Farming",
+        "description": "Improves tree growth",
+        "short": "FRM"
+    },
+    "trading": {
+        "name": "Trading",
+        "description": "Increases coins gained",
+        "short": "TRD"
+    }
+};
+
 // tree data
 const trees = {
     "normal": {
@@ -485,18 +534,18 @@ const characters = {
         "trading": 25
     },
     "thurgo": {
-        "weight": 188,
+        "weight": 69,
         "name": "Thurgo",
         "image": "thurgo.png",
         "agility": 1,
-        "strength": 36,
-        "woodcutting": 21,
+        "strength": 61,
+        "woodcutting": 79,
         "luck": 59,
-        "tick_manipulation": 32,
-        "range": 84,
-        "learning_rate": 18,
-        "farming": 69,
-        "trading": 34
+        "tick_manipulation": 66,
+        "range": 55,
+        "learning_rate": 47,
+        "farming": 62,
+        "trading": 79
     },
     "graador": {
         "weight": 41,
@@ -639,7 +688,7 @@ const characters = {
         "trading": 34
     },
     "evil_chicken": {
-        "weight": 169,
+        "weight": 139,
         "name": "Evil Chicken",
         "image": "evil_chicken.webp",
         "agility": 63,
@@ -864,7 +913,7 @@ const rarities = {
         "trading": 37,
         "name": "Bronze",
         "strength": 3,
-        "weight": 550
+        "weight": 650
     },
     "iron": {
         "color": "gray",
@@ -878,7 +927,7 @@ const rarities = {
         "learning_rate": 10,
         "farming": 36,
         "trading": 59,
-        "weight": 450
+        "weight": 550
     },
     "steel": {
         "color": "lightgray",
@@ -892,7 +941,7 @@ const rarities = {
         "learning_rate": 31,
         "farming": 30,
         "trading": 35,
-        "weight": 400
+        "weight": 450
     },
     "black": {
         "color": "black",
@@ -906,7 +955,7 @@ const rarities = {
         "learning_rate": 17,
         "farming": 51,
         "trading": 45.0,
-        "weight": 350
+        "weight": 400
     },
     "mithril": {
         "color": "lightblue",
@@ -920,7 +969,7 @@ const rarities = {
         "learning_rate": 43,
         "farming": 6,
         "trading": 67,
-        "weight": 300
+        "weight": 350
     },
     "adamant": {
         "color": "green",
@@ -948,7 +997,7 @@ const rarities = {
         "learning_rate": 17.0,
         "farming": 89,
         "trading": 40,
-        "weight": 200
+        "weight": 150
     },
     "dragon": {
         "color": "red",
@@ -962,7 +1011,7 @@ const rarities = {
         "learning_rate": 16,
         "farming": 61,
         "trading": 38,
-        "weight": 150
+        "weight": 100
     },
     "crystal": {
         "color": "cyan",
@@ -1385,9 +1434,19 @@ function showRarities() {
         rarityNameElement.innerText = rarityName;
         let rarityTooltip = document.createElement("div");
         rarityTooltip.innerText = rarityStr;
-        
+
         rarityElement.appendChild(rarityNameElement);
         rarityElement.appendChild(rarityTooltip);
+
+        if (rarityName !== "???") {
+            let tooltip = createStatsDiv(allRarities[sortable[i][0]]);
+
+            tooltip.classList.add("tooltip");
+
+            rarityElement.appendChild(tooltip);
+        }
+        
+        
         rarityList.appendChild(rarityElement);
     }
 
@@ -1428,11 +1487,21 @@ function showCharacters() {
         charElement.classList.add("rarity-element");
         let charNameElement = document.createElement("div");
         charNameElement.innerText = charName;
-        let charTooltip = document.createElement("div");
-        charTooltip.innerText = rarityStr;
-        
+        let charRarityElement = document.createElement("div");
+        charRarityElement.innerText = rarityStr;
+
         charElement.appendChild(charNameElement);
-        charElement.appendChild(charTooltip);
+        charElement.appendChild(charRarityElement);
+
+        if (charName !== "???") {
+            let tooltip = createStatsDiv(allChars[sortable[i][0]]);
+
+            tooltip.classList.add("tooltip");
+
+            charElement.appendChild(tooltip);
+        }
+        
+        
         charList.appendChild(charElement);
     }
 
@@ -1441,6 +1510,31 @@ function showCharacters() {
 
 }
 
+function createStatsDiv(stats) {
+
+    let statsDiv = document.createElement("div");
+    statsDiv.classList.add("stats-div");
+
+    for (let key in statsMeta) {
+        let name = statsMeta[key].name;
+        let shortName = statsMeta[key].short;
+        let value = stats[key];
+        let description = statsMeta[key].description;
+        let statElement = document.createElement("div");
+        statElement.classList.add("stat-element");
+        statElement.innerText = shortName + ": " + value;
+
+        let tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        tooltip.innerText = name + ": " + value + "\n" + description;
+
+        statElement.appendChild(tooltip);
+        statsDiv.appendChild(statElement);
+
+    }
+
+    return statsDiv;
+}
 
 function createWindow(element, title, onClose) {
     let window = document.createElement("div");
