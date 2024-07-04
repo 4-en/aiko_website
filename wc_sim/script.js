@@ -2306,6 +2306,39 @@ class Worker {
         return Math.max(0, stat);
     }
 
+    // base stats are basically the stats at level 100
+    calculateBaseStats() {
+        let charStats = characters[this.character];
+        let rarityStats = rarities[this.rarity];
+        let baseStats = {};
+        for (let key in this.ivs) {
+            if (key === "general") {
+                continue;
+            }
+            let charStatKey = 0;
+            if (charStats.hasOwnProperty(key)) {
+                charStatKey += charStats[key];
+            }
+            if (charStats.hasOwnProperty("general")) {
+                charStatKey += rarityStats["general"];
+            }
+            let rarityStatKey = 0;
+            if (rarityStats.hasOwnProperty(key)) {
+                rarityStatKey += rarityStats[key];
+            }
+            if (rarityStats.hasOwnProperty("general")) {
+                rarityStatKey += rarityStats["general"];
+            }
+            let ivStatKey = 0;
+            if (this.ivs.hasOwnProperty(key)) {
+                ivStatKey += this.ivs[key];
+            }
+
+            baseStats[key] = this.calculateStat(100, charStatKey, rarityStatKey, ivStatKey);
+        }
+        return baseStats;
+    }
+
     calculateStats() {
         let charStats = characters[this.character];
         let rarityStats = rarities[this.rarity];
