@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>More</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0c0414;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            position: relative;
+        }
+
+        .navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            color: #ad83b3;
+            text-decoration: none;
+            background-color: transparent;
+            z-index: 1;
+            display: flex;
+            justify-content: space-evenly;
+            padding: 0;
+            margin: 0;
+        }
+
+        .inner-navbar {
+            display: flex;
+            position: relative;
+
+            justify-content: space-evenly;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0;
+            padding: 8px 10px;
+        }
+
+        .inner-navbar a {
+            color: #c89ece;
+            border-color: transparent;
+            border-width: 2px;
+            border-style: solid;
+            padding: 3px 10px;
+            padding-bottom: 6px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        @media screen and (max-width: 500px) {
+            .inner-navbar a {
+                font-size: 1rem;
+                padding: 3px 5px;
+                padding-bottom: 4px;
+            }
+        }
+
+        .inner-navbar a:hover {
+            border-color: #c89ece;
+        }
+
+        .root {
+            margin-top: 80px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: top;
+            align-items: center;
+            flex-direction: column;
+            max-width: 1200px;
+            width: 95vw;
+            color: #eeccff;
+            background-color: transparent;
+            border-radius: 20px;
+        }
+
+        h1 {
+            color: #eeccff;
+            padding: 0;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .links {
+            top: 45%;
+            left: 50%;
+
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #eeccff;
+            text-decoration: none;
+            font-size: 1.5rem;
+            margin: 30px;
+        }
+
+        .links a:hover {
+            color: #c89ece;
+        }
+
+        .wallpaper-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(512px, 1fr));
+            grid-gap: 20px;
+            justify-content: center;
+            align-items: center;
+
+            width: 100%;
+            height: 100%;
+            max-width: 880px;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .wallpaper-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .wallpaper-item img {
+            width: 512px;
+            max-width: 33%;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="inner-navbar">
+            <a href="/">Home</a>
+            <a href="/chat/">Chat</a>
+            <a href="/store/">Store</a>
+            <a href="/games/">Games</a>
+            <a href="/more/">More</a>
+        </div>
+    </div>
+    <div class="root">
+        <h1>Wallpapers</h1>
+        <div class="wallpaper-container">
+            
+            <div class="wallpaper-item">
+                <img src="wallpapers/aiko_flames.png" alt="Wallpaper 1">
+            </div>
+            <div class="wallpaper-item">
+                <img src="/wallpapers/2.jpg" alt="Wallpaper 2">
+            </div>
+            <div class="wallpaper-item">
+                <img src="/wallpapers/3.jpg" alt="Wallpaper 3">
+            </div>
+            <div class="wallpaper-item">
+                <img src="/wallpapers/4.jpg" alt="Wallpaper 4">
+            </div>
+            <div class="wallpaper-item">
+                <img src="/wallpapers/5.jpg" alt="Wallpaper 5">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const wallpaperItems = document.querySelectorAll('.wallpaper-item');
+
+
+        // add links to wallpaper items
+        wallpaperItems.forEach((item, index) => {
+            let image = item.querySelector('img');
+            let image_src = image.getAttribute('src');
+            let image_name = image_src.split('/').pop();
+            item.addEventListener('click', () => {
+                window.location.href = `/wallpaper/view.html?wallpaper=${image_name}`;
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>More</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0c0414;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            position: relative;
+
+            background-position: center;
+            background-size: cover;
+        }
+
+        .navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            color: #ad83b3;
+            text-decoration: none;
+            background-color: transparent;
+            z-index: 1;
+            display: flex;
+            justify-content: space-evenly;
+            padding: 0;
+            margin: 0;
+        }
+
+        .inner-navbar {
+            display: flex;
+            position: relative;
+
+            justify-content: space-evenly;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0;
+            padding: 8px 10px;
+        }
+
+        .inner-navbar a {
+            color: #c89ece;
+            border-color: transparent;
+            border-width: 2px;
+            border-style: solid;
+            padding: 3px 10px;
+            padding-bottom: 6px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        @media screen and (max-width: 500px) {
+            .inner-navbar a {
+                font-size: 1rem;
+                padding: 3px 5px;
+                padding-bottom: 4px;
+            }
+        }
+
+        .inner-navbar a:hover {
+            border-color: #c89ece;
+        }
+
+        .root {
+            margin-top: 80px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: top;
+            align-items: center;
+            flex-direction: column;
+            max-width: 1200px;
+            width: 95vw;
+            color: #eeccff;
+            background-color: transparent;
+            border-radius: 20px;
+        }
+
+        h1 {
+            color: #eeccff;
+            padding: 0;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .links {
+            top: 45%;
+            left: 50%;
+
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #eeccff;
+            text-decoration: none;
+            font-size: 1.5rem;
+            margin: 30px;
+        }
+
+        .links a:hover {
+            color: #c89ece;
+        }
+
+        #prev-button,
+        .download-button,
+        #next-button {
+            background-color: transparent;
+            color: #eeccff;
+            text-shadow: 0 0 5px #1c0825;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 5rem;
+            cursor: pointer;
+        }
+
+        #prev-button:hover,
+        .download-button:hover,
+        #next-button:hover {
+            border-color: #c89ece;
+            color: #c89ece;
+        }
+
+        #prev-button {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+        }
+
+        #next-button {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+
+        .download-buttons {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .download-button {
+            background-color: transparent;
+            color: #eeccff;
+            text-shadow: 0 0 5px #1c0825;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="inner-navbar">
+            <a href="/">Home</a>
+            <a href="/chat/">Chat</a>
+            <a href="/store/">Store</a>
+            <a href="/games/">Games</a>
+            <a href="/more/">More</a>
+        </div>
+    </div>
+
+    <button id="prev-button">
+        < </button>
+            <button id="next-button">
+                >
+            </button>
+            <div class="download-buttons">
+            </div>
+
+
+            <script>
+                // insert wallpaper data from get parameter wallpaper
+                const prevButton = document.getElementById('prev-button');
+                const nextButton = document.getElementById('next-button');
+
+                const params = new URLSearchParams(window.location.search);
+                const wallpaper = params.get('wallpaper');
+
+                // set as body background
+                document.body.style.backgroundImage = `url('wallpapers/${wallpaper}')`;
+
+                // create download links for different resolutions
+                let long_resolutions = [720, 1920, 2560, 3840];
+
+                const image = new Image();
+                image.src = `wallpapers/${wallpaper}`;
+                image.onload = setButtons;
+
+                function setButtons() {
+                    const original_width = image.width;
+                    const original_height = image.height;
+
+                    let is_landscape = original_width > original_height;
+
+                    const downloadButtons = document.querySelector('.download-buttons');
+
+                    let long_original = is_landscape ? original_width : original_height;
+
+                    // remove resolutions that are larger than the original
+                    long_resolutions = long_resolutions.filter(resolution => resolution <= long_original);
+
+                    let resolutions = [];
+                    if (is_landscape) {
+                        resolutions = long_resolutions.map(resolution => `${resolution}x${Math.round(resolution * original_height / original_width)}`);
+                    } else {
+                        resolutions = long_resolutions.map(resolution => `${Math.round(resolution * original_width / original_height)}x${resolution}`);
+                    }
+
+                    function download_image(width, height) {
+                        let canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        let ctx = canvas.getContext('2d');
+
+                        let img = new Image();
+                        img.src = `wallpapers/${wallpaper}`;
+                        img.onload = function () {
+                            ctx.drawImage(img, 0, 0, width, height);
+                            let a = document.createElement('a');
+                            a.href = canvas.toDataURL('image/png');
+                            a.download = `${wallpaper.split('.')[0]}_${width}x${height}.png`;
+                            a.click();
+                        }
+                    }
+
+                    resolutions.forEach(resolution => {
+                        let [width, height] = resolution.split('x');
+
+                        let button = document.createElement('button');
+                        button.classList.add('download-button');
+                        button.innerText = resolution;
+                        button.addEventListener('click', () => {
+                            download_image(width, height);
+                        });
+                        downloadButtons.appendChild(button);
+                    });
+
+                    // add original resolution download
+                    let button = document.createElement('button');
+                    button.classList.add('download-button');
+                    button.innerText = 'Original';
+                    button.addEventListener('click', () => {
+                        let a = document.createElement('a');
+                        a.href = `wallpapers/${wallpaper}`;
+                        a.download = wallpaper;
+                        a.click();
+                    });
+                    downloadButtons.appendChild(button);
+
+                }
+
+
+
+            </script>
+
+</body>
+
+</html>
