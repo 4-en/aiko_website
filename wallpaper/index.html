@@ -204,9 +204,9 @@
             let goTo = null;
             for(let i = 0; i < wallpaperItems.length; i++) {
                 if(wallpaperItems[i].querySelector('img').getAttribute('src').includes(prev)) {
-                    if(i > 0) {
-                        goTo = wallpaperItems[i - 1].querySelector('img').getAttribute('src').split('/').pop();
-                    }
+
+                    goTo = wallpaperItems[(i - 1+wallpaperItems.length)%wallpaperItems.length].querySelector('img').getAttribute('src').split('/').pop();
+
                     break;
                 }
             }
@@ -220,9 +220,7 @@
             let goTo = null;
             for(let i = 0; i < wallpaperItems.length; i++) {
                 if(wallpaperItems[i].querySelector('img').getAttribute('src').includes(next)) {
-                    if(i < wallpaperItems.length - 1) {
-                        goTo = wallpaperItems[i + 1].querySelector('img').getAttribute('src').split('/').pop();
-                    }
+                    goTo = wallpaperItems[(i + 1) % wallpaperItems.length].querySelector('img').getAttribute('src').split('/').pop();
                     break;
                 }
             }

@@ -237,9 +237,7 @@
                 </div>
             </div>
             <div class="chat-input">
-                <textarea type="text" placeholder="Type a message...">
-                    dawd
-                </textarea>
+                <textarea type="text" placeholder="Type a message..."></textarea>
                 <button>→</button>
             </div>
         </div>
@@ -286,8 +284,51 @@
             appendMessage(chatMessage);
         }
 
+        function sendTextAreaMessage() {
+            const textarea = document.querySelector('.chat-input textarea');
+            const message = textarea.value;
+            if (message === '') {
+                return;
+            }
+
+            const chatMessage = document.createElement('div');
+            chatMessage.classList.add('chat-message');
+            const chatMessageUser = document.createElement('div');
+            chatMessageUser.classList.add('chat-message-user');
+            chatMessageUser.innerText = 'User';
+            const chatMessageText = document.createElement('div');
+            chatMessageText.classList.add('chat-message-text');
+            chatMessageText.innerText = message;
+            chatMessage.appendChild(chatMessageUser);
+            chatMessage.appendChild(chatMessageText);
+
+            appendMessage(chatMessage);
+
+            clearTextarea();
+        }
+
         let button = document.querySelector('.chat-input button');
-        button.addEventListener('click', addTestMessage);
+        button.addEventListener('click', sendTextAreaMessage);
+
+        let textarea = document.querySelector('.chat-input textarea');
+        
+        function clearTextarea() {
+            textarea.value = '';
+        }
+        
+        textarea.addEventListener('keydown', (event) => {
+            // check if shift key is pressed
+            if (event.shiftKey) {
+                return;
+            }
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            sendTextAreaMessage();
+
+            event.preventDefault();
+        });
     </script>
 </body>
 
