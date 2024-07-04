@@ -202,11 +202,27 @@
 
             <script>
                 // insert wallpaper data from get parameter wallpaper
-                const prevButton = document.getElementById('prev-button');
-                const nextButton = document.getElementById('next-button');
-
                 const params = new URLSearchParams(window.location.search);
                 const wallpaper = params.get('wallpaper');
+
+                const prevButton = document.getElementById('prev-button');
+                prevButton.addEventListener('click', () => {
+                    let url = `/wallpaper/index.html?prev=${wallpaper}`;
+
+                    // click the link
+                    window.location.href = url;
+
+                });
+
+                const nextButton = document.getElementById('next-button');
+                nextButton.addEventListener('click', () => {
+                    let url = `/wallpaper/index.html?next=${wallpaper}`;
+
+                    // click the link
+                    window.location.href = url;
+                });
+
+                
 
                 // set as body background
                 document.body.style.backgroundImage = `url('wallpapers/${wallpaper}')`;

@@ -245,6 +245,24 @@
         </div>
     </div>
     <script>
+
+        function appendMessage(element) {
+            // scroll down after appending a message
+            const chatMessages = document.querySelector('.chat-messages');
+            const chatMessagesScroll = document.querySelector('.chat-messages-scroll');
+
+            const tolerance = 20;
+            const wasScrolledToBottom = chatMessagesScroll.scrollHeight - chatMessagesScroll.scrollTop <= chatMessagesScroll.clientHeight + tolerance;
+
+            chatMessages.appendChild(element);
+            
+            if (!wasScrolledToBottom) {
+                return;
+            }
+            chatMessagesScroll.scrollTop = chatMessagesScroll.scrollHeight;
+        }
+
+
         function addTestMessage() {
             const chatMessages = document.querySelector('.chat-messages');
             const chatMessage = document.createElement('div');
@@ -257,7 +275,6 @@
             chatMessageText.innerText = 'Hello, World!';
             chatMessage.appendChild(chatMessageUser);
             chatMessage.appendChild(chatMessageText);
-            chatMessages.appendChild(chatMessage);
 
             let messageType = Math.floor(Math.random() * 2);
             if (messageType == 0) {
@@ -265,6 +282,8 @@
             } else {
                 chatMessage.classList.add('other-message');
             }
+
+            appendMessage(chatMessage);
         }
 
         let button = document.querySelector('.chat-input button');

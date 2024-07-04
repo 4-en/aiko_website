@@ -195,6 +195,42 @@
                 window.location.href = `/wallpaper/view.html?wallpaper=${image_name}`;
             });
         });
+
+        const params = new URLSearchParams(window.location.search);
+        const prev = params.get('prev');
+        const next = params.get('next');
+
+        if(prev) {
+            let goTo = null;
+            for(let i = 0; i < wallpaperItems.length; i++) {
+                if(wallpaperItems[i].querySelector('img').getAttribute('src').includes(prev)) {
+                    if(i > 0) {
+                        goTo = wallpaperItems[i - 1].querySelector('img').getAttribute('src').split('/').pop();
+                    }
+                    break;
+                }
+            }
+
+            if(goTo) {
+                window.location.href = `/wallpaper/view.html?wallpaper=${goTo}`;
+            }
+        }
+
+        if(next) {
+            let goTo = null;
+            for(let i = 0; i < wallpaperItems.length; i++) {
+                if(wallpaperItems[i].querySelector('img').getAttribute('src').includes(next)) {
+                    if(i < wallpaperItems.length - 1) {
+                        goTo = wallpaperItems[i + 1].querySelector('img').getAttribute('src').split('/').pop();
+                    }
+                    break;
+                }
+            }
+
+            if(goTo) {
+                window.location.href = `/wallpaper/view.html?wallpaper=${goTo}`;
+            }
+        }
     </script>
 
 </body>
