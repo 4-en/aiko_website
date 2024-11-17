@@ -165,10 +165,10 @@
         <div class="wallpaper-container">
             
             <div class="wallpaper-item">
-                <img src="wallpapers/aiko_flames.png" alt="Wallpaper 1">
+                <img src="wallpapers/aiko_flames_preview.png" alt="Wallpaper 1">
             </div>
             <div class="wallpaper-item">
-                <img src="/wallpapers/2.jpg" alt="Wallpaper 2">
+                <img src="/wallpapers/aiko_spezi_preview.png" alt="Wallpaper 2">
             </div>
             <div class="wallpaper-item">
                 <img src="/wallpapers/3.jpg" alt="Wallpaper 3">
@@ -191,6 +191,12 @@
             let image = item.querySelector('img');
             let image_src = image.getAttribute('src');
             let image_name = image_src.split('/').pop();
+
+            // check if preview in image name
+            if(image_name.includes('_preview')) {
+                image_name = image_name.replace('_preview', '');
+            }
+
             item.addEventListener('click', () => {
                 window.location.href = `/wallpaper/view.html?wallpaper=${image_name}`;
             });
