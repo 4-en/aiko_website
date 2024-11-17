@@ -209,12 +209,19 @@
         if(prev) {
             let goTo = null;
             for(let i = 0; i < wallpaperItems.length; i++) {
-                if(wallpaperItems[i].querySelector('img').getAttribute('src').includes(prev)) {
+                let src = wallpaperItems[i].querySelector('img').getAttribute('src');
+                let src_prev = src.replace('.png', '_preview.png');
+                if(src_prev.includes(prev) || src.includes(prev)) {
 
                     goTo = wallpaperItems[(i - 1+wallpaperItems.length)%wallpaperItems.length].querySelector('img').getAttribute('src').split('/').pop();
+                    if(goTo.includes('_preview')) {
+                        goTo = goTo.replace('_preview', '');
+                    }
 
                     break;
                 }
+
+                
             }
 
             if(goTo) {
@@ -225,8 +232,13 @@
         if(next) {
             let goTo = null;
             for(let i = 0; i < wallpaperItems.length; i++) {
-                if(wallpaperItems[i].querySelector('img').getAttribute('src').includes(next)) {
+                let src = wallpaperItems[i].querySelector('img').getAttribute('src');
+                let src_prev = src.replace('.png', '_preview.png');
+                if(src_prev.includes(next) || src.includes(next)) {
                     goTo = wallpaperItems[(i + 1) % wallpaperItems.length].querySelector('img').getAttribute('src').split('/').pop();
+                    if(goTo.includes('_preview')) {
+                        goTo = goTo.replace('_preview', '');
+                    }
                     break;
                 }
             }
