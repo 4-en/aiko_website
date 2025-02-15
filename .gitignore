@@ -1,0 +1,4 @@
+# git ignore
+.env
+node_modules
+__pycache__
