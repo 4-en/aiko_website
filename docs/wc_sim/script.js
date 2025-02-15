@@ -192,6 +192,7 @@ function load() {
                 }
 
                 let newWorker = new Worker(worker1.character, worker1.rarity);
+                newWorker.id = worker1.id ? worker1.id : crypto.randomUUID();
                 newWorker.level = worker1.level;
                 newWorker.xp = worker1.xp;
                 newWorker.ivs = worker1.ivs;
@@ -205,6 +206,7 @@ function load() {
         if (saveData.worker_storage) {
             worker_storage = saveData.worker_storage.map(worker1 => {
                 let newWorker = new Worker(worker1.character, worker1.rarity);
+                newWorker.id = worker1.id ? worker1.id : crypto.randomUUID();
                 newWorker.level = worker1.level;
                 newWorker.xp = worker1.xp;
                 newWorker.ivs = worker1.ivs;
@@ -1888,8 +1890,11 @@ function rollWeightedRandom(weights) {
     return null;
 }
 
+
+
 class Worker {
     constructor(character, rarity) {
+        this.id = crypto.randomUUID();
         this.character = character;
         this.rarity = rarity;
         this.level = 1;
