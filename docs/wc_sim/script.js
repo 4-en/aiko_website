@@ -1376,10 +1376,11 @@ function craftWithSelected() {
     }
 
     // fill the active workers with workers from the storage
-    while(worker_storage.length > 0) {
-        for (let i = 0; i < worker.length; i++) {
-            if (worker[i] === null) {
+    for (let i = 0; i < worker.length; i++) {
+        if (worker[i] === null) {
+            if( worker_storage.length > 0) {
                 worker[i] = worker_storage.pop();
+            } else {
                 break;
             }
         }
