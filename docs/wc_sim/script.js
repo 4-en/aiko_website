@@ -1785,6 +1785,16 @@ function createCharacterCard(character) {
     return characterCard;
 }
 
+function showCharacterDetails(character) {
+    let characterCard = createCharacterCard(character);
+
+    let dialog = createDialog(null, characterCard, () => {
+        console.log("Dialog closed");
+    });
+
+    return dialog;
+}
+
 function createCharacterRollAnimation(character) {
     let characterCardInner = createCharacterCard(character);
 
@@ -2209,6 +2219,9 @@ class Worker {
             img.style.filter = "drop-shadow(0px 0px " + shadowSize + "px " + rarities[this.rarity].color + ")";
             this.div.appendChild(img);
             this.tooltip = document.createElement("div");
+            this.tooltip.onclick = () => {
+                createCharacterWindow(this);
+            };
             this.tooltip.classList.add("tooltip");
             this.tooltip.innerText = this.getDescriptionString();
             this.div.appendChild(this.tooltip);
@@ -2624,6 +2637,9 @@ function updateUI() {
             let rarity = rarities[worker[i].rarity];
             let tooltip = document.createElement("div");
             tooltip.classList.add("tooltip");
+            tooltip.onclick = () => {
+                createCharacterWindow(worker[i]);
+            };
             tooltip.innerText = worker[i].getDescriptionString();
             workerElement.appendChild(tooltip);
             let img = document.createElement("img");
@@ -2711,6 +2727,9 @@ function updateWorkerStorageUI() {
         let rarity = rarities[workerData.rarity];
         let tooltip = document.createElement("div");
         tooltip.classList.add("tooltip");
+        tooltip.onclick = () => {
+            createCharacterWindow(workerData);
+        };
         tooltip.innerText = workerData.getDescriptionString();
         workerElement.appendChild(tooltip);
         let img = document.createElement("img");
