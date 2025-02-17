@@ -252,6 +252,7 @@
             
             ws = new WebSocket(API_URL.replace('https', 'wss') + '/chat');
             ws.onmessage = (event) => {
+                console.log('WebSocket message received', event.data);
                 on_message_received(event.data);
             };
             ws.onclose = (event) => {
@@ -287,6 +288,7 @@
         }
 
         function on_message_received(message) {
+            console.log('Message received', message);
             // message format: User: message
             const chatMessages = document.querySelector('.chat-messages');
             const chatMessage = document.createElement('div');
@@ -300,10 +302,18 @@
             chatMessage.appendChild(chatMessageUser);
             chatMessage.appendChild(chatMessageText);
 
+            if (message.split(':')[0] === get_username()) {
+                chatMessage.classList.add('user-message');
+            } else {
+                chatMessage.classList.add('other-message');
+            }
+
+            appendMessage(chatMessage);
+
         }
 
         function sendTextAreaMessage() {
-            if (!is_logged_in()) {
+            if (!is_logged_in(full_check=true)) {
                 login(redirect="/chat/");
                 return;
             }

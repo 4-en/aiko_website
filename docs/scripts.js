@@ -3,11 +3,23 @@
 const API_URL = 'https://api.aiko.lol';
 
 
-async function is_logged_in() {
+async function is_logged_in(full_check=false) {
+
+    let user = null;
+    if(full_check) {
+        user = await get_user();
+        if (user === null) {
+            return false;
+        }
+        if (user.logged_in === false) {
+            return false;
+        }
+        return true;
+    }
 
     // check if user is logged in
     // get user data from local storage
-    let user = JSON.parse(localStorage.getItem('user'));
+    user = JSON.parse(localStorage.getItem('user'));
     if(user === null) {
         // if no user data, get user data from api
         user = await get_user();
@@ -20,6 +32,14 @@ async function is_logged_in() {
         return true;
     }
     
+}
+
+function get_username() {
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(user === null) {
+        return null;
+    }
+    return user.username;
 }
 
 async function get_user() {
