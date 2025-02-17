@@ -299,7 +299,7 @@ async def callback(request: Request, code: str, state: str="/"):
 
     # Redirect back to the frontend
     response = RedirectResponse(f"{FRONTEND_URL}{state}")
-    response.set_cookie("session_token", session_token, httponly=True, secure=True, same_site="none")
+    response.set_cookie("session_token", session_token, httponly=True, secure=True, samesite="none")
     return response
 
 def get_discord_user(access_token):
