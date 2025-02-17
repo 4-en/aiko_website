@@ -199,6 +199,8 @@ async def websocket_endpoint(websocket: WebSocket):
     ws_clients.append(websocket)
     ws_semaphore.release()
 
+    print("connected", name)
+
     try:
         while True:
             data = await websocket.receive_text()
@@ -226,6 +228,8 @@ async def websocket_endpoint(websocket: WebSocket):
         ws_semaphore.acquire()
         ws_clients.remove(websocket)  # Remove client from the list safely
         ws_semaphore.release()
+
+    print("disconnected", name)
 
 
 
