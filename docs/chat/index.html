@@ -238,7 +238,7 @@
 
         async function on_load() {
             if(!is_logged_in()) {
-                login(redirect="/chat/");
+                console.error('Not logged in');
                 return;
             }
 
@@ -301,6 +301,10 @@
         }
 
         function sendTextAreaMessage() {
+            if (!is_logged_in()) {
+                login(redirect="/chat/");
+                return;
+            }
             const textarea = document.querySelector('.chat-input textarea');
             const message = textarea.value;
             if (message === '') {

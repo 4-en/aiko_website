@@ -65,14 +65,11 @@
 
         .inner-navbar {
             display: flex;
-            position: relative;
-
-            justify-content: space-evenly;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            justify-content: center;
             align-items: center;
-            width: 100%;
-            max-width: 600px;
-            margin: 0;
-            padding: 8px 10px;
         }
 
         .inner-navbar a {
@@ -85,6 +82,31 @@
             border-radius: 5px;
             text-decoration: none;
             font-size: 1.5rem;
+        }
+
+        .right-navbar {
+            display: flex;
+            position: absolute;
+            right: 0;
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .login {
+            color: #c89ece;
+            border-color: transparent;
+            border-width: 2px;
+            border-style: solid;
+            padding: 3px 10px;
+            padding-bottom: 6px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login:hover {
+            border-color: #c89ece;
         }
 
         @media screen and (max-width: 500px) {
@@ -109,6 +131,9 @@
             <a href="/store/">Store</a>
             <a href="/games/">Games</a>
             <a href="/more/">More</a>
+        </div>
+        <div class="right-navbar">
+            <a class="login" href="https://api.aiko.lol/login">Login</a>
         </div>
     </div>
     <div class="stars"></div>
