@@ -2,20 +2,40 @@
 
 const API_URL = 'https://api.aiko.lol';
 
-function get_session_token() {
-    // get session_token from cookies
-    let token = '';
-    document.cookie.split(';').forEach((item) => {
-        if(item.trim().startsWith('session_token=')) {
-            token = item.trim().split('=')[1];
-        }
-    });
-    return token;
+
+async function is_logged_in() {
+
+    // check if user is logged in
+    // get user data from local storage
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(user === null) {
+        // if no user data, get user data from api
+        user = await get_user();
+    }
+
+    // check if user is logged in
+    if(user === null) {
+        return false;
+    } else {
+        return true;
+    }
+    
 }
 
-function is_logged_in() {
-    // check if session_token is set in cookies
-    return document.cookie.split(';').some((item) => item.trim().startsWith('session_token='));
+async function get_user() {
+    // get user data from api
+    let response = await fetch(`${API_URL}/user`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    });
+    let data = await response.json();
+
+    // update local storage
+    localStorage.setItem('user', JSON.stringify(data));
+    return data;
 }
 
 function login(redirect=null) {

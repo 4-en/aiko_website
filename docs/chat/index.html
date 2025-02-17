@@ -237,7 +237,7 @@
         var ws = null;
 
         async function on_load() {
-            if(!is_logged_in()) {
+            if(! await is_logged_in()) {
                 console.error('Not logged in');
                 return;
             }
@@ -249,12 +249,8 @@
             });
 
             // connect to websocket
-            let session_token_param = get_session_token();
-            if (!session_token_param) {
-                console.error('No session token found');
-                return;
-            }
-            ws = new WebSocket(API_URL.replace('https', 'ws') + '/chat' + '?session_token=' + session_token_param);
+            
+            ws = new WebSocket(API_URL.replace('https', 'ws') + '/chat');
             ws.onmessage = (event) => {
                 on_message_received(event.data);
             };
