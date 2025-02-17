@@ -312,6 +312,10 @@ def get_discord_user(access_token):
         return response.json()
     return None
 
+@app.get("/debug-cookies")
+async def debug_cookies(request: Request):
+    return JSONResponse({"cookies": request.cookies})
+
 @app.get("/user")
 async def get_user(request: Request):
     """Check if the user is logged in (without exposing user ID)"""
