@@ -166,18 +166,26 @@ ws_clients = []
 ws_semaphore = Semaphore()
 MAX_CHAT_LOG = 100
 chat_log = Queue(maxsize=MAX_CHAT_LOG)
+
+
 @app.websocket("/chat")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
-    # get session token
-    session_token = websocket.query_params.get("session_token")
+    # Extract session_token from cookies
+    session_cookie = websocket.headers.get("cookie")
+    session_token = None
+
+    if session_cookie:
+        cookies = {c.split("=")[0]: c.split("=")[1] for c in session_cookie.split("; ")}
+        session_token = cookies.get("session_token")
+
     if not session_token or session_token not in SESSION_DB:
         await websocket.close()
         return
     
     user_id = SESSION_DB[session_token]
-    if not user_id in DATABASE:
+    if user_id not in DATABASE:
         await websocket.close()
         return
     
@@ -186,30 +194,36 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close()
         return
     
-    # add to clients
+    # Add to connected clients
     ws_semaphore.acquire()
     ws_clients.append(websocket)
     ws_semaphore.release()
 
-
-    ws_clients.append(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            # add to chat log
+            
             ws_semaphore.acquire()
+            
+            # Add to chat log
             if chat_log.full():
                 chat_log.get()
             chat_log.put(data)
-            # broadcast to all clients
-            for client in ws_clients:
+
+            # Broadcast to all clients
+            for client in ws_clients[:]:  # Iterate over a copy to avoid modifying list mid-loop
                 try:
                     await client.send_text(f"{name}: {data}")
                 except WebSocketDisconnect:
                     ws_clients.remove(client)
+            
             ws_semaphore.release()
+    
     except WebSocketDisconnect:
-        ws_clients.remove(websocket)
+        ws_semaphore.acquire()
+        ws_clients.remove(websocket)  # Remove client from the list safely
+        ws_semaphore.release()
+
 
 
 # get chat history
@@ -287,7 +301,7 @@ async def callback(request: Request, code: str, state: str="/"):
     if not user_id in DATABASE:
         DATABASE[user_id] = {}
 
-    DATABASE[user_id]["user"] = user.model_dump()
+    set_data(user_id, "user", user.model_dump())
 
     # Redirect back to the frontend
     response = RedirectResponse(f"{FRONTEND_URL}{state}")
@@ -319,8 +333,12 @@ async def get_user(request: Request):
         return JSONResponse({"logged_in": False}, status_code=401)
     
     user_id = SESSION_DB[session_token]
-    data = DATABASE.get(user_id, {}).get("data", {})
-    name = data.get("user", {}).get("name", "Unknown")
+    name = get_data(user_id, "user.name", "Unknown")
+
+    # debug
+    print("user_id", user_id)
+    print("name", name)
+    print("user", DATABASE[user_id])
     
     return {
             "logged_in": True,

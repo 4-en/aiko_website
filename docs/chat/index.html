@@ -250,7 +250,7 @@
 
             // connect to websocket
             
-            ws = new WebSocket(API_URL.replace('https', 'ws') + '/chat');
+            ws = new WebSocket(API_URL.replace('https', 'wss') + '/chat');
             ws.onmessage = (event) => {
                 on_message_received(event.data);
             };
