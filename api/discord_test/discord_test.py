@@ -116,24 +116,62 @@ async def home():
 
 
 # websocket test for chat
+from queue import Queue
 ws_clients = []
 ws_semaphore = Semaphore()
-chat_log = []
+MAX_CHAT_LOG = 100
+chat_log = Queue(maxsize=MAX_CHAT_LOG)
 @app.websocket("/chat")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+
+    # get session token
+    session_token = websocket.query_params.get("session_token")
+    if not session_token or session_token not in SESSION_DB:
+        await websocket.close()
+        return
+    
+    user_id = SESSION_DB[session_token]
+    if not user_id in DATABASE:
+        await websocket.close()
+        return
+    
+    name = DATABASE[user_id]["user"]["name"]
+    if not name:
+        await websocket.close()
+        return
+    
+    # add to clients
+    ws_semaphore.acquire()
+    ws_clients.append(websocket)
+    ws_semaphore.release()
+
+
     ws_clients.append(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            chat_log.append(data)
-            async with ws_semaphore:
-                for client in ws_clients:
-                    await client.send_text(data)
+            # add to chat log
+            ws_semaphore.acquire()
+            if chat_log.full():
+                chat_log.get()
+            chat_log.put(data)
+            # broadcast to all clients
+            for client in ws_clients:
+                try:
+                    await client.send_text(f"{name}: {data}")
+                except WebSocketDisconnect:
+                    ws_clients.remove(client)
+            ws_semaphore.release()
     except WebSocketDisconnect:
         ws_clients.remove(websocket)
 
 
+# get chat history
+@app.get("/chat_history")
+async def chat_history():
+    # return as list of strings
+    return list(chat_log.queue)
 
 @app.get("/login")
 async def login(redirect: str = "/"):
