@@ -56,7 +56,7 @@ function get_username() {
         return null;
     }
 
-    return user.username;
+    return user.name;
 }
 
 async function get_user() {
@@ -123,7 +123,7 @@ function login_button_setup() {
         let logged_in = await is_logged_in(true);
         if(logged_in) {
             login_button.innerText = get_username();
-            button.onclick = () => window.location.href = '/profile';
+            login_button.onclick = () => window.location.href = '/profile';
         } else {
             login_button.innerText = 'Login';
             login_button.onclick = () => login(redirect);
