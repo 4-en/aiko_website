@@ -260,8 +260,6 @@ async def callback(request: Request, code: str, state: str="/"):
 
     display_name = global_name or user_name or "Unknown"
 
-    request.session["user"] = user_id
-
     print("User logged in:", display_name)
     print("User ID:", user_id)
     print("User Data:", user_data)
@@ -271,7 +269,6 @@ async def callback(request: Request, code: str, state: str="/"):
 
     # Generate a session token (UUID) for the user
     session_token = str(uuid4())
-    request.session["session_token"] = session_token  # Store session token in cookies
 
     # Store session in backend memory
 
