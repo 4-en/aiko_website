@@ -1,6 +1,6 @@
 import json
 import os
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2AuthorizationCodeBearer
@@ -16,7 +16,7 @@ from contextlib import asynccontextmanager
 import threading
 from threading import Semaphore
 from uuid import uuid4
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 
@@ -99,7 +99,41 @@ app.add_middleware(SessionMiddleware, secret_key="your_secret_key")
 
 @app.get("/")
 async def home():
-    return {"message": "Welcome to the FastAPI Discord Auth Example"}
+    # send basic html page
+    html = """
+    <html>
+    <head>
+    <title>Discord OAuth2 Test</title>
+    </head>
+    <body>
+    <h1>Discord OAuth2 Test</h1>
+    <p>Click the button below to login with Discord:</p>
+    <a href="/login"><button>Login with Discord</button></a>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html, status_code=200)
+
+
+# websocket test for chat
+ws_clients = []
+ws_semaphore = Semaphore()
+chat_log = []
+@app.websocket("/chat")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    ws_clients.append(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            chat_log.append(data)
+            async with ws_semaphore:
+                for client in ws_clients:
+                    await client.send_text(data)
+    except WebSocketDisconnect:
+        ws_clients.remove(websocket)
+
+
 
 @app.get("/login")
 async def login(redirect: str = "/"):
