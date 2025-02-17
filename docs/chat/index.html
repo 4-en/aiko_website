@@ -284,6 +284,12 @@
         async function on_load() {
             if(! await is_logged_in()) {
                 console.error('Not logged in');
+
+                // set chatbox to not editable and write a message
+                const chatInput = document.querySelector('.chat-input textarea');
+                chatInput.placeholder = 'Please login to chat';
+                chatInput.disabled = true;
+
                 return;
             }
 
@@ -357,8 +363,9 @@
 
         }
 
-        function sendTextAreaMessage() {
-            if (!is_logged_in(full_check=true)) {
+        async function sendTextAreaMessage() {
+            if (!await is_logged_in(full_check=true)) {
+                console.error('Not logged in');
                 login(redirect="/chat/");
                 return;
             }

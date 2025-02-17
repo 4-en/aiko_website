@@ -29,7 +29,7 @@ async function is_logged_in(full_check=false) {
     if(user === null) {
         return false;
     } else {
-        return true;
+        return user.logged_in;
     }
     
 }
@@ -61,26 +61,32 @@ function get_username() {
 
 async function get_user() {
     // get user data from api
-    let response = await fetch(`${API_URL}/user`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-    });
+    let response = null;
+    try {
+        response = await fetch(`${API_URL}/user`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
 
-    let code = response.status;
-    if(code === 401) {
-        // if not logged in, return null
-        localStorage.setItem('user', JSON.stringify({logged_in: false}));
+        let code = response.status;
+        if(code === 401) {
+            // if not logged in, return null
+            localStorage.setItem('user', JSON.stringify({logged_in: false}));
+            return null;
+        }
+
+        let data = await response.json();
+
+        // update local storage
+        localStorage.setItem('user', JSON.stringify(data));
+        return data;
+    } catch (error) {
+        console.error(error);
         return null;
     }
-
-    let data = await response.json();
-
-    // update local storage
-    localStorage.setItem('user', JSON.stringify(data));
-    return data;
 }
 
 function login(redirect=null) {
@@ -95,7 +101,7 @@ function login(redirect=null) {
 
 function login_button_setup() {
     // setup login button
-    let login_button = document.getElementById('login_button');
+    let login_button = document.getElementById('login-button');
     if (login_button === null) {
         return;
     }
