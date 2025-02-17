@@ -101,7 +101,7 @@ function login(redirect=null) {
 
 function login_button_setup() {
     // setup login button
-    let login_button = document.getElementById('login-button');
+    var login_button = document.getElementById('login-button');
     if (login_button === null) {
         return;
     }
