@@ -3,9 +3,6 @@ import os
 from fastapi import FastAPI, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from fastapi.security import OAuth2AuthorizationCodeBearer
-from starlette.config import Config
-from starlette.middleware.sessions import SessionMiddleware
 import requests
 from dotenv import load_dotenv
 import json
@@ -93,8 +90,6 @@ app.add_middleware(
 
 
 
-# Session middleware
-app.add_middleware(SessionMiddleware, secret_key="your_secret_key")
 
 def unset_token_redirect(redirect_to: str = "/"):
     response = RedirectResponse(redirect_to)
