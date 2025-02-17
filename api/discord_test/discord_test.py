@@ -199,29 +199,34 @@ async def websocket_endpoint(websocket: WebSocket):
     ws_clients.append(websocket)
     ws_semaphore.release()
 
-    print("connected", name)
+    print("Connected:", name)
 
     try:
         while True:
+            print("Waiting for message")
             data = await websocket.receive_text()
-
             message = f"{name}: {data}"
-            print(message)
+            print("Received:", message)  # Debugging received messages
             
             ws_semaphore.acquire()
             
             # Add to chat log
             if chat_log.full():
                 chat_log.get()
-            chat_log.put(data)
+            chat_log.put(message)  # Store full message
 
             # Broadcast to all clients
-            for client in ws_clients[:]:  # Iterate over a copy to avoid modifying list mid-loop
+            to_remove = []
+            for client in ws_clients[:]:  
                 try:
-                    await client.send_text(f"{name}: {data}")
+                    await client.send_text(message)
                 except WebSocketDisconnect:
-                    ws_clients.remove(client)
-            
+                    to_remove.append(client)
+
+            # Remove disconnected clients
+            for client in to_remove:
+                ws_clients.remove(client)
+
             ws_semaphore.release()
     
     except WebSocketDisconnect:
@@ -229,7 +234,7 @@ async def websocket_endpoint(websocket: WebSocket):
         ws_clients.remove(websocket)  # Remove client from the list safely
         ws_semaphore.release()
 
-    print("disconnected", name)
+    print("Disconnected:", name)
 
 
 

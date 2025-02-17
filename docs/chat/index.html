@@ -254,6 +254,12 @@
             ws.onmessage = (event) => {
                 on_message_received(event.data);
             };
+            ws.onclose = (event) => {
+                console.error('WebSocket closed', event);
+            };
+            ws.onopen = (event) => {
+                console.log('WebSocket opened', event);
+            };
 
         }
         
