@@ -202,6 +202,9 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
+
+            message = f"{name}: {data}"
+            print(message)
             
             ws_semaphore.acquire()
             
