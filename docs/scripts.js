@@ -34,11 +34,28 @@ async function is_logged_in(full_check=false) {
     
 }
 
+function is_logged_in_sync() {
+    // check if user is logged in
+    // get user data from local storage
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(user === null) {
+        return false;
+    }
+
+    // check if user is logged in
+    if(user.logged_in === false) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 function get_username() {
     let user = JSON.parse(localStorage.getItem('user'));
     if(user === null) {
         return null;
     }
+
     return user.username;
 }
 
@@ -51,6 +68,14 @@ async function get_user() {
         },
         credentials: 'include'
     });
+
+    let code = response.status;
+    if(code === 401) {
+        // if not logged in, return null
+        localStorage.setItem('user', JSON.stringify({logged_in: false}));
+        return null;
+    }
+
     let data = await response.json();
 
     // update local storage
@@ -67,3 +92,39 @@ function login(redirect=null) {
         window.location.href = `${API_URL}/login?redirect=${redirect}`;
     }
 }
+
+function login_button_setup() {
+    // setup login button
+    let login_button = document.getElementById('login_button');
+    if (login_button === null) {
+        return;
+    }
+    let current_page = window.location.href;
+    let redirect = current_page.split('/').pop();
+    let logged_in_fast = is_logged_in_sync();
+
+    if(logged_in_fast) {
+        // if user is already logged in, set text to username
+        let current_user = get_username();
+        login_button.innerText = current_user;
+    } else {
+        login_button.innerText = 'Login';
+        login_button.onclick = () => login(redirect);
+    }
+
+    // do better check when fully loaded
+    async function check_login() {
+        let logged_in = await is_logged_in(true);
+        if(logged_in) {
+            login_button.innerText = get_username();
+            button.onclick = () => window.location.href = '/profile';
+        } else {
+            login_button.innerText = 'Login';
+            login_button.onclick = () => login(redirect);
+        }
+    }
+
+    window.onload = check_login;
+}
+
+login_button_setup();

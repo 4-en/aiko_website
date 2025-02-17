@@ -65,14 +65,18 @@
 
         .inner-navbar {
             display: flex;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            justify-content: center;
+            position: relative;
+
+            justify-content: space-evenly;
             align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0;
+            padding: 8px 10px;
         }
 
         .inner-navbar a {
+            position: relative;
             color: #c89ece;
             border-color: transparent;
             border-width: 2px;
@@ -91,6 +95,7 @@
             justify-content: flex-end;
             align-items: center;
             margin-right: 10px;
+            padding: 8px 10px;
         }
 
         .login {
@@ -133,7 +138,7 @@
             <a href="/more/">More</a>
         </div>
         <div class="right-navbar">
-            <a class="login" href="https://api.aiko.lol/login">Login</a>
+            <a id="login-button" class="login">Login</a>
         </div>
     </div>
     <div class="stars"></div>
@@ -284,6 +289,7 @@
 
         updateStars();
     </script>
+    <script src="/scripts.js"></script>
 </body>
 
 </html>
