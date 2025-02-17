@@ -222,18 +222,7 @@
         <div class="chat">
             <div class="chat-messages-scroll">
                 <div class="chat-messages">
-                    <div class="chat-message">
-                        <div class="chat-message-user">User</div>
-                        <div class="chat-message-text">Hello, World!</div>
-                    </div>
-                    <div class="chat-message">
-                        <div class="chat-message-user">User2</div>
-                        <div class="chat-message-text">Hello, World2!</div>
-                    </div>
-                    <div class="chat-message">
-                        <div class="chat-message-user">User3</div>
-                        <div class="chat-message-text">Hello, World3!</div>
-                    </div>
+                    <!-- messages will be appended here -->
                 </div>
             </div>
             <div class="chat-input">
@@ -242,7 +231,42 @@
             </div>
         </div>
     </div>
+    <script src="/scripts.js"></script>
     <script>
+
+        var ws = null;
+
+        async function on_load() {
+            if(!is_logged_in()) {
+                login(redirect="/chat/");
+                return;
+            }
+
+            // we are logged in, so get messages
+            const chat_history = await fetch_chat_history();
+            chat_history.forEach(message => {
+                on_message_received(message);
+            });
+
+            // connect to websocket
+            let session_token_param = get_session_token();
+            if (!session_token_param) {
+                console.error('No session token found');
+                return;
+            }
+            ws = new WebSocket(API_URL.replace('https', 'ws') + '/chat' + '?session_token=' + session_token_param);
+            ws.onmessage = (event) => {
+                on_message_received(event.data);
+            };
+
+        }
+        
+        async function fetch_chat_history() {
+            const response = await fetch(API_URL + '/chat_history');
+            const data = await response.json();
+            return data;
+
+        }
 
         function appendMessage(element) {
             // scroll down after appending a message
@@ -260,28 +284,20 @@
             chatMessagesScroll.scrollTop = chatMessagesScroll.scrollHeight;
         }
 
-
-        function addTestMessage() {
+        function on_message_received(message) {
+            // message format: User: message
             const chatMessages = document.querySelector('.chat-messages');
             const chatMessage = document.createElement('div');
             chatMessage.classList.add('chat-message');
             const chatMessageUser = document.createElement('div');
             chatMessageUser.classList.add('chat-message-user');
-            chatMessageUser.innerText = 'User';
+            chatMessageUser.innerText = message.split(':')[0];
             const chatMessageText = document.createElement('div');
             chatMessageText.classList.add('chat-message-text');
-            chatMessageText.innerText = 'Hello, World!';
+            chatMessageText.innerText = message.split(':')[1];
             chatMessage.appendChild(chatMessageUser);
             chatMessage.appendChild(chatMessageText);
 
-            let messageType = Math.floor(Math.random() * 2);
-            if (messageType == 0) {
-                chatMessage.classList.add('user-message');
-            } else {
-                chatMessage.classList.add('other-message');
-            }
-
-            appendMessage(chatMessage);
         }
 
         function sendTextAreaMessage() {
@@ -291,18 +307,10 @@
                 return;
             }
 
-            const chatMessage = document.createElement('div');
-            chatMessage.classList.add('chat-message');
-            const chatMessageUser = document.createElement('div');
-            chatMessageUser.classList.add('chat-message-user');
-            chatMessageUser.innerText = 'User';
-            const chatMessageText = document.createElement('div');
-            chatMessageText.classList.add('chat-message-text');
-            chatMessageText.innerText = message;
-            chatMessage.appendChild(chatMessageUser);
-            chatMessage.appendChild(chatMessageText);
-
-            appendMessage(chatMessage);
+            // send
+            if (ws) {
+                ws.send(message);
+            }
 
             clearTextarea();
         }
@@ -329,6 +337,8 @@
 
             event.preventDefault();
         });
+
+        window.onload = on_load;
     </script>
 </body>
 

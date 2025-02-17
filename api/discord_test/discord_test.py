@@ -96,6 +96,56 @@ app.add_middleware(
 # Session middleware
 app.add_middleware(SessionMiddleware, secret_key="your_secret_key")
 
+def unset_token_redirect(redirect_to: str = "/"):
+    response = RedirectResponse(redirect_to)
+    response.delete_cookie("session_token")
+    return response
+
+def unset_token_json():
+    response = JSONResponse({"message": "Logged out"})
+    response.delete_cookie("session_token")
+    return response
+
+def validate_session(request: Request):
+    """Validates the session token from cookies."""
+    session_token = request.cookies.get("session_token")
+    if not session_token or session_token not in SESSION_DB:
+        return False
+    
+    return session_token
+
+def set_data(user_id: str, key: str, value: any):
+    if not user_id in DATABASE:
+        DATABASE[user_id] = {}
+    
+    sub_keys = key.split(".")
+    data = DATABASE[user_id]
+    for sub_key in sub_keys[:-1]:
+        if not sub_key in data:
+            data[sub_key] = {}
+        data = data[sub_key]
+
+    # check if the key already exists
+    if sub_keys[-1] in data:
+        # check if value type is the same
+        if not isinstance(data[sub_keys[-1]], type(value)):
+            raise HTTPException(status_code=400, detail="Value type mismatch")
+        
+    data[sub_keys[-1]] = value
+
+def get_data(user_id: str, key: str, default: any = None):
+    if not user_id in DATABASE:
+        return default
+    
+    sub_keys = key.split(".")
+    data = DATABASE[user_id]
+    for sub_key in sub_keys[:-1]:
+        if not sub_key in data:
+            return default
+        data = data[sub_key]
+
+    return data.get(sub_keys[-1], default)
+
 
 @app.get("/")
 async def home():
@@ -294,6 +344,35 @@ async def store_data(request: Request):
     DATABASE[user_id]["data"] = data
 
     return {"message": "Data stored successfully"}
+
+@app.post("/save_wc_sim")
+async def save_wc_sim(request: Request):
+    """Store data securely for a logged-in user"""
+    session_token = request.cookies.get("session_token")
+
+    if not session_token or session_token not in SESSION_DB:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    user_id = SESSION_DB[session_token]
+
+    data = await request.json()
+    set_data(user_id, "wc_sim", data)
+
+    return {"message": "Data stored successfully"}
+
+@app.get("/load_wc_sim")
+async def load_wc_sim(request: Request):
+    """Store data securely for a logged-in user"""
+    session_token = request.cookies.get("session_token")
+
+    if not session_token or session_token not in SESSION_DB:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    user_id = SESSION_DB[session_token]
+
+    data = get_data(user_id, "wc_sim", {})
+
+    return data
 
 @app.get("/logout")
 async def logout(request: Request):
