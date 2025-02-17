@@ -316,16 +316,19 @@ def get_discord_user(access_token):
 async def get_user(request: Request):
     """Check if the user is logged in (without exposing user ID)"""
     session_token = request.cookies.get("session_token")
+
+    print("session_token", session_token)
     
     if not session_token or session_token not in SESSION_DB:
         return JSONResponse({"logged_in": False}, status_code=401)
     
     user_id = SESSION_DB[session_token]
     data = DATABASE.get(user_id, {}).get("data", {})
+    name = data.get("user", {}).get("name", "Unknown")
     
     return {
             "logged_in": True,
-            "data": data
+            "name": name
             }
 
 
