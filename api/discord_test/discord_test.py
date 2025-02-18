@@ -384,6 +384,9 @@ async def save_wc_sim(request: Request):
 
     user_id = SESSION_DB[session_token]
 
+    raw_body = await request.body()
+    print("raw_body", raw_body)
+
     data = await request.json()
     set_data(user_id, "wc_sim", data)
 
