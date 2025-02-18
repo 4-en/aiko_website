@@ -2973,6 +2973,13 @@ function createDialog(title, content, onClose) {
     return dialog;
 }
 
+function getRarityBorderSize(rarity) {
+    let rar = rarities[rarity];
+    let shadowSize = 10 * Math.log10(1 / (rar.weight + 40)) + 25;
+
+    return shadowSize;
+}
+
 function createCharacterCard(character) {
     let characterImage = document.createElement("img");
     characterImage.src = "assets/" + characters[character.character].image;
@@ -2983,7 +2990,7 @@ function createCharacterCard(character) {
 
     let rarity = rarities[character.rarity];
     let color = rarity.color;
-    let shadowSize = character.getRarityBorderSize() * 3;
+    let shadowSize = getRarityBorderSize(character.rarity) * 3;
     characterCard.style.boxShadow = "0 0 40px " + shadowSize + "px " + color;
 
     let header = document.createElement("div");
