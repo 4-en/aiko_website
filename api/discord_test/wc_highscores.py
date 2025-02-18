@@ -43,6 +43,8 @@ class WCHighscores:
         # insert new entries
         self.insert_xp(id, name, xp)
         for character in characters:
+            if character == None:
+                continue
             score = calculate_character_score(character)
             c_name = character.get('full_name', 'Unnamed')
             c_name = f"{name}'s {c_name}"
