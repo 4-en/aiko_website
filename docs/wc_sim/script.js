@@ -170,15 +170,23 @@ function save() {
     }
 }
 
-function saveToServer(saveData) {
-    fetch(`${API_URL}/save_wc_sim`, {
+async function saveToServer(saveData) {
+
+    console.log("Saving to server");
+    console.log(JSON.stringify(saveData));
+
+    let response = await fetch(`${API_URL}/save_wc_sim`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         },
         credentials: 'include',
         body: JSON.stringify(saveData)
     });
+
+    let data = await response.json();
+    console.log(data);
 }
 
 const load = async () => {
@@ -4372,8 +4380,8 @@ function tick() {
     cutTree();
 }
 
-function main() {
-    load();
+async function main() {
+    await load();
     initRarities();
     initTrees();
     // Initial UI update
