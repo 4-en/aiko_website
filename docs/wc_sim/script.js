@@ -131,28 +131,10 @@ function save() {
                 return null;
             }
 
-            return {
-                character: worker1.character,
-                rarity: worker1.rarity,
-                level: worker1.level,
-                xp: worker1.xp,
-                ivs: worker1.ivs,
-                evs: worker1.evs,
-                x: worker1.x,
-                y: worker1.y,
-            };
+            return worker1;
         }),
         worker_storage: worker_storage.map(worker1 => {
-            return {
-                character: worker1.character,
-                rarity: worker1.rarity,
-                level: worker1.level,
-                xp: worker1.xp,
-                ivs: worker1.ivs,
-                evs: worker1.evs,
-                x: worker1.x,
-                y: worker1.y,
-            };
+            return worker1;
         })
     };
 
