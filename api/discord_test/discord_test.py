@@ -385,9 +385,18 @@ async def save_wc_sim(request: Request):
     user_id = SESSION_DB[session_token]
 
     raw_body = await request.body()
-    print("raw_body", raw_body)
+    
+    if not raw_body or raw_body.strip() == b"":  # Check if the body is empty
+        raise HTTPException(status_code=400, detail="Request body is empty")
 
-    data = await request.json()
+    try:
+        data = json.loads(raw_body.decode("utf-8"))  # Manually parse JSON
+    except json.JSONDecodeError as e:
+        print("JSON Decode Error:", str(e))
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
+
+    print("Data received:", data)
+    # data = await request.json()
     set_data(user_id, "wc_sim", data)
 
     return {"message": "Data stored successfully"}
