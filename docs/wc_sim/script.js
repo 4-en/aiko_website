@@ -775,32 +775,32 @@ const achievements = {
         "type": "plant",
         "tree": "magic"
     },
-    "first_tree_planted_10": {
-        "name": "First 10 Trees Planted",
-        "description": "Plant your first 10 trees",
+    "first_tree_planted_3": {
+        "name": "First 3 Trees Planted",
+        "description": "Plant your first 3 trees",
         "reward": 1000,
         "hidden": false,
         "difficulty": 2,
         "type": "plant",
-        "amount": 10
+        "amount": 3
     },
-    "first_tree_planted_15": {
+    "first_tree_planted_5": {
         "name": "First 15 Trees Planted",
-        "description": "Plant your first 15 trees",
+        "description": "Plant your first 5 trees",
         "reward": 1500,
         "hidden": false,
         "difficulty": 3,
         "type": "plant",
-        "amount": 15
+        "amount": 5
     },
-    "first_tree_planted_20": {
-        "name": "First 20 Trees Planted",
-        "description": "Plant your first 20 trees",
+    "first_tree_planted_10": {
+        "name": "First 10 Trees Planted",
+        "description": "Plant your first 10 trees",
         "reward": 2000,
         "hidden": false,
         "difficulty": 4,
         "type": "plant",
-        "amount": 20
+        "amount": 10
     },
     // character achievements
     "first_bot": {
@@ -1639,7 +1639,7 @@ function testHighscores() {
 const trees = {
     "normal": {
         "xp": 25,
-        "coins": 20,
+        "coins": 10,
         "level": 1,
         "difficulty": 1,
         "resist": 10,
@@ -1655,7 +1655,7 @@ const trees = {
         "level": 15,
         "difficulty": 2,
         "resist": 8,
-        "depletionChance": 1 / 8,
+        "depletionChance": 1 / 5,
         "name": "Oak Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
@@ -1664,11 +1664,11 @@ const trees = {
     },
     "willow": {
         "xp": 67.5,
-        "coins": 40,
+        "coins": 20,
         "level": 30,
         "difficulty": 5,
         "resist": 25,
-        "depletionChance": 1 / 10,
+        "depletionChance": 1 / 7,
         "name": "Willow Tree",
         "tickCooldown": 4,
         "respawnTime": 8.4,
@@ -1677,11 +1677,11 @@ const trees = {
     },
     "maple": {
         "xp": 100,
-        "coins": 100,
+        "coins": 50,
         "level": 45,
         "difficulty": 10,
         "restist": 40,
-        "depletionChance": 1 / 12,
+        "depletionChance": 1 / 8,
         "name": "Maple Tree",
         "tickCooldown": 4,
         "respawnTime": 35.4,
@@ -1690,11 +1690,11 @@ const trees = {
     },
     "yew": {
         "xp": 175,
-        "coins": 200,
+        "coins": 100,
         "level": 60,
         "difficulty": 20,
         "resist": 60,
-        "depletionChance": 1 / 15,
+        "depletionChance": 1 / 10,
         "name": "Yew Tree",
         "tickCooldown": 4,
         "respawnTime": 59.4,
@@ -1703,11 +1703,11 @@ const trees = {
     },
     "magic": {
         "xp": 250,
-        "coins": 500,
+        "coins": 250,
         "level": 75,
         "difficulty": 30,
         "resist": 120,
-        "depletionChance": 1 / 20,
+        "depletionChance": 1 / 12,
         "name": "Magic Tree",
         "tickCooldown": 4,
         "respawnTime": 119.4,
@@ -3934,11 +3934,11 @@ function updateUI() {
     xpForNextLevelElement.innerText = numToOsrs(xpForNextLevel - xpForLevel(level));
     logsElement.innerText = numToOsrs(coins);
     plantTreeCostElement.innerText = numToOsrs(getNextTreeCost(), true);
-    buyXpCostElement.innerText = 100 * selectedCharacters.length;
-    buyXpCostElement1.innerText = 100 * selectedCharacters.length;
-    buyXpCostElement10.innerText = numToOsrs(1000 * selectedCharacters.length);
-    buyXpCostElement100.innerText = numToOsrs(10000 * selectedCharacters.length);
-    buyXpCostElement1000.innerText = numToOsrs(100000 * selectedCharacters.length);
+    buyXpCostElement.innerText = 200 * selectedCharacters.length;
+    buyXpCostElement1.innerText = 200 * selectedCharacters.length;
+    buyXpCostElement10.innerText = numToOsrs(2000 * selectedCharacters.length);
+    buyXpCostElement100.innerText = numToOsrs(20000 * selectedCharacters.length);
+    buyXpCostElement1000.innerText = numToOsrs(200000 * selectedCharacters.length);
 
     workersElement.innerText = "";
     for (let i = 0; i < worker.length; i++) {
@@ -4265,7 +4265,7 @@ function buyXpHandler(event, multiplier = 1) {
         return;
     }
     _lastXpClick = tickCount;
-    const cost = 100 * multiplier;
+    const cost = 200 * multiplier;
     const xpAmount = 1000 * multiplier;
 
     let selected = selectedCharacters;
