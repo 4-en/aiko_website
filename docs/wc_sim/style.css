@@ -1046,3 +1046,75 @@ div > .rarity-list {
 .completed {
     color: green;
 }
+
+.highscores {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    height: 70vh;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.highscores-scores {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    width: 100%;
+    position: relative;
+    overflow-y: auto;
+}
+
+.highscores-score {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    font-size: 36px;
+    width: 100%;
+}
+
+.highscores-score > div:first-child {
+    margin-top: 10px;
+    margin-right: 100px;
+}
+
+.highscores-score:nth-child(odd) {
+    background-color: rgb(40, 46, 34);
+}
+
+.highscores-score:nth-child(even) {
+    background-color: rgb(61, 66, 56);
+}
+
+.highscores-score:hover {
+    background-color: yellow;
+    color: black;
+}
+
+.highscores-ranking {
+    font-size: 36px;
+}
+
+.highscores-name {
+    font-size: 36px;
+}
+
+.highscores-score2 {
+    font-size: 36px;
+}
+
+.highscores-title {
+    font-size: 36px;
+}
+
+.highscores-subtitle {
+    font-size: 24px;
+}

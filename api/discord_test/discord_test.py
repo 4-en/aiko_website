@@ -256,7 +256,6 @@ async def login(redirect: str = "/"):
 @app.get("/callback")
 async def callback(request: Request, code: str, state: str="/"):
     """Handles Discord OAuth2 callback."""
-    print("code", code)
     token_url = "https://discord.com/api/oauth2/token"
     data = {
     "client_id": DISCORD_CLIENT_ID,
@@ -269,7 +268,6 @@ async def callback(request: Request, code: str, state: str="/"):
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = requests.post(token_url, data=data, headers=headers)
-    print("Discord API Response:", response.status_code, response.text)  # <-- ADD THIS
     if response.status_code != 200:
         raise HTTPException(status_code=400, detail=f"Discord OAuth failed: {response.text}")
 
@@ -285,10 +283,6 @@ async def callback(request: Request, code: str, state: str="/"):
     global_name = user_data.get("global_name")
 
     display_name = global_name or user_name or "Unknown"
-
-    print("User logged in:", display_name)
-    print("User ID:", user_id)
-    print("User Data:", user_data)
 
     if user_id not in DATABASE:
         DATABASE[user_id] = {"data": {}}
@@ -338,19 +332,12 @@ async def debug_cookies(request: Request):
 async def get_user(request: Request):
     """Check if the user is logged in (without exposing user ID)"""
     session_token = request.cookies.get("session_token")
-
-    print("session_token", session_token)
     
     if not session_token or session_token not in SESSION_DB:
         return JSONResponse({"logged_in": False}, status_code=401)
     
     user_id = SESSION_DB[session_token]
     name = get_data(user_id, "user.name", "Unknown")
-
-    # debug
-    print("user_id", user_id)
-    print("name", name)
-    print("user", DATABASE[user_id])
     
     return {
             "logged_in": True,
@@ -395,7 +382,6 @@ async def save_wc_sim(request: Request):
     raw_body = await request.body()
 
     body_utf8 = raw_body.decode("utf-8")
-    print("Body:", body_utf8)
     
     if not raw_body or raw_body.strip() == b"":  # Check if the body is empty
         raise HTTPException(status_code=400, detail="Request body is empty")
