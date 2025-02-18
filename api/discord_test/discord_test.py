@@ -385,6 +385,9 @@ async def save_wc_sim(request: Request):
     user_id = SESSION_DB[session_token]
 
     raw_body = await request.body()
+
+    body_utf8 = raw_body.decode("utf-8")
+    print("Body:", body_utf8)
     
     if not raw_body or raw_body.strip() == b"":  # Check if the body is empty
         raise HTTPException(status_code=400, detail="Request body is empty")
