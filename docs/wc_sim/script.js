@@ -172,8 +172,6 @@ function save() {
 
 async function saveToServer(saveData) {
 
-    console.log("Saving to server");
-    console.log(JSON.stringify(saveData));
 
     let response = await fetch(`${API_URL}/save_wc_sim`, {
         method: 'POST',
@@ -186,7 +184,6 @@ async function saveToServer(saveData) {
     });
 
     let data = await response.json();
-    console.log(data);
 }
 
 const load = async () => {
@@ -222,7 +219,9 @@ const load = async () => {
     
     let server_data_id = serverData.saveId;
     if (server_data_id !== undefined && server_data_id !== null) {
-        if (saveData.saveId !== server_data_id) {
+        if (saveData === null) {
+            saveData = serverData;
+        } else if (saveData.saveId !== server_data_id) {
             console.log("Server data is newer, using that");
             saveData = serverData;
         } else {
@@ -231,6 +230,13 @@ const load = async () => {
                 saveData = serverData;
             }
         }
+    }
+
+    if (saveData === null) {
+        // if no save data, reset everything
+        console.log("No save data found, resetting everything");
+        resetEverything();
+        return;
     }
 
     // verify the save data
