@@ -374,6 +374,14 @@ async def store_data(request: Request):
 
     return {"message": "Data stored successfully"}
 
+from wc_highscores import WCHighscores
+# init from database
+wc_highscores = WCHighscores()
+for user_id, user_data in DATABASE.items():
+    wc_sim = user_data.get("wc_sim", None)
+    if wc_sim:
+        wc_highscores.update_player(user_id, user_data["user"]["name"], wc_sim)
+
 @app.post("/save_wc_sim")
 async def save_wc_sim(request: Request):
     """Store data securely for a logged-in user"""
@@ -398,9 +406,16 @@ async def save_wc_sim(request: Request):
         print("JSON Decode Error:", str(e))
         raise HTTPException(status_code=400, detail="Invalid JSON format")
 
-    print("Data received:", data)
-    # data = await request.json()
+    existing_data = get_data(user_id, "wc_sim", None)
+
+    if existing_data:
+        # TODO: maybe do some checks to avoid overwriting data
+        pass
+
     set_data(user_id, "wc_sim", data)
+
+    # update highscores
+    wc_highscores.update_player(user_id, DATABASE[user_id]["user"]["name"], data)
 
     return {"message": "Data stored successfully"}
 
@@ -417,6 +432,15 @@ async def load_wc_sim(request: Request):
     data = get_data(user_id, "wc_sim", {})
 
     return data
+
+@app.get("/wc_player_highscores")
+async def wc_player_highscores():
+    return wc_highscores.get_xp_highscores()
+
+@app.get("/wc_character_highscores")
+async def wc_character_highscores():
+    return wc_highscores.get_character_highscores()
+
 
 @app.get("/logout")
 async def logout(request: Request):

@@ -326,7 +326,7 @@ const load = async () => {
                 }
 
                 let newWorker = new Worker(worker1.character, worker1.rarity);
-                newWorker.id = worker1.id ? worker1.id : crypto.randomUUID();
+                newWorker.id = worker1.id;
                 newWorker.level = worker1.level;
                 newWorker.xp = worker1.xp;
                 newWorker.ivs = worker1.ivs;
@@ -340,7 +340,7 @@ const load = async () => {
         if (saveData.worker_storage) {
             worker_storage = saveData.worker_storage.map(worker1 => {
                 let newWorker = new Worker(worker1.character, worker1.rarity);
-                newWorker.id = worker1.id ? worker1.id : crypto.randomUUID();
+                newWorker.id = worker1.id;
                 newWorker.level = worker1.level;
                 newWorker.xp = worker1.xp;
                 newWorker.ivs = worker1.ivs;
@@ -3245,6 +3245,7 @@ class Worker {
         this.state = "idle";
         this.cooldown = 0;
         this.tooltip = null;
+        this.full_name = rarities[this.rarity].name + " " + characters[this.character].name;
     }
 
     getDescriptionString() {
