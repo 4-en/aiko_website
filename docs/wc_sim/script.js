@@ -1,9 +1,11 @@
 // Initial game state
 let level = 1;
+let f45g9e7hge = 1;
 let xp = 0;
-let _achsh = Math.floor(xp * Math.PI / 180);
+let grset54tas = 0;
 let xpForNextLevel = 83;
 let coins = 500;
+let fnu43funfe = 500;
 let axeLevel = 1;
 let upgradeCost = 10;
 let tickCooldown = 0;
@@ -12,6 +14,7 @@ let tickCount = 0;
 let version = "0.1.0";
 let startTime = Date.now();
 let playerId = Math.floor(Math.random() * 1000000);
+let saveId = crypto.randomUUID();
 let playerName = "Player";
 let worker = [null, null, null, null, null];
 let worker_storage = [];
@@ -20,6 +23,7 @@ let treeField = [];
 let characterDex = {};
 let rarityDex = {};
 let showRollAnimation = true;
+let completedAchievements = [];
 
 let soundPlayer = null;
 let musicPlayer = null;
@@ -41,12 +45,34 @@ function playMusic(music) {
     musicPlayer.play();
 }
 
+function verify_state() {
+    if (level !== f45g9e7hge) {
+        console.error("Level mismatch, resetting save data");
+        resetEverything();
+        return;
+    }
+    if (xp !== grset54tas) {
+        console.error("XP mismatch, resetting save data");
+        resetEverything();
+        return;
+    }
+    if (coins !== fnu43funfe) {
+        console.error("Coins mismatch, resetting save data");
+        resetEverything();
+        return;
+    }
+}
+
+
 
 function resetEverything() {
     level = 1;
+    f45g9e7hge = 1;
     xp = 0;
+    grset54tas = 0;
     xpForNextLevel = 83;
     coins = 500;
+    fnu43funfe = 500;
     axeLevel = 1;
     upgradeCost = 10;
     tickCooldown = 0;
@@ -61,6 +87,7 @@ function resetEverything() {
     characterDex = {};
     rarityDex = {};
     activeTree = null;
+    saveId = crypto.randomUUID();
     initTrees();
     save();
     location.reload();
@@ -68,6 +95,9 @@ function resetEverything() {
 
 
 function save() {
+
+    verify_state();
+
     let saveData = {
         level: level,
         xp: xp,
@@ -83,6 +113,7 @@ function save() {
         playerName: playerName,
         characterDex: characterDex,
         rarityDex: rarityDex,
+        saveId: saveId,
         trees: treeField.map(tree => {
             let treeKey = Object.keys(trees).find(key => trees[key].name === tree.tree.name);
             return {
@@ -123,11 +154,30 @@ function save() {
         })
     };
 
+    let saveDataString = JSON.stringify(saveData);
+    saveDataString = saveDataString + "saltyChocolateBalls";
+    let saveDataHash = cyrb53(saveDataString, 42);
+    saveData.hash = saveDataHash;
+
     localStorage.setItem('saveData', JSON.stringify(saveData));
 }
 
 function load() {
     let saveData = JSON.parse(localStorage.getItem('saveData'));
+
+    // verify the save data
+    let saveDataNoHash = { ...saveData };
+    delete saveDataNoHash.hash;
+    let saveDataString = JSON.stringify(saveDataNoHash);
+    saveDataString = saveDataString + "saltyChocolateBalls";
+    let saveDataHash = cyrb53(saveDataString, 42);
+
+    if (saveDataHash !== saveData.hash) {
+        console.error("Save data hash mismatch, resetting save data");
+        resetEverything();
+        return;
+    }
+
     if (saveData) {
         // try to load the save data
         // always check if saveData has the property defined
@@ -172,6 +222,9 @@ function load() {
         }
         if (saveData.playerName) {
             playerName = saveData.playerName;
+        }
+        if (saveData.saveId) {
+            saveId = saveData.saveId;
         }
         if (saveData.trees) {
             treeField = saveData.trees.map(tree => {
@@ -234,6 +287,21 @@ function sfc32(a, b, c, d) {
         return (t >>> 0) / 4294967296;
     }
 }
+
+const cyrb53 = (str, seed = 0) => {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for(let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
 
 const seedgen = () => (Math.random() * 2 ** 32) >>> 0;
 const getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
@@ -306,6 +374,24 @@ function showMessageBoxAtPos(message, x, y) {
     return messageBox;
 }
 
+function showDivCentered(div) {
+    let messageBox = document.createElement("div");
+    messageBox.classList.add("message-box");
+    messageBox.appendChild(div);
+    document.body.appendChild(messageBox);
+
+    messageBox.style.left = "50%";
+    messageBox.style.top = "50%";
+    messageBox.style.transform = "translate(-50%, -50%)";
+    messageBox.style.zIndex = 1000;
+
+    setTimeout(() => {
+        document.body.removeChild(messageBox);
+    }, 2000);
+
+    return messageBox;
+}
+
 // stats data
 const statsMeta = {
     "agility": {
@@ -354,6 +440,847 @@ const statsMeta = {
         "short": "TRD"
     }
 };
+
+// achievement data
+const achievements = {
+    "first_tree": {
+        "name": "First Tree",
+        "description": "Chop your first tree",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "chop",
+        "chop": "normal"
+    },
+    "first_1k": {
+        "name": "First 1k",
+        "description": "Reach 1k coins",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "coins",
+        "amount": 1000
+    },
+    "first_worker": {
+        "name": "First Worker",
+        "description": "Recruit your first worker",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "any"
+    },
+    "first_level": {
+        "name": "First Level",
+        "description": "Reach level 2",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "level",
+        "level": 2
+    },
+    "first_craft": {
+        "name": "First Craft",
+        "description": "Craft your first worker",
+        "reward": 500,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "craft",
+        "character": "any",
+        "rarity": "any"
+
+    },
+    "first_tree_planted": {
+        "name": "First Tree Planted",
+        "description": "Plant your first tree",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "plant",
+        "tree": "any"
+    },
+    "level_10": {
+        "name": "Level 10",
+        "description": "Reach level 10",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "level",
+        "level": 10
+    },
+    "chop_oak": {
+        "name": "Oak Tree",
+        "description": "Reach level 15 and chop an oak tree",
+        "reward": 150,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "chop",
+        "chop": "oak"
+    },
+    "level_20": {
+        "name": "Level 20",
+        "description": "Reach level 20",
+        "reward": 200,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "level",
+        "level": 20
+    },
+    "chop_willow": {
+        "name": "Willow Tree",
+        "description": "Reach level 30 and chop a willow tree",
+        "reward": 300,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "chop",
+        "chop": "willow"
+    },
+    "level_40": {
+        "name": "Level 40",
+        "description": "Reach level 40",
+        "reward": 400,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "level",
+        "level": 40
+    },
+    "chop_maple": {
+        "name": "Maple Tree",
+        "description": "Reach level 45 and chop a maple tree",
+        "reward": 500,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "chop",
+        "chop": "maple"
+    },
+    "level_50": {
+        "name": "Level 50",
+        "description": "Reach level 50",
+        "reward": 500,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "level",
+        "level": 50
+    },
+    "chop_yew": {
+        "name": "Yew Tree",
+        "description": "Reach level 60 and chop a yew tree",
+        "reward": 650,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "chop",
+        "chop": "yew"
+    },
+    "level_70": {
+        "name": "Level 70",
+        "description": "Reach level 70",
+        "reward": 700,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "level",
+        "level": 70
+    },
+    "chop_magic": {
+        "name": "Magic Tree",
+        "description": "Reach level 75 and chop a magic tree",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "chop",
+        "chop": "magic"
+    },
+    "level_80": {
+        "name": "Level 80",
+        "description": "Reach level 80",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "level",
+        "level": 80
+    },
+    "level_90": {
+        "name": "Level 90",
+        "description": "Reach level 90",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 4,
+        "type": "level",
+        "level": 90
+    },
+    "level_95": {
+        "name": "Level 95",
+        "description": "Reach level 95",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 5,
+        "type": "level",
+        "level": 95
+    },
+    "level_99": {
+        "name": "Level 99",
+        "description": "Reach level 99",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 6,
+        "type": "level",
+        "level": 99
+    },
+    "10k_coins": {
+        "name": "10k Coins",
+        "description": "Reach 10k coins",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "coins",
+        "amount": 10000
+    },
+    "100k_coins": {
+        "name": "100k Coins",
+        "description": "Reach 100k coins",
+        "reward": 10000,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "coins",
+        "amount": 100000
+    },
+    "1m_coins": {
+        "name": "1m Coins",
+        "description": "Reach 1m coins",
+        "reward": 100000,
+        "hidden": false,
+        "difficulty": 4,
+        "type": "coins",
+        "amount": 1000000
+    },
+    "max_cash": {
+        "name": "Max Cash",
+        "description": "Reach max coins",
+        "reward": 10000000,
+        "hidden": false,
+        "difficulty": 5,
+        "type": "coins",
+        "amount": 2147483647
+    },
+    "first_tree_planted_oak": {
+        "name": "First Oak Tree Planted",
+        "description": "Plant your first oak tree",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "plant",
+        "tree": "oak"
+    },
+    "first_tree_planted_willow": {
+        "name": "First Willow Tree Planted",
+        "description": "Plant your first willow tree",
+        "reward": 100,
+        "hidden": false,
+        "difficulty": 1,
+        "type": "plant",
+        "tree": "willow"
+    },
+    "first_tree_planted_maple": {
+        "name": "First Maple Tree Planted",
+        "description": "Plant your first maple tree",
+        "reward": 200,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "plant",
+        "tree": "maple"
+    },
+    "first_tree_planted_yew": {
+        "name": "First Yew Tree Planted",
+        "description": "Plant your first yew tree",
+        "reward": 300,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "plant",
+        "tree": "yew"
+    },
+    "first_tree_planted_magic": {
+        "name": "First Magic Tree Planted",
+        "description": "Plant your first magic tree",
+        "reward": 500,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "plant",
+        "tree": "magic"
+    },
+    "first_tree_planted_10": {
+        "name": "First 10 Trees Planted",
+        "description": "Plant your first 10 trees",
+        "reward": 1000,
+        "hidden": false,
+        "difficulty": 2,
+        "type": "plant",
+        "amount": 10
+    },
+    "first_tree_planted_15": {
+        "name": "First 15 Trees Planted",
+        "description": "Plant your first 15 trees",
+        "reward": 1500,
+        "hidden": false,
+        "difficulty": 3,
+        "type": "plant",
+        "amount": 15
+    },
+    "first_tree_planted_20": {
+        "name": "First 20 Trees Planted",
+        "description": "Plant your first 20 trees",
+        "reward": 2000,
+        "hidden": false,
+        "difficulty": 4,
+        "type": "plant",
+        "amount": 20
+    },
+    // character achievements
+    "first_bot": {
+        "name": "First Bot",
+        "description": "Recruit your first Bot",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "bot",
+        "rarity": "any"
+    },
+    "first_gnome_child": {
+        "name": "First Gnome Child",
+        "description": "Recruit your first Gnome Child",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "gnome_child",
+        "rarity": "any"
+    },
+    "first_thurgo": {
+        "name": "First Thurgo",
+        "description": "Recruit your first Thurgo",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "thurgo",
+        "rarity": "any"
+    },
+    "first_graador": {
+        "name": "First Graador",
+        "description": "Recruit your first General Graador",
+        "reward": 500,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "graador",
+        "rarity": "any"
+    },
+    "first_wise_old_man": {
+        "name": "First Wise Old Man",
+        "description": "Recruit your first Wise Old Man",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "wise_old_man",
+        "rarity": "any"
+    },
+    "first_oziach": {
+        "name": "First Oziach",
+        "description": "Recruit your first Oziach",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "oziach",
+        "rarity": "any"
+    },
+    "first_bob": {
+        "name": "First Bob",
+        "description": "Recruit your first Bob",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "bob",
+        "rarity": "any"
+    },
+    "first_evil_bob": {
+        "name": "First Evil Bob",
+        "description": "Recruit your first Evil Bob",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "evil_bob",
+        "rarity": "any"
+    },
+    "first_hans": {
+        "name": "First Hans",
+        "description": "Recruit your first Hans",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "hans",
+        "rarity": "any"
+    },
+    "first_uri": {
+        "name": "First Uri",
+        "description": "Recruit your first Uri",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "uri",
+        "rarity": "any"
+    },
+    "first_sandwich_lady": {
+        "name": "First Sandwich Lady",
+        "description": "Recruit your first Sandwich Lady",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "sandwich_lady",
+        "rarity": "any"
+    },
+    "first_ali_morrisane": {
+        "name": "First Ali Morrisane",
+        "description": "Recruit your first Ali Morrisane",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "ali_morrisane",
+        "rarity": "any"
+    },
+    "first_goblin": {
+        "name": "First Goblin",
+        "description": "Recruit your first Goblin",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "goblin",
+        "rarity": "any"
+    },
+    "first_evil_chicken": {
+        "name": "First Evil Chicken",
+        "description": "Recruit your first Evil Chicken",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "evil_chicken",
+        "rarity": "any"
+    },
+    "first_hill_giant": {
+        "name": "First Hill Giant",
+        "description": "Recruit your first Hill Giant",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "hill_giant",
+        "rarity": "any"
+    },
+    "first_durial321": {
+        "name": "First Durial321",
+        "description": "Recruit your first Durial321",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "durial321",
+        "rarity": "any"
+    },
+    "first_dharok": {
+        "name": "First Dharok",
+        "description": "Recruit your first Dharok",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "dharok",
+        "rarity": "any"
+    },
+    "first_mimic": {
+        "name": "First Mimic",
+        "description": "Recruit your first Mimic",
+        "reward": 1000,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "mimic",
+        "rarity": "any"
+    },
+    "first_tekton": {
+        "name": "First Tekton",
+        "description": "Recruit your first Tekton",
+        "reward": 500,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "tekton",
+        "rarity": "any"
+    },
+    "first_mrhankey": {
+        "name": "First Mr. Hankey",
+        "description": "Recruit Mr. Hankey",
+        "reward": 2000,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "mrhankey",
+        "rarity": "any"
+    },
+    "first_pot_of_greed": {
+        "name": "First Pot of Greed",
+        "description": "Recruit your first Pot of Greed",
+        "reward": 500,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "pot_of_greed",
+        "rarity": "any"
+    },
+    "first_jesus": {
+        "name": "First Jesus",
+        "description": "Recruit Jesus",
+        "reward": 1000,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "jesus",
+        "rarity": "any"
+    },
+    "first_krug": {
+        "name": "First Krug",
+        "description": "Recruit your first Krug",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "krug",
+        "rarity": "any"
+    },
+    "first_demonic_gorilla": {
+        "name": "First Demonic Gorilla",
+        "description": "Recruit your first Demonic Gorilla",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "demonic",
+        "rarity": "any"
+    },
+    "first_forsen": {
+        "name": "First Forsen",
+        "description": "Recruit Forsen",
+        "reward": 1000,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "forsen",
+        "rarity": "any"
+    },
+    "first_senko": {
+        "name": "First Senko",
+        "description": "Recruit Senko-san",
+        "reward": 10000,
+        "hidden": true,
+        "difficulty": 5,
+        "type": "recruit",
+        "character": "senko",
+        "rarity": "any"
+    },
+    "first_aiko": {
+        "name": "First Aiko",
+        "description": "Recruit Aiko",
+        "reward": 10000,
+        "hidden": true,
+        "difficulty": 5,
+        "type": "recruit",
+        "character": "aiko",
+        "rarity": "any"
+    },
+
+    // rarity achievements
+    "first_bronze": {
+        "name": "First Bronze",
+        "description": "Recruit your first Bronze worker",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "bronze"
+    },
+    "first_iron": {
+        "name": "First Iron",
+        "description": "Recruit your first Iron worker",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "iron"
+    },
+    "first_steel": {
+        "name": "First Steel",
+        "description": "Recruit your first Steel worker",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "steel"
+    },
+    "first_black": {
+        "name": "First Black",
+        "description": "Recruit your first Black worker",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "black"
+    },
+    "first_mithril": {
+        "name": "First Mithril",
+        "description": "Recruit your first Mithril worker",
+        "reward": 100,
+        "hidden": true,
+        "difficulty": 1,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "mithril"
+    },
+    "first_adamant": {
+        "name": "First Adamant",
+        "description": "Recruit your first Adamant worker",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "adamant"
+    },
+    "first_rune": {
+        "name": "First Rune",
+        "description": "Recruit your first Rune worker",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "rune"
+    },
+    "first_dragon": {
+        "name": "First Dragon",
+        "description": "Recruit your first Dragon worker",
+        "reward": 200,
+        "hidden": true,
+        "difficulty": 2,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "dragon"
+    },
+    "first_crystal": {
+        "name": "First Crystal",
+        "description": "Recruit your first Crystal worker",
+        "reward": 300,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "crystal"
+    },
+    "first_graceful": {
+        "name": "First Graceful",
+        "description": "Recruit your first Graceful worker",
+        "reward": 300,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "graceful"
+    },
+    "first_3a": {
+        "name": "First 3rd Age",
+        "description": "Recruit your first 3rd Age worker",
+        "reward": 500,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "3a"
+    },
+    "first_infernal": {
+        "name": "First Infernal",
+        "description": "Recruit your first Infernal worker",
+        "reward": 300,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "infernal"
+    },
+    "first_ancestral": {
+        "name": "First Ancestral",
+        "description": "Recruit your first Ancestral worker",
+        "reward": 300,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "ancestral"
+    },
+    "first_twisted": {
+        "name": "First Twisted",
+        "description": "Recruit your first Twisted worker",
+        "reward": 300,
+        "hidden": true,
+        "difficulty": 3,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "twisted"
+    },
+    "first_legendary": {
+        "name": "First Legendary",
+        "description": "Recruit your first Legendary worker",
+        "reward": 1000,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "legendary"
+    },
+    "first_golden_legendary": {
+        "name": "First Golden Legendary",
+        "description": "Recruit your first Golden Legendary worker",
+        "reward": 2000,
+        "hidden": true,
+        "difficulty": 4,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "golden_legendary"
+    },
+    "first_starlight": {
+        "name": "First Starlight",
+        "description": "Recruit your first Starlight worker",
+        "reward": 5000,
+        "hidden": true,
+        "difficulty": 5,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "starlight"
+    },
+    "first_divine": {
+        "name": "First Divine",
+        "description": "Recruit your first Divine Legendary worker",
+        "reward": 10000,
+        "hidden": true,
+        "difficulty": 5,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "divine"
+    },
+    "first_parallel": {
+        "name": "First Parallel",
+        "description": "Recruit your first Parallel Universe Stardust Enigmatic worker",
+        "reward": 50000,
+        "hidden": true,
+        "difficulty": 5,
+        "type": "recruit",
+        "character": "any",
+        "rarity": "parallel"
+    }
+};
+
+const achievement_difficulties = {
+    1: {
+        "name": "Beginner",
+        "color": "#00ff00"
+    },
+    2: {
+        "name": "Easy",
+        "color": "#ffcc00"
+    },
+    3: {
+        "name": "Medium",
+        "color": "#ff6600"
+    },
+    4: {
+        "name": "Hard",
+        "color": "#ff0000"
+    },
+    5: {
+        "name": "Master",
+        "color": "#cc00cc"
+    }
+};
+
+function completeAchievement(achievement_name) {
+    // sets the achievement as completed
+    if(completedAchievements.includes(achievement_name)) {
+        return;
+    }
+
+    let achievement = achievements[achievement_name];
+
+    // check if undefined
+    if (achievement === undefined || achievement === null) {
+        console.error("Achievement " + achievement_name + " does not exist");
+        return;
+    }
+
+    completedAchievements.push(achievement_name);
+
+
+
+
+    let reward = achievement.reward;
+    let diff = achievement_difficulties[achievement.difficulty];
+    let color = diff.color;
+    let diff_name = diff.name;
+    addCoins(reward);
+
+    reward = numToOsrs(reward);
+
+    // create a message box
+    let messageBox = document.createElement("div");
+    messageBox.classList.add("achievement-box");
+    let title = diff_name + " Achievement Unlocked!";
+    let description = achievement.name + ": " + achievement.description;
+    let rewardText = "Reward: " + reward + " coins";
+
+    let titleElement = document.createElement("div");
+    titleElement.innerText = title;
+    titleElement.style.color = color;
+    titleElement.classList.add("achievement-title");
+    messageBox.appendChild(titleElement);
+
+    let descriptionElement = document.createElement("div");
+    descriptionElement.innerText = description;
+    descriptionElement.classList.add("achievement-description");
+    messageBox.appendChild(descriptionElement);
+
+    let rewardElement = document.createElement("div");
+    rewardElement.innerText = rewardText;
+
+    rewardElement.classList.add("achievement-reward");
+    messageBox.appendChild(rewardElement);
+
+    document.body.appendChild(messageBox);
+
+    setTimeout(() => {
+        document.body.removeChild(messageBox);
+    }
+    , 5000);
+}
+
 
 // tree data
 const trees = {
@@ -2769,8 +3696,23 @@ function updateWorkerStorageUI() {
     }
 }
 
+function setCoins(num) {
+    coins = num;
+    fnu43funfe = coins;
+
+    updateUI();
+}
+
+function addCoins(num) {
+    coins += num;
+    fnu43funfe = coins;
+
+    updateUI();
+}
+
 function gainXP(amount) {
     xp += amount;
+    grset54tas = xp;
     while (xp >= xpForLevel(level + 1)) {
         levelUp();
     }
@@ -2779,6 +3721,7 @@ function gainXP(amount) {
 
 function levelUp() {
     level++;
+    f45g9e7hge = level;
     xpForNextLevel = xpForLevel(level + 1);
     playSound("Woodcutting_level_up.oga");
 }
@@ -2804,7 +3747,7 @@ function cutTree() {
         let logGain = tree.coins;
         gainXP(xpGain);
         spawnXpDrop(treeData.x, treeData.y, xpGain);
-        coins += logGain;
+        addCoins(logGain);
         treeData.respawnTime = tree.respawnTime;
 
         if (getRand() < tree.depletionChance) {
@@ -2841,7 +3784,7 @@ function recruitHandler(event) {
         }
     }
 
-    coins -= cost;
+    addCoins(-cost);
 
     let new_worker = pullCharacter();
 
@@ -2907,7 +3850,7 @@ function plantTreeHandler(event) {
         return;
     }
 
-    coins -= getNextTreeCost();
+    addCoins(-getNextTreeCost());
     addTree();
     updateUI();
 }
@@ -2941,7 +3884,7 @@ function buyXpHandler(event, multiplier = 1) {
         return;
     }
 
-    coins -= xpCost;
+    addCoins(-xpCost);
     for (let i = 0; i < selected.length; i++) {
         let workerIndex = selected[i];
         let workerData = worker[workerIndex];
@@ -2968,6 +3911,9 @@ document.addEventListener('contextmenu', cancelRightClicks);
 
 let saveTimer = 0;
 function tick() {
+
+    verify_state();
+
     time += tickRate;
     tickCount++;
     saveTimer += tickRate;
