@@ -177,9 +177,7 @@ function saveToServer(saveData) {
             'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: {
-            "data": saveData
-        }
+        body: JSON.stringify(saveData)
     });
 }
 
@@ -199,6 +197,8 @@ const load = async () => {
                 },
                 credentials: 'include'
             });
+
+            serverData = await serverData.json();
         }
     }
     catch (error) {
