@@ -89,9 +89,14 @@ function resetEverything() {
     activeTree = null;
     completedAchievements = [];
     saveId = crypto.randomUUID();
+
+    treeDiv.innerHTML = "";
+
     initTrees();
     save();
-    location.reload();
+
+    updateUI();
+    
 }
 
 
@@ -217,7 +222,7 @@ const load = async () => {
     if (saveData === null) {
         // if no save data, reset everything
         console.log("No save data found, resetting everything");
-        resetEverything();
+        // resetEverything();
         return;
     }
 
@@ -4370,8 +4375,8 @@ function tick() {
 }
 
 async function main() {
-    await load();
     initRarities();
+    await load();
     initTrees();
     // Initial UI update
     updateUI();
