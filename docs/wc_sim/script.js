@@ -183,8 +183,47 @@ function saveToServer(saveData) {
     });
 }
 
-function load() {
+const load = async () => {
+
+    let serverData = {};
+    // first, try to load from server
+    try {
+        let logged_in = await is_logged_in(true);
+        
+        if (logged_in) {
+            console.log("Logged in, loading from server");
+            serverData = await fetch(`${API_URL}/load_wc_sim`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+        }
+    }
+    catch (error) {
+        console.error("Error loading from server, loading from local storage");
+    }
+
+
     let saveData = JSON.parse(localStorage.getItem('saveData'));
+
+    // if server data is newer, use that
+    // if different saveIds, use server data
+    // if same saveIds, use newer data
+    
+    let server_data_id = serverData.saveId;
+    if (server_data_id !== undefined && server_data_id !== null) {
+        if (saveData.saveId !== server_data_id) {
+            console.log("Server data is newer, using that");
+            saveData = serverData;
+        } else {
+            if (serverData.time > saveData.time) {
+                console.log("Server data is newer, using that");
+                saveData = serverData;
+            }
+        }
+    }
 
     // verify the save data
     let saveDataNoHash = { ...saveData };
