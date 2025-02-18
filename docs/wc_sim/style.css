@@ -294,8 +294,9 @@ button:disabled {
     border: 3px solid black;
     font-size: 16px;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 10%;
+    transform: translate(-50%, 0%);
+    z-index: 200;
 }
 
 .achievement-title {
@@ -506,10 +507,9 @@ button:disabled {
 
 .floating-window-content {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: block;
+    width: 100%;
+    height: 100%;
     border: none;
     padding: none;
     margin: none;
@@ -557,7 +557,7 @@ button:disabled {
 }
 
 .dialog::backdrop {
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(0px);
     /* no events on the backdrop */
     pointer-events: none;
 }
@@ -775,7 +775,7 @@ button:disabled {
 }
 
 .character-roll-card::backdrop {
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(0px);
     /* no events on the backdrop */
     pointer-events: none;
     animation: backdropAnimation 3s ease-in-out 1;
@@ -1003,4 +1003,46 @@ div > .rarity-list {
     background-color: rgb(61, 66, 56);
     cursor: pointer;
     border-radius: 3px;
+}
+
+.achievements-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    height: 70vh;
+    width: 90vw;
+    max-width: 800px;
+    overflow-x: show;
+    position: relative;
+    overflow-y: auto;
+}
+
+.achievement {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    font-size: 36px;
+    width: 100%;
+}
+
+.achievement > div:first-child {
+    margin-top: 10px;
+    margin-right: 100px;
+}
+
+.achievement:nth-child(odd) {
+    background-color: rgb(40, 46, 34);
+}
+
+.achievement:nth-child(even) {
+    background-color: rgb(61, 66, 56);
+}
+
+.completed {
+    color: green;
 }

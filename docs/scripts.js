@@ -99,6 +99,23 @@ function login(redirect=null) {
     }
 }
 
+function logout() {
+    // logout function
+    // go to api logout endpoint
+    let logout_endpoint = `${API_URL}/logout`;
+    fetch(logout_endpoint, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    })
+
+    // remove user
+    localStorage.removeItem('user');
+}
+
+
 function login_button_setup() {
     // setup login button
     var login_button = document.getElementById('login-button');

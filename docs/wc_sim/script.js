@@ -11,7 +11,7 @@ let upgradeCost = 10;
 let tickCooldown = 0;
 let time = 0;
 let tickCount = 0;
-let version = "0.1.0";
+let version = "0.2.0";
 let startTime = Date.now();
 let playerId = Math.floor(Math.random() * 1000000);
 let saveId = crypto.randomUUID();
@@ -87,6 +87,7 @@ function resetEverything() {
     characterDex = {};
     rarityDex = {};
     activeTree = null;
+    completedAchievements = [];
     saveId = crypto.randomUUID();
     initTrees();
     save();
@@ -114,6 +115,7 @@ function save() {
         characterDex: characterDex,
         rarityDex: rarityDex,
         saveId: saveId,
+        completedAchievements: completedAchievements,
         trees: treeField.map(tree => {
             let treeKey = Object.keys(trees).find(key => trees[key].name === tree.tree.name);
             return {
@@ -160,6 +162,25 @@ function save() {
     saveData.hash = saveDataHash;
 
     localStorage.setItem('saveData', JSON.stringify(saveData));
+
+    // check if logged in, if so, save to server as well
+
+    if(LOGGED_IN) {
+        saveToServer(saveData);
+    }
+}
+
+function saveToServer(saveData) {
+    fetch(`${API_URL}/save_wc_sim`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: {
+            "data": saveData
+        }
+    });
 }
 
 function load() {
@@ -183,15 +204,22 @@ function load() {
         // always check if saveData has the property defined
         if (saveData.level) {
             level = saveData.level;
+            f45g9e7hge = saveData.level;
         }
         if (saveData.xp) {
             xp = saveData.xp;
+            grset54tas = saveData.xp;
+
         }
         if (saveData.xpForNextLevel) {
             xpForNextLevel = saveData.xpForNextLevel;
         }
         if (saveData.coins) {
             coins = saveData.coins;
+            fnu43funfe = saveData.coins;
+        }
+        if (saveData.completedAchievements) {
+            completedAchievements = saveData.completedAchievements;
         }
         if (saveData.axeLevel) {
             axeLevel = saveData.axeLevel;
@@ -290,16 +318,16 @@ function sfc32(a, b, c, d) {
 
 const cyrb53 = (str, seed = 0) => {
     let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    for(let i = 0, ch; i < str.length; i++) {
+    for (let i = 0, ch; i < str.length; i++) {
         ch = str.charCodeAt(i);
         h1 = Math.imul(h1 ^ ch, 2654435761);
         h2 = Math.imul(h2 ^ ch, 1597334677);
     }
-    h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
     h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
     h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  
+
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 };
 
@@ -622,7 +650,7 @@ const achievements = {
         "description": "Reach level 99",
         "reward": 1000,
         "hidden": false,
-        "difficulty": 6,
+        "difficulty": 5,
         "type": "level",
         "level": 99
     },
@@ -1222,9 +1250,215 @@ const achievement_difficulties = {
     }
 };
 
+function showAchievementsList() {
+    // shows the achievements list in a window
+    let achievementsList = document.createElement("div");
+    achievementsList.classList.add("achievements-list");
+
+    // first show completed achievements
+    let completed_achievements = [];
+    let not_completed_achievements = [];
+
+    // iterate through achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        let completed = completedAchievements.includes(achievement_name);
+        if (completed) {
+            completed_achievements.push(achievement);
+        } else {
+            not_completed_achievements.push(achievement);
+        }
+    }
+
+    // sort by hidden -> difficulty -> name
+    completed_achievements.sort((a, b) => {
+        if (a.hidden && !b.hidden) {
+            return 1;
+        } else if (!a.hidden && b.hidden) {
+            return -1;
+        } else if (a.difficulty !== b.difficulty) {
+            return a.difficulty - b.difficulty;
+        }
+        return a.name.localeCompare(b.name);
+    });
+
+    not_completed_achievements.sort((a, b) => {
+        if (a.hidden && !b.hidden) {
+            return 1;
+        } else if (!a.hidden && b.hidden) {
+            return -1;
+        } else if (a.difficulty !== b.difficulty) {
+            return a.difficulty - b.difficulty;
+        }
+        return a.name.localeCompare(b.name);
+    });
+
+    // add completed achievements
+    for (let achievement of completed_achievements) {
+        let achievementDiv = document.createElement("div");
+        achievementDiv.classList.add("achievement");
+        achievementDiv.classList.add("completed");
+        let a_name = achievement.name;
+        let a_description = achievement.description;
+        let a_difficulty = achievement_difficulties[achievement.difficulty].name;
+        let a_reward = numToOsrs(achievement.reward);
+        let achievement_name_div = document.createElement("div");
+        achievement_name_div.innerText = a_name;
+        achievement_name_div.style.color = achievement_difficulties[achievement.difficulty].color;
+        achievementDiv.appendChild(achievement_name_div);
+        let achievement_description_div = document.createElement("div");
+        achievement_description_div.innerText = a_description + " (" + a_difficulty + ") - Reward: " + a_reward + " coins";
+        achievementDiv.appendChild(achievement_description_div);
+        achievementsList.appendChild(achievementDiv);
+    }
+
+    // add not completed achievements
+    for (let achievement of not_completed_achievements) {
+        let achievementDiv = document.createElement("div");
+        achievementDiv.classList.add("achievement");
+        let a_name = achievement.name;
+        let a_description = achievement.description;
+        let a_difficulty = achievement_difficulties[achievement.difficulty].name;
+        let a_reward = numToOsrs(achievement.reward);
+
+        if (achievement.hidden) {
+            achievementDiv.classList.add("hidden");
+            a_name = "???";
+            a_description = "???";
+            a_difficulty = "???";
+            a_reward = "???";
+        }
+
+        let achievement_name_div = document.createElement("div");
+        achievement_name_div.innerText = a_name;
+        achievement_name_div.style.color = achievement_difficulties[achievement.difficulty].color;
+        achievementDiv.appendChild(achievement_name_div);
+        let achievement_description_div = document.createElement("div");
+        achievement_description_div.innerText = a_description + " (" + a_difficulty + ") - Reward: " + a_reward + " coins";
+        achievementDiv.appendChild(achievement_description_div);
+
+        achievementsList.appendChild(achievementDiv);
+    }
+
+    createWindow(achievementsList, "Achievements");
+}
+
+
+function checkRecruitAchievements(new_worker) {
+    // check for recruit achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        if (achievement.type !== "recruit") {
+            continue;
+        }
+        if (completedAchievements.includes(achievement_name)) {
+            continue;
+        }
+        if (achievement.character === new_worker.character || achievement.character === "any") {
+            if (achievement.rarity === new_worker.rarity || achievement.rarity === "any") {
+                completeAchievement(achievement_name);
+            }
+        }
+
+    }
+}
+
+function checkCoinAchievements(coins) {
+    // check for coin achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        if (achievement.type !== "coins") {
+            continue;
+        }
+        if (completedAchievements.includes(achievement_name)) {
+            continue;
+        }
+        if (coins >= achievement.amount) {
+            completeAchievement(achievement_name);
+        }
+    }
+}
+
+function checkLevelAchievements(level) {
+    // check for level achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        if (achievement.type !== "level") {
+            continue;
+        }
+        if (completedAchievements.includes(achievement_name)) {
+            continue;
+        }
+        if (level >= achievement.level) {
+            completeAchievement(achievement_name);
+        }
+
+    }
+}
+
+function checkChopAchievements(tree) {
+    // check for chop achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        if (achievement.type !== "chop") {
+            continue;
+        }
+        if (completedAchievements.includes(achievement_name)) {
+            continue;
+        }
+        let tree_name = trees[achievement.chop].name;
+        if (tree_name  === tree) {
+            completeAchievement(achievement_name);
+        }
+    }
+}
+
+function checkPlantAchievements(tree) {
+    // check for plant achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        if (achievement.type !== "plant") {
+            continue;
+        }
+        if (completedAchievements.includes(achievement_name)) {
+            continue;
+        }
+        if (achievement.tree !== undefined) {
+            let tree_name = trees[achievement.tree]?.name ?? "idk";
+            if (tree_name  === tree || achievement.tree === "any") {
+                completeAchievement(achievement_name);
+            }
+        } else if (achievement.amount !== undefined) {
+            let totalPlanted = treeField.length - 6;
+            if (achievement.amount <= totalPlanted) {
+                completeAchievement(achievement_name);
+            }
+        }
+    }
+}
+
+function checkCraftAchievements(worker) {
+    // check for craft achievements
+    for (let achievement_name in achievements) {
+        let achievement = achievements[achievement_name];
+        if (achievement.type !== "craft") {
+            continue;
+        }
+        if (completedAchievements.includes(achievement_name)) {
+            continue;
+        }
+        if (achievement.character === worker.character || achievement.character === "any") {
+            if (achievement.rarity === worker.rarity || achievement.rarity === "any") {
+                completeAchievement(achievement_name);
+            }
+        }
+    }
+}
+
+
 function completeAchievement(achievement_name) {
     // sets the achievement as completed
-    if(completedAchievements.includes(achievement_name)) {
+    if (completedAchievements.includes(achievement_name)) {
         return;
     }
 
@@ -1278,8 +1512,87 @@ function completeAchievement(achievement_name) {
     setTimeout(() => {
         document.body.removeChild(messageBox);
     }
-    , 5000);
+        , 5000);
 }
+
+// highscores
+function showHighscores(title, subtitle, scores) {
+    // scores is a list of: {name: "name", score: 1234, character: object}
+    // character can be null. If not, left click opens character card
+    let highscoresDiv = document.createElement("div");
+    highscoresDiv.classList.add("highscores");
+
+    let titleDiv = document.createElement("div");
+    titleDiv.innerText = title;
+    titleDiv.classList.add("highscores-title");
+    highscoresDiv.appendChild(titleDiv);
+
+    if (subtitle !== null) {
+        let subtitleDiv = document.createElement("div");
+        subtitleDiv.innerText = subtitle;
+        subtitleDiv.classList.add("highscores-subtitle");
+        highscoresDiv.appendChild(subtitleDiv);
+    }
+
+    let scoresDiv = document.createElement("div");
+    scoresDiv.classList.add("highscores-scores");
+
+    // sort scores
+    scores.sort((a, b) => {
+        return b.score - a.score;
+    });
+
+    for (let i = 0; i < scores.length; i++) {
+        let score = scores[i];
+        let scoreDiv = document.createElement("div");
+        scoreDiv.classList.add("highscores-score");
+
+        let rankDiv = document.createElement("div");
+        rankDiv.classList.add("highscores-rank");
+        rankDiv.innerText = (i + 1) + ".";
+        scoreDiv.appendChild(rankDiv);
+
+        let nameDiv = document.createElement("div");
+        nameDiv.classList.add("highscores-name");
+        nameDiv.innerText = score.name;
+        scoreDiv.appendChild(nameDiv);
+
+        let scoreDiv2 = document.createElement("div");
+        scoreDiv2.classList.add("highscores-score2");
+        scoreDiv2.innerText = numToOsrs(score.score);
+        scoreDiv.appendChild(scoreDiv2);
+
+        if (score.character !== null) {
+            scoreDiv.addEventListener("click", () => {
+                createCharacterWindow(score.character);
+            });
+            scoreDiv.classList.add("clickable");
+        }
+
+        scoresDiv.appendChild(scoreDiv);
+    }
+
+    highscoresDiv.appendChild(scoresDiv);
+
+    createWindow(highscoresDiv, "Highscores");
+}
+
+// test highscores with local characters
+function testHighscores() {
+    let scores = [];
+    for (let i = 0; i < worker_storage.length; i++) {
+        let character = worker_storage[i];
+        console.log(character);
+        let score = Math.floor(Math.random() * 1000000);
+        let rarity_name = rarities[character.rarity].name;
+        let character_name = characters[character.character].name;
+        let full_name = rarity_name + " " + character_name;
+        scores.push({name: full_name, score: score, character: character});
+    }
+
+    showHighscores("Test Highscores", "Test subtitle", scores);
+}
+
 
 
 // tree data
@@ -2112,7 +2425,7 @@ function addToDex(character, rarity) {
     else {
         rarityDex[rarity]++;
     }
-    
+
 }
 
 function pullCharacter() {
@@ -2305,7 +2618,7 @@ function craftWithSelected() {
     // fill the active workers with workers from the storage
     for (let i = 0; i < worker.length; i++) {
         if (worker[i] === null) {
-            if( worker_storage.length > 0) {
+            if (worker_storage.length > 0) {
                 worker[i] = worker_storage.pop();
             } else {
                 break;
@@ -2337,6 +2650,27 @@ function createCharacterWindow(character) {
     return window;
 }
 
+function getStarCount(character, rarity) {
+    let rarityValue = rarities[rarity].rarity * 10;
+    let starCount = 1;
+    while (rarityValue < 1) {
+        rarityValue *= 5;
+        // add star
+        starCount++;
+    }
+
+    rarityValue = characters[character].rarity * 10;
+    while (rarityValue < 1) {
+        rarityValue *= 5;
+        // add star
+        starCount++;
+    }
+
+    starCount = Math.min(starCount, 10);
+
+    return starCount;
+}
+
 function showRarities() {
     let allRarities = rarities;
     // sort rarities by weight
@@ -2348,7 +2682,7 @@ function showRarities() {
         return b[1] - a[1];
     });
 
-    for(let i = 0; i < sortable.length; i++) {
+    for (let i = 0; i < sortable.length; i++) {
         let rarity = sortable[i][0];
         if (rarityDex[rarity]) {
             sortable[i].push(allRarities[rarity].name);
@@ -2362,7 +2696,7 @@ function showRarities() {
 
     for (let i = 0; i < sortable.length; i++) {
         let rarity = allRarities[sortable[i][0]].rarity;
-        rarity = numToOsrs(Math.round(1/rarity));
+        rarity = numToOsrs(Math.round(1 / rarity));
         let rarityStr = "1 / " + rarity;
         let rarityName = sortable[i][2];
         rarityStr = rarityName === "???" ? "???" : rarityStr;
@@ -2385,8 +2719,8 @@ function showRarities() {
 
             rarityElement.appendChild(tooltip);
         }
-        
-        
+
+
         rarityList.appendChild(rarityElement);
     }
 
@@ -2419,7 +2753,7 @@ function showCharacters() {
 
     for (let i = 0; i < sortable.length; i++) {
         let rarity = allChars[sortable[i][0]].rarity;
-        rarity = numToOsrs(Math.round(1/rarity));
+        rarity = numToOsrs(Math.round(1 / rarity));
         let rarityStr = "1 / " + rarity;
         let charName = sortable[i][2];
         rarityStr = charName === "???" ? "???" : rarityStr;
@@ -2440,8 +2774,8 @@ function showCharacters() {
 
             charElement.appendChild(tooltip);
         }
-        
-        
+
+
         charList.appendChild(charElement);
     }
 
@@ -2494,7 +2828,7 @@ function createWindow(element, title, onClose) {
         document.onmousemove = null;
         document.onkeydown = null;
         document.body.removeChild(window);
-        if(onClose) {
+        if (onClose) {
             onClose();
         }
     }
@@ -2517,7 +2851,7 @@ function createWindow(element, title, onClose) {
 
     titlebar.appendChild(windowClose);
     window.appendChild(titlebar);
-    
+
     window.appendChild(windowContent);
     document.body.appendChild(window);
 
@@ -2575,8 +2909,8 @@ function createDialog(title, content, onClose) {
     }
     let dialogContent = document.createElement("div");
     dialogContent.classList.add("dialog-content");
-    if(typeof content === "string") {
-    dialogContent.innerText = content;
+    if (typeof content === "string") {
+        dialogContent.innerText = content;
     } else {
         dialogContent.appendChild(content);
     }
@@ -2625,7 +2959,7 @@ function createCharacterCard(character) {
     let characterName = document.createElement("div");
     characterName.classList.add("character-roll-name");
     characterName.innerText = characters[character.character].name + " Lv. " + character.level;
-    let characterTrueRarity = 1 /characters[character.character].rarity;
+    let characterTrueRarity = 1 / characters[character.character].rarity;
     characterTrueRarity = numToOsrs(Math.round(characterTrueRarity));
     let characterTrueRarityStr = "1 / " + characterTrueRarity;
     let nameTooltip = document.createElement("div");
@@ -3016,7 +3350,8 @@ class Worker {
         this.addXp(xpGain);
         spawnXpDrop(this.x, this.y, xpGain + " (+" + playerXpGain + ")");
         let logGain = treeData.coins * (1 + this.stats.trading / 50);
-        coins += Math.floor(logGain);
+        logGain = Math.floor(logGain);
+        addCoins(logGain);
 
         if (getRand() < treeData.depletionChance) {
             let element = tree.element;
@@ -3413,6 +3748,8 @@ function addTree() {
 
     treeField.push(treeData);
 
+    return treeData;
+
 }
 
 function addTreeOfType(treeType, x, y) {
@@ -3700,12 +4037,16 @@ function setCoins(num) {
     coins = num;
     fnu43funfe = coins;
 
+    checkCoinAchievements(coins);
+
     updateUI();
 }
 
 function addCoins(num) {
     coins += num;
     fnu43funfe = coins;
+
+    checkCoinAchievements(coins);
 
     updateUI();
 }
@@ -3721,6 +4062,7 @@ function gainXP(amount) {
 
 function levelUp() {
     level++;
+    checkLevelAchievements(level);
     f45g9e7hge = level;
     xpForNextLevel = xpForLevel(level + 1);
     playSound("Woodcutting_level_up.oga");
@@ -3743,6 +4085,9 @@ function cutTree() {
     let cutSuccess = rollTreeCut(level, axePower, tree.difficulty);
 
     if (cutSuccess) {
+
+        checkChopAchievements(tree.name);
+
         let xpGain = tree.xp;
         let logGain = tree.coins;
         gainXP(xpGain);
@@ -3805,6 +4150,8 @@ function recruitHandler(event) {
         }
     }
 
+    checkRecruitAchievements(new_worker);
+
     console.log(new_worker);
     updateUI();
     save(); // save after recruiting to prevent save scumming
@@ -3830,6 +4177,10 @@ function craftHandler(event) {
         let y = event.clientY - 100;
         showMessageBoxAtPos(newWorkerString, x, y);
         */
+
+        checkCraftAchievements(newWorker);
+        checkRecruitAchievements(newWorker);
+
         save(); // save after crafting to prevent save scumming
     }
 }
@@ -3851,7 +4202,8 @@ function plantTreeHandler(event) {
     }
 
     addCoins(-getNextTreeCost());
-    addTree();
+    let treeData = addTree();
+    checkPlantAchievements(treeData.tree.name);
     updateUI();
 }
 

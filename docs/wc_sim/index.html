@@ -23,6 +23,9 @@
             <dialog id="guide" class="dialog">
                 <button class="ui-button dialog-close" onclick="closeGuide();">X</button>
                 <h2>Menu</h2>
+                <button id="login-button" class="ui-button" onclick="loginFromMenu();">Login</button>
+                <button class="ui-button" onclick="closeAndShowHighscores();">Show Highscores</button>
+                <button class="ui-button" onclick="closeAndShowAchievements();">Show Achievements</button>
                 <button class="ui-button" onclick="closeAndShowRarities();">Show Rarities</button>
                 <button class="ui-button" onclick="closeAndShowCharacters();">Show Characters</button>
                 <button class="ui-button" onclick="toggleRollAnimation();">Toggle Recruit Animation</button>
@@ -149,6 +152,7 @@
 
     </div>
     <script src="script.js"></script>
+    <script src="/scripts.js"></script>
     <script>
         function openGuide() {
             document.getElementById("guide").showModal();
@@ -210,6 +214,49 @@
             closeGuide();
             showRarities();
         }
+
+        function closeAndShowAchievements() {
+            closeGuide();
+            showAchievementsList();
+        }
+
+        function closeAndShowHighscores() {
+            closeGuide();
+            showHighscores();
+        }
+
+        function loginFromMenu() {
+            closeGuide();
+            save();
+            login(redirect="/wc_sim");
+        }
+
+        var LOGGED_IN = false;
+
+        function logoutFromMenu() {
+            closeGuide();
+            save();
+            logout();
+            LOGGED_IN = false;
+        }
+
+        
+
+        async function login_or_logout_button() {
+            let button = document.getElementById("login-button");
+
+            let logged_in = await is_logged_in(true);
+            LOGGED_IN = logged_in;
+            if (logged_in) {
+                button.innerText = "Logout";
+                button.onclick = logoutFromMenu;
+            } else {
+                button.innerText = "Login";
+                button.onclick = loginFromMenu;
+            }
+        }
+
+        window.onload = login_or_logout_button;
 
     </script>
 </body>
