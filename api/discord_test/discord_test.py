@@ -394,16 +394,42 @@ async def save_wc_sim(request: Request):
 
     existing_data = get_data(user_id, "wc_sim", None)
 
-    if existing_data:
+    if existing_data and existing_data.get("saveId", None):
         # TODO: maybe do some checks to avoid overwriting data
-        pass
+        save_id = data.get("saveId", None) # unique id for each save
+        passed_time = data.get("time", 0) # time passed in a save
+        if save_id:
+            existing_save_id = existing_data.get("saveId", None)
+            existing_passed_time = existing_data.get("time", 0)
+            if existing_save_id and existing_save_id != save_id:
+                raise HTTPException(status_code=400, detail="Tried to overwrite existing save with a different saveId. Reset the save first.")
+            if existing_passed_time > passed_time:
+                raise HTTPException(status_code=400, detail="Tried to save with a lower time than existing save. Did the save not load properly from the server?")
+        else:
+            raise HTTPException(status_code=400, detail="saveId is required to save data")
+        
 
+    # if were here, there is either no existing data or the new data is the newer version of the existing data
     set_data(user_id, "wc_sim", data)
 
     # update highscores
     wc_highscores.update_player(user_id, DATABASE[user_id]["user"]["name"], data)
 
     return {"message": "Data stored successfully"}
+
+@app.post("/reset_wc_sim")
+async def reset_wc_sim(request: Request):
+    """Store data securely for a logged-in user"""
+    session_token = request.cookies.get("session_token")
+
+    if not session_token or session_token not in SESSION_DB:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    user_id = SESSION_DB[session_token]
+
+    set_data(user_id, "wc_sim", {})
+
+    return {"message": "Data reset successfully"}
 
 @app.get("/load_wc_sim")
 async def load_wc_sim(request: Request):

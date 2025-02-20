@@ -65,7 +65,20 @@ function verify_state() {
 
 
 
-function resetEverything() {
+async function resetEverything() {
+
+    if(LOGGED_IN) {
+        // reset server save by sending request to reset endpoint
+        let response = await fetch(`${API_URL}/reset_wc_sim`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+    }
+
     level = 1;
     f45g9e7hge = 1;
     xp = 0;
